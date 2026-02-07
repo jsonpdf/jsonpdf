@@ -3,11 +3,15 @@ import { PDFDocument, StandardFonts } from 'pdf-lib';
 import type { PDFFont, PDFPage } from 'pdf-lib';
 import { linePlugin } from '../../src/line/line-plugin.js';
 import { fontKey } from '../../src/types.js';
-import type { MeasureContext, RenderContext, FontMap } from '../../src/types.js';
+import type { MeasureContext, RenderContext, FontMap, ImageCache } from '../../src/types.js';
 import type { Style } from '@jsonpdf/core';
 
+let doc: PDFDocument;
 let page: PDFPage;
 let fonts: FontMap;
+const noopImageCache: ImageCache = {
+  getOrEmbed: () => Promise.reject(new Error('no images in test')),
+};
 
 const defaultStyle: Style = {
   fontFamily: 'Helvetica',
@@ -18,7 +22,7 @@ const defaultStyle: Style = {
 };
 
 beforeAll(async () => {
-  const doc = await PDFDocument.create();
+  doc = await PDFDocument.create();
   const helvetica = await doc.embedFont(StandardFonts.Helvetica);
   page = doc.addPage([612, 792]);
   fonts = new Map();
@@ -32,6 +36,8 @@ function makeMeasureCtx(overrides?: Partial<MeasureContext>): MeasureContext {
     availableHeight: 100,
     resolveStyle: () => defaultStyle,
     elementStyle: defaultStyle,
+    pdfDoc: doc,
+    imageCache: noopImageCache,
     ...overrides,
   };
 }

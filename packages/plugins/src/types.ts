@@ -1,5 +1,17 @@
-import type { PDFFont, PDFPage } from 'pdf-lib';
+import type { PDFDocument, PDFFont, PDFImage, PDFPage } from 'pdf-lib';
 import type { Style, JSONSchema, ValidationError } from '@jsonpdf/core';
+
+/** An embedded image with its natural dimensions. */
+export interface EmbeddedImage {
+  image: PDFImage;
+  width: number;
+  height: number;
+}
+
+/** Cache for embedded images. Deduplicates loads for the same src. */
+export interface ImageCache {
+  getOrEmbed(src: string, doc: PDFDocument): Promise<EmbeddedImage>;
+}
 
 /** Map of font key to embedded PDFFont. */
 export type FontMap = Map<string, PDFFont>;
@@ -25,6 +37,10 @@ export interface MeasureContext {
   resolveStyle: (name: string) => Style;
   /** The element's computed style (defaults + named + overrides merged). */
   elementStyle: Style;
+  /** The pdf-lib document (needed for embedding images). */
+  pdfDoc: PDFDocument;
+  /** Image cache for deduplicating image loads. */
+  imageCache: ImageCache;
 }
 
 /** Context available during the render pass. */

@@ -1,8 +1,10 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 import { layoutTemplate } from '../src/layout.js';
-import { PluginRegistry, textPlugin, linePlugin, listPlugin, fontKey } from '@jsonpdf/plugins';
-import type { FontMap, Plugin } from '@jsonpdf/plugins';
+import {
+  PluginRegistry, textPlugin, linePlugin, listPlugin, fontKey, createImageCache,
+} from '@jsonpdf/plugins';
+import type { FontMap, Plugin, ImageCache } from '@jsonpdf/plugins';
 import { createTemplate, addSection, addBand, addElement, addStyle } from '@jsonpdf/template';
 import { createExpressionEngine } from '../src/expression.js';
 import type { ExpressionEngine } from '../src/expression.js';
@@ -10,6 +12,8 @@ import type { ExpressionEngine } from '../src/expression.js';
 let fonts: FontMap;
 let registry: PluginRegistry;
 let engine: ExpressionEngine;
+let pdfDoc: PDFDocument;
+let imageCache: ImageCache;
 
 beforeAll(async () => {
   registry = new PluginRegistry();
@@ -17,12 +21,13 @@ beforeAll(async () => {
   registry.register(linePlugin);
   registry.register(listPlugin);
 
-  const doc = await PDFDocument.create();
-  const helvetica = await doc.embedFont(StandardFonts.Helvetica);
+  pdfDoc = await PDFDocument.create();
+  const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
   fonts = new Map();
   fonts.set(fontKey('Helvetica', 'normal', 'normal'), helvetica);
 
   engine = createExpressionEngine();
+  imageCache = createImageCache();
 });
 
 function getPlugin(type: string): Plugin {
@@ -30,7 +35,7 @@ function getPlugin(type: string): Plugin {
 }
 
 function doLayout(template: ReturnType<typeof createTemplate>, data = {}, totalPagesHint = 0) {
-  return layoutTemplate(template, fonts, getPlugin, engine, data, totalPagesHint);
+  return layoutTemplate(template, fonts, getPlugin, engine, data, totalPagesHint, pdfDoc, imageCache);
 }
 
 describe('layoutTemplate: backward-compatible body band tests', () => {
