@@ -14,3 +14,4 @@ export {
 export { loadFontBytes } from './font-loader.js';
 export { collectAnchors } from './anchors.js';
 export { buildPdfOutline, type BookmarkEntry } from './bookmarks.js';
+export { computeColumnLayout, type ColumnLayout } from './columns.js';

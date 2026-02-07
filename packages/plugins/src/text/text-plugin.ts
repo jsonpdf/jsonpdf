@@ -3,7 +3,7 @@ import { parseColor } from '@jsonpdf/core';
 import type { RichContent, StyledRun, Style, ValidationError, JSONSchema } from '@jsonpdf/core';
 import type { Plugin, MeasureContext, RenderContext } from '../types.js';
 import { getFont, getLineHeight } from '../utils.js';
-import { wrapText, measureTextWidth } from './word-wrap.js';
+import { wrapText, measureTextWidth, type WrapOptions } from './word-wrap.js';
 
 export interface TextProps {
   content: RichContent;
@@ -79,7 +79,8 @@ function measurePlainText(text: string, ctx: MeasureContext): { width: number; h
   const font = getFont(ctx.fonts, style);
   const fontSize = style.fontSize ?? 12;
   const lh = getLineHeight(style);
-  const result = wrapText(text, font, fontSize, ctx.availableWidth, lh);
+  const wrapOpts: WrapOptions = { widows: style.widows, orphans: style.orphans };
+  const result = wrapText(text, font, fontSize, ctx.availableWidth, lh, wrapOpts);
   return { width: ctx.availableWidth, height: result.height };
 }
 
@@ -89,8 +90,9 @@ function renderPlainText(text: string, ctx: RenderContext): void {
   const fontSize = style.fontSize ?? 12;
   const lh = getLineHeight(style);
   const color = parseColor(style.color ?? '#000000');
+  const wrapOpts: WrapOptions = { widows: style.widows, orphans: style.orphans };
 
-  const wrapped = wrapText(text, font, fontSize, ctx.width, lh);
+  const wrapped = wrapText(text, font, fontSize, ctx.width, lh, wrapOpts);
   const ascent = font.heightAtSize(fontSize, { descender: false });
 
   for (let i = 0; i < wrapped.lines.length; i++) {

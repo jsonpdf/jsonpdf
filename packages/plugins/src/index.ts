@@ -24,7 +24,7 @@ export { getFont, getLineHeight } from './utils.js';
 
 // Text plugin
 export { textPlugin, type TextProps } from './text/text-plugin.js';
-export { wrapText, measureTextWidth } from './text/word-wrap.js';
+export { wrapText, measureTextWidth, type WrapOptions } from './text/word-wrap.js';
 
 // Line plugin
 export { linePlugin, type LineProps } from './line/line-plugin.js';
