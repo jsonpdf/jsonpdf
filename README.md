@@ -148,11 +148,11 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 
 ### Phase 4: CLI
 
-- [ ] `jsonpdf init` — scaffold template
-- [ ] `jsonpdf validate` — validate template
-- [ ] `jsonpdf render` — render PDF
-- [ ] `jsonpdf sample-data` — generate sample data from dataSchema
-- [ ] Watch mode (`--watch`)
+- [x] `jsonpdf init` — scaffold template
+- [x] `jsonpdf validate` — validate template
+- [x] `jsonpdf render` — render PDF
+- [x] `jsonpdf sample-data` — generate sample data from dataSchema
+- [x] Watch mode (`--watch`)
 
 ### Phase 5: Advanced Plugins
 
