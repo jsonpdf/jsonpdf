@@ -1,4 +1,11 @@
-import { PDFDocument, rgb } from 'pdf-lib';
+import {
+  PDFDocument,
+  rgb,
+  pushGraphicsState,
+  popGraphicsState,
+  rotateDegrees,
+  translate,
+} from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import type { Template } from '@jsonpdf/core';
 import { parseColor, validateTemplateSchema } from '@jsonpdf/core';
@@ -14,8 +21,11 @@ import {
 import { embedFonts, collectFontSpecs } from './fonts.js';
 import { layoutTemplate, mergePageConfig } from './layout.js';
 import { createRenderContext } from './context.js';
+import { templateToPdf } from './coordinate.js';
 import { createExpressionEngine } from './expression.js';
 import { validateData } from './data.js';
+import { collectAnchors } from './anchors.js';
+import { buildPdfOutline, type BookmarkEntry } from './bookmarks.js';
 
 export interface RenderOptions {
   /** Skip template validation. */
@@ -84,7 +94,7 @@ export async function renderPdf(
   const getPlugin = (type: string) => registry.get(type);
   const imageCache = createImageCache();
 
-  // 9. Pass 1: measure layout to determine total page count
+  // 9. Pass 1: measure layout to determine total page count and anchors
   const measureLayout = await layoutTemplate(
     template,
     fonts,
@@ -96,7 +106,13 @@ export async function renderPdf(
     imageCache,
   );
 
-  // 10. Pass 2: layout with correct totalPages
+  // 9b. Collect cross-reference anchors and register ref filter
+  const anchorMap = collectAnchors(measureLayout);
+  engine.registerFilter('ref', (anchorId: unknown) => {
+    return anchorMap.get(String(anchorId)) ?? '??';
+  });
+
+  // 10. Pass 2: layout with correct totalPages (and ref filter available)
   const layout = await layoutTemplate(
     template,
     fonts,
@@ -109,12 +125,42 @@ export async function renderPdf(
   );
 
   // 11. Render pages
+  const bookmarkEntries: BookmarkEntry[] = [];
+  let lastSectionIndex = -1;
+
   for (const layoutPage of layout.pages) {
     const section = template.sections[layoutPage.sectionIndex];
     const pageConfig = mergePageConfig(template.page, section.page);
     const page = doc.addPage([pageConfig.width, pageConfig.height]);
 
+    // Section bookmark (only on first page of each section)
+    if (layoutPage.sectionIndex !== lastSectionIndex && section.bookmark) {
+      const scope = layoutPage.bands.length > 0 ? layoutPage.bands[0].scope : {};
+      const title = await engine.resolve(section.bookmark, scope);
+      bookmarkEntries.push({
+        title,
+        page,
+        top: pageConfig.height,
+        left: 0,
+        level: 0,
+      });
+    }
+    lastSectionIndex = layoutPage.sectionIndex;
+
     for (const layoutBand of layoutPage.bands) {
+      // Band bookmark
+      if (layoutBand.band.bookmark) {
+        const title = await engine.resolve(layoutBand.band.bookmark, layoutBand.scope);
+        const pdfY = pageConfig.height - pageConfig.margins.top - layoutBand.offsetY;
+        bookmarkEntries.push({
+          title,
+          page,
+          top: pdfY,
+          left: pageConfig.margins.left,
+          level: 1,
+        });
+      }
+
       // Draw band background
       if (layoutBand.band.backgroundColor) {
         const bgColor = parseColor(layoutBand.band.backgroundColor);
@@ -185,12 +231,44 @@ export async function renderPdf(
           imageCache,
           measuredHeight,
         );
+
+        // Apply rotation transform if element has rotation
+        const rotation = effectiveElement.rotation;
+        if (rotation) {
+          const elementHeight = measuredHeight ?? effectiveElement.height;
+          const { x: preX, y: preY } = templateToPdf(
+            effectiveElement.x,
+            layoutBand.offsetY + effectiveElement.y,
+            pageConfig.height,
+            pageConfig.margins.top,
+            pageConfig.margins.left,
+          );
+          const centerX = preX + effectiveElement.width / 2;
+          const centerY = preY - elementHeight / 2;
+
+          page.pushOperators(
+            pushGraphicsState(),
+            translate(-centerX, -centerY),
+            rotateDegrees(-rotation),
+            translate(centerX, centerY),
+          );
+        }
+
         await plugin.render(props, renderCtx);
+
+        if (rotation) {
+          page.pushOperators(popGraphicsState());
+        }
       }
     }
   }
 
-  // 12. Save
+  // 12. Build PDF outline from collected bookmarks
+  if (bookmarkEntries.length > 0) {
+    buildPdfOutline(doc, bookmarkEntries);
+  }
+
+  // 13. Save
   const bytes = await doc.save();
   return {
     bytes,

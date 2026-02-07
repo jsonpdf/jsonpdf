@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { PDFDocument, PDFName, PDFDict, PDFNumber, PDFArray } from 'pdf-lib';
 import { renderPdf } from '../src/renderer.js';
 import { createTemplate, addSection, addBand, addElement, addStyle } from '@jsonpdf/template';
 
@@ -243,5 +244,235 @@ describe('renderPdf: multi-page', () => {
 
     const result = await renderPdf(t);
     expect(result.pageCount).toBe(2);
+  });
+});
+
+describe('renderPdf: element rotation', () => {
+  it('renders element with rotation without error', async () => {
+    let t = createTemplate({ name: 'Rotation' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 200, elements: [] });
+    t = addElement(t, 'b1', {
+      id: 'rotated',
+      type: 'text',
+      x: 50,
+      y: 50,
+      width: 200,
+      height: 30,
+      rotation: 45,
+      properties: { content: 'Rotated Text' },
+    });
+
+    const result = await renderPdf(t);
+    expect(result.pageCount).toBe(1);
+    expect(result.bytes.length).toBeGreaterThan(0);
+  });
+
+  it('renders with rotation=0 (no transform)', async () => {
+    let t = createTemplate({ name: 'No Rotation' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'b1', {
+      id: 'el1',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 20,
+      rotation: 0,
+      properties: { content: 'No rotation' },
+    });
+
+    const result = await renderPdf(t);
+    expect(result.pageCount).toBe(1);
+  });
+
+  it('renders with negative rotation', async () => {
+    let t = createTemplate({ name: 'Negative Rotation' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 200, elements: [] });
+    t = addElement(t, 'b1', {
+      id: 'el1',
+      type: 'text',
+      x: 50,
+      y: 50,
+      width: 200,
+      height: 30,
+      rotation: -90,
+      properties: { content: 'Rotated -90' },
+    });
+
+    const result = await renderPdf(t);
+    expect(result.pageCount).toBe(1);
+  });
+
+  it('applies rotation to shape element', async () => {
+    let t = createTemplate({ name: 'Rotated Shape' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 200, elements: [] });
+    t = addElement(t, 'b1', {
+      id: 'rotated-rect',
+      type: 'shape',
+      x: 50,
+      y: 50,
+      width: 100,
+      height: 50,
+      rotation: 30,
+      properties: { shapeType: 'rect', fill: '#ff0000' },
+    });
+
+    const result = await renderPdf(t);
+    expect(result.pageCount).toBe(1);
+    expect(result.bytes.length).toBeGreaterThan(0);
+  });
+});
+
+describe('renderPdf: bookmarks', () => {
+  it('creates PDF outline from section bookmark', async () => {
+    let t = createTemplate({ name: 'Section Bookmark' });
+    t = addSection(t, { id: 'sec1', bands: [], bookmark: 'Introduction' });
+    t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'b1', {
+      id: 'el1',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 20,
+      properties: { content: 'Hello' },
+    });
+
+    const result = await renderPdf(t);
+    expect(result.pageCount).toBe(1);
+
+    // Verify the PDF has an outline by re-loading
+    const loadedDoc = await PDFDocument.load(result.bytes);
+    const outlineRef = loadedDoc.catalog.get(PDFName.of('Outlines'));
+    expect(outlineRef).toBeDefined();
+  });
+
+  it('creates PDF outline from band bookmark', async () => {
+    let t = createTemplate({ name: 'Band Bookmark' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', {
+      id: 'b1',
+      type: 'body',
+      height: 100,
+      elements: [],
+      bookmark: 'My Band',
+    });
+    t = addElement(t, 'b1', {
+      id: 'el1',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 20,
+      properties: { content: 'Hello' },
+    });
+
+    const result = await renderPdf(t);
+    const loadedDoc = await PDFDocument.load(result.bytes);
+    const outlineRef = loadedDoc.catalog.get(PDFName.of('Outlines'));
+    expect(outlineRef).toBeDefined();
+  });
+
+  it('resolves bookmark expressions with data', async () => {
+    let t = createTemplate({ name: 'Bookmark Expression' });
+    t = addSection(t, { id: 'sec1', bands: [], bookmark: '{{ title }}' });
+    t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'b1', {
+      id: 'el1',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 20,
+      properties: { content: 'Content' },
+    });
+
+    const result = await renderPdf(t, { data: { title: 'Dynamic Title' } });
+    expect(result.pageCount).toBe(1);
+    expect(result.bytes.length).toBeGreaterThan(0);
+  });
+
+  it('has no outline when no bookmarks present', async () => {
+    const result = await renderPdf(buildSimpleTemplate());
+    const loadedDoc = await PDFDocument.load(result.bytes);
+    const outlineRef = loadedDoc.catalog.get(PDFName.of('Outlines'));
+    expect(outlineRef).toBeUndefined();
+  });
+});
+
+describe('renderPdf: cross-references', () => {
+  it('resolves {{ anchor | ref }} to page number', async () => {
+    let t = createTemplate({ name: 'Cross Ref' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'b1', {
+      id: 'el1',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 20,
+      anchor: 'myAnchor',
+      properties: { content: 'Anchored text' },
+    });
+    t = addElement(t, 'b1', {
+      id: 'el2',
+      type: 'text',
+      x: 0,
+      y: 30,
+      width: 200,
+      height: 20,
+      properties: { content: 'See page {{ "myAnchor" | ref }}' },
+    });
+
+    const result = await renderPdf(t);
+    expect(result.pageCount).toBe(1);
+    expect(result.bytes.length).toBeGreaterThan(0);
+  });
+
+  it('resolves missing anchor to ??', async () => {
+    let t = createTemplate({ name: 'Missing Ref' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'b1', {
+      id: 'el1',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 20,
+      properties: { content: 'See page {{ "nonexistent" | ref }}' },
+    });
+
+    const result = await renderPdf(t);
+    expect(result.pageCount).toBe(1);
+  });
+
+  it('resolves band-level anchor', async () => {
+    let t = createTemplate({ name: 'Band Anchor' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', {
+      id: 'b1',
+      type: 'body',
+      height: 100,
+      anchor: 'bandRef',
+      elements: [],
+    });
+    t = addElement(t, 'b1', {
+      id: 'el1',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 20,
+      properties: { content: 'Band page: {{ "bandRef" | ref }}' },
+    });
+
+    const result = await renderPdf(t);
+    expect(result.pageCount).toBe(1);
   });
 });

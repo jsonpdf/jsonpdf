@@ -1,4 +1,4 @@
-import { rgb } from 'pdf-lib';
+import { rgb, PDFName, PDFString, PDFArray, PDFRef } from 'pdf-lib';
 import { parseColor } from '@jsonpdf/core';
 import type { RichContent, StyledRun, Style, ValidationError, JSONSchema } from '@jsonpdf/core';
 import type { Plugin, MeasureContext, RenderContext } from '../types.js';
@@ -181,6 +181,48 @@ function measureRichText(
   return { width: ctx.availableWidth, height: totalHeight };
 }
 
+/** Add a URI link annotation covering a rectangular area on the page. */
+function addLinkAnnotation(
+  ctx: RenderContext,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  uri: string,
+): void {
+  const context = ctx.pdfDoc.context;
+
+  const actionDict = context.obj({
+    S: 'URI',
+    URI: PDFString.of(uri),
+  });
+
+  const annotDict = context.obj({
+    Type: 'Annot',
+    Subtype: 'Link',
+    Rect: [x, y, x + width, y + height],
+    Border: [0, 0, 0],
+    A: actionDict,
+  });
+
+  const annotRef = context.register(annotDict);
+
+  // Get or create the Annots array on the page
+  const annotsKey = PDFName.of('Annots');
+  const existing = ctx.page.node.get(annotsKey);
+
+  if (existing instanceof PDFArray) {
+    existing.push(annotRef);
+  } else if (existing instanceof PDFRef) {
+    const resolved = context.lookup(existing);
+    if (resolved instanceof PDFArray) {
+      resolved.push(annotRef);
+    }
+  } else {
+    ctx.page.node.set(annotsKey, context.obj([annotRef]));
+  }
+}
+
 function renderRichText(runs: StyledRun[], ctx: RenderContext): void {
   let currentX = ctx.x;
   let currentY = ctx.y;
@@ -228,6 +270,11 @@ function renderRichText(runs: StyledRun[], ctx: RenderContext): void {
         size: fontSize,
         color: rgb(color.r, color.g, color.b),
       });
+
+      // Add link annotation if the run has a link
+      if (run.link) {
+        addLinkAnnotation(ctx, currentX, currentY - lh, segWidth, lh, run.link);
+      }
 
       currentX += segWidth;
       lineStarted = true;

@@ -176,3 +176,39 @@ describe('ExpressionEngine custom filters', () => {
     expect(result).toBe('[      hi]');
   });
 });
+
+describe('ExpressionEngine.registerFilter', () => {
+  it('registers and uses a custom ref filter', async () => {
+    const engine = createExpressionEngine();
+    const anchorMap = new Map([
+      ['chapter1', 1],
+      ['chapter2', 3],
+    ]);
+    engine.registerFilter('ref', (anchorId: unknown) => {
+      return anchorMap.get(String(anchorId)) ?? '??';
+    });
+
+    const result = await engine.resolve('See page {{ "chapter1" | ref }}', {});
+    expect(result).toBe('See page 1');
+  });
+
+  it('returns ?? for missing anchor', async () => {
+    const engine = createExpressionEngine();
+    engine.registerFilter('ref', (anchorId: unknown) => {
+      return new Map<string, number>().get(String(anchorId)) ?? '??';
+    });
+
+    const result = await engine.resolve('Page {{ "missing" | ref }}', {});
+    expect(result).toBe('Page ??');
+  });
+
+  it('filter receives the piped value as first argument', async () => {
+    const engine = createExpressionEngine();
+    engine.registerFilter('double', (val: unknown) => {
+      return Number(val) * 2;
+    });
+
+    const result = await engine.resolve('{{ 5 | double }}', {});
+    expect(result).toBe('10');
+  });
+});

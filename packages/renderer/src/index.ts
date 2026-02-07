@@ -12,3 +12,5 @@ export {
   type FontSpec,
 } from './fonts.js';
 export { loadFontBytes } from './font-loader.js';
+export { collectAnchors } from './anchors.js';
+export { buildPdfOutline, type BookmarkEntry } from './bookmarks.js';
