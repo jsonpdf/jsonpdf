@@ -1,5 +1,5 @@
 import type { PDFDocument, PDFFont, PDFImage, PDFPage } from 'pdf-lib';
-import type { Style, JSONSchema, ValidationError } from '@jsonpdf/core';
+import type { Element, Style, JSONSchema, ValidationError } from '@jsonpdf/core';
 
 /** An embedded image with its natural dimensions. */
 export interface EmbeddedImage {
@@ -41,6 +41,10 @@ export interface MeasureContext {
   pdfDoc: PDFDocument;
   /** Image cache for deduplicating image loads. */
   imageCache: ImageCache;
+  /** Child elements for container plugins (from Element.elements). */
+  children?: Element[];
+  /** Measure a child element's content size. Only available for container plugins. */
+  measureChild?: (element: Element) => Promise<{ width: number; height: number }>;
 }
 
 /** Context available during the render pass. */
@@ -55,6 +59,8 @@ export interface RenderContext extends MeasureContext {
   width: number;
   /** Content height (element height minus padding, may be measured). */
   height: number;
+  /** Render a child element at an offset from the container's content area. */
+  renderChild?: (element: Element, offsetX: number, offsetY: number) => Promise<void>;
 }
 
 /** An element plugin that can measure and render a specific element type. */
