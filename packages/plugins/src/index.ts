@@ -44,3 +44,7 @@ export type { ImageFormat, LoadedImage } from './image/image-loader.js';
 
 // Container plugin
 export { containerPlugin, type ContainerProps } from './container/container-plugin.js';
+
+// Table plugin
+export { tablePlugin } from './table/table-plugin.js';
+export { type TableProps, type TableColumn, computeColumnWidths } from './table/table-types.js';

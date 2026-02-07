@@ -79,4 +79,13 @@ export interface Plugin<TProps = Record<string, unknown>> {
   measure(props: TProps, ctx: MeasureContext): Promise<{ width: number; height: number }>;
   /** Render the element onto a PDF page. */
   render(props: TProps, ctx: RenderContext): Promise<void>;
+  /** Whether this plugin supports splitting across page boundaries. */
+  canSplit?: boolean;
+  /** Split the element into two parts that fit within availableHeight.
+   *  Returns null if the element cannot be meaningfully split. */
+  split?: (
+    props: TProps,
+    ctx: MeasureContext,
+    availableHeight: number,
+  ) => Promise<{ fit: TProps; overflow: TProps } | null>;
 }

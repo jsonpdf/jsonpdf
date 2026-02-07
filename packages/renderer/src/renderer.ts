@@ -19,6 +19,7 @@ import {
   shapePlugin,
   imagePlugin,
   containerPlugin,
+  tablePlugin,
   createImageCache,
 } from '@jsonpdf/plugins';
 import { embedFonts, collectFontSpecs } from './fonts.js';
@@ -247,6 +248,7 @@ function createDefaultRegistry(): PluginRegistry {
   registry.register(shapePlugin);
   registry.register(imagePlugin);
   registry.register(containerPlugin);
+  registry.register(tablePlugin);
   return registry;
 }
 

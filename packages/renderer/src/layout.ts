@@ -506,6 +506,58 @@ async function layoutSection(
     };
   }
 
+  // Attempt to split a band that contains a single splittable element.
+  // Returns fit/overflow bands on success, or null to fall back to standard overflow.
+  async function trySplitBand(
+    instance: BandInstance,
+    availableHeight: number,
+  ): Promise<{ fitBand: Band; overflowBand: Band } | null> {
+    // Only split bands with exactly one element that supports splitting
+    if (instance.band.elements.length !== 1) return null;
+
+    const element = instance.band.elements[0];
+    const plugin = getPlugin(element.type);
+    if (!plugin.canSplit || !plugin.split) return null;
+
+    const props = plugin.resolveProps(element.properties);
+    const measureCtx = createMeasureContext(element, fonts, styles, pdfDoc, imageCache);
+
+    // Account for element's Y offset within the band and padding
+    const elPadding = normalizePadding(resolveElementStyle(element, styles).padding);
+    const availableForContent = availableHeight - element.y - elPadding.top - elPadding.bottom;
+
+    if (availableForContent <= 0) return null;
+
+    const splitResult = await plugin.split(props, measureCtx, availableForContent);
+    if (!splitResult) return null;
+
+    const fitElement: Element = {
+      ...element,
+      properties: splitResult.fit,
+      id: element.id + '__fit',
+    };
+    const overflowElement: Element = {
+      ...element,
+      properties: splitResult.overflow,
+      id: element.id + '__overflow',
+    };
+
+    return {
+      fitBand: {
+        ...instance.band,
+        id: instance.band.id + '__fit',
+        elements: [fitElement],
+        autoHeight: true,
+      },
+      overflowBand: {
+        ...instance.band,
+        id: instance.band.id + '__overflow',
+        elements: [overflowElement],
+        autoHeight: true,
+      },
+    };
+  }
+
   // Place a full-width content band, handling page breaks and overflow.
   // Returns the updated lastUsedInstance.
   async function placeFullWidthBand(
@@ -524,12 +576,46 @@ async function layoutSection(
       placeColumnHeaders(pageScope(instance, globalPageOffset + pages.length));
     }
 
-    // Natural overflow (skipped for autoHeight)
-    if (!pageConfig.autoHeight && bandHeight > availableContentHeight - cursorY && cursorY > 0) {
-      finalizePage(pageScope(lastUsed, globalPageOffset + pages.length), false);
-      startNewPage();
-      placePageHeaders(pageScope(instance, globalPageOffset + pages.length));
-      placeColumnHeaders(pageScope(instance, globalPageOffset + pages.length));
+    // Natural overflow (skipped for autoHeight pages)
+    if (!pageConfig.autoHeight && bandHeight > availableContentHeight - cursorY) {
+      // Attempt splitting even at cursorY=0 (splittable elements can be partially placed)
+      const splitResult = await trySplitBand(instance, availableContentHeight - cursorY);
+
+      if (splitResult) {
+        // Place fit portion on current page
+        const fitMeasured = await measureBand(
+          splitResult.fitBand,
+          fonts,
+          styles,
+          getPlugin,
+          pdfDoc,
+          imageCache,
+        );
+        const fitOffsetY = pageHeaderHeight + columnHeaderHeight + cursorY;
+        currentBands.push(createLayoutBand(splitResult.fitBand, fitOffsetY, fitMeasured, scope));
+        cursorY += fitMeasured.height;
+
+        // Start new page for overflow
+        finalizePage(scope, false);
+        startNewPage();
+        placePageHeaders(pageScope(instance, globalPageOffset + pages.length));
+        placeColumnHeaders(pageScope(instance, globalPageOffset + pages.length));
+
+        // Recursively place overflow (may split again)
+        const overflowInstance: BandInstance = {
+          band: splitResult.overflowBand,
+          scope: instance.scope,
+        };
+        return placeFullWidthBand(overflowInstance, instance);
+      }
+
+      // Standard behavior: move entire band to next page (only if not already at top)
+      if (cursorY > 0) {
+        finalizePage(pageScope(lastUsed, globalPageOffset + pages.length), false);
+        startNewPage();
+        placePageHeaders(pageScope(instance, globalPageOffset + pages.length));
+        placeColumnHeaders(pageScope(instance, globalPageOffset + pages.length));
+      }
     }
 
     const contentOffsetY = pageHeaderHeight + columnHeaderHeight + cursorY;

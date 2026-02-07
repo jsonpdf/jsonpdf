@@ -156,8 +156,8 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 
 ### Phase 5: Advanced Plugins
 
-- [ ] Container plugin (horizontal, vertical, absolute, grid layout)
-- [ ] Table plugin (columns, headers, borders, auto page-break)
+- [x] Container plugin (horizontal, vertical, absolute, grid layout)
+- [x] Table plugin (columns, headers, borders, auto page-break)
 - [ ] Chart plugin (Vega-Lite → image → PDF)
 - [ ] Barcode/QR plugin
 - [ ] Frame plugin (nested band container for side-by-side repeating content)
