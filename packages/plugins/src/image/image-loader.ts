@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import type { PDFDocument } from 'pdf-lib';
 import type { EmbeddedImage, ImageCache } from '../types.js';
+import { isSvgBytes, rasterizeSvg } from './svg-rasterizer.js';
 
 /** Default fetch timeout in milliseconds (30 seconds). */
 const FETCH_TIMEOUT_MS = 30_000;
@@ -28,15 +29,25 @@ export function detectFormat(bytes: Uint8Array): ImageFormat {
 /** Load image bytes from a source string. */
 export async function loadImageBytes(src: string): Promise<LoadedImage> {
   let bytes: Uint8Array;
+  let isSvgDataUri = false;
 
   if (src.startsWith('data:')) {
-    // Data URI: data:image/png;base64,...
     const commaIdx = src.indexOf(',');
     if (commaIdx === -1) {
       throw new Error(`Invalid data URI: ${src.slice(0, 50)}`);
     }
-    const base64 = src.slice(commaIdx + 1);
-    bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+    const header = src.slice(0, commaIdx).toLowerCase();
+    isSvgDataUri = header.includes('image/svg+xml');
+
+    if (header.includes(';base64')) {
+      // Base64-encoded data URI (PNG, JPEG, or SVG)
+      const base64 = src.slice(commaIdx + 1);
+      bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+    } else {
+      // URL-encoded data URI (common for SVG)
+      const decoded = decodeURIComponent(src.slice(commaIdx + 1));
+      bytes = new TextEncoder().encode(decoded);
+    }
   } else if (src.startsWith('http://') || src.startsWith('https://')) {
     // URL with timeout
     const controller = new AbortController();
@@ -55,6 +66,13 @@ export async function loadImageBytes(src: string): Promise<LoadedImage> {
   } else {
     // File path
     bytes = await readFile(src);
+  }
+
+  // SVG: rasterize to PNG before embedding
+  if (isSvgDataUri || isSvgBytes(bytes)) {
+    const svgString = new TextDecoder().decode(bytes);
+    const { pngBytes } = rasterizeSvg(svgString);
+    return { bytes: pngBytes, format: 'png' };
   }
 
   const format = detectFormat(bytes);
