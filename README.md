@@ -110,13 +110,13 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 
 ### Phase 1: Core Types + Static Rendering
 
-- [ ] `@jsonpdf/core` — TypeScript interfaces, utilities, JSON Schema validation
-- [ ] `@jsonpdf/template` — Template factory, validation, basic add helpers (full manipulation API in Phase 6)
-- [ ] `@jsonpdf/plugins` — Text plugin (word wrapping, font measurement, multi-line)
-- [ ] `@jsonpdf/plugins` — Line plugin (solid and dashed via `dashPattern`)
-- [ ] `@jsonpdf/plugins` — List plugin (bullet, numbered, lettered with nesting and RichContent items)
-- [ ] `@jsonpdf/renderer` — Single-page rendering with `body` bands, standard fonts (no data binding yet)
-- [ ] End-to-end test: static text on a page renders to valid PDF
+- [x] `@jsonpdf/core` — TypeScript interfaces, utilities, JSON Schema validation
+- [x] `@jsonpdf/template` — Template factory, validation, basic add helpers (full manipulation API in Phase 6)
+- [x] `@jsonpdf/plugins` — Text plugin (word wrapping, font measurement, multi-line)
+- [x] `@jsonpdf/plugins` — Line plugin (solid and dashed via `dashPattern`)
+- [x] `@jsonpdf/plugins` — List plugin (bullet, numbered, lettered with nesting and RichContent items)
+- [x] `@jsonpdf/renderer` — Single-page rendering with `body` bands, standard fonts (no data binding yet)
+- [x] End-to-end test: static text on a page renders to valid PDF
 
 ### Phase 2: Data Binding + Multi-Page
 
