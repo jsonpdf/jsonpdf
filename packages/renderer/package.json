@@ -20,6 +20,7 @@
     "@jsonpdf/core": "workspace:*",
     "@jsonpdf/plugins": "workspace:*",
     "@jsonpdf/template": "workspace:*",
+    "liquidjs": "^10.24.0",
     "pdf-lib": "^1.17.1"
   }
 }

@@ -120,17 +120,17 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 
 ### Phase 2: Data Binding + Multi-Page
 
-- [ ] Renderer — LiquidJS integration and custom filters (`money`, `date`, etc.)
-- [ ] Renderer — Layout engine: two-pass measure + render
-- [ ] Renderer — Detail bands: iterate over `dataSource` arrays
-- [ ] Renderer — Column headers: repeat after page breaks
-- [ ] Renderer — Page headers/footers with `_pageNumber` and `_totalPages`
-- [ ] Renderer — Conditional bands (`condition` property)
-- [ ] Renderer — `pageBreakBefore` on bands
-- [ ] Renderer — `lastPageFooter`, `summary`, `noData` bands
-- [ ] Renderer — Multi-section support with per-section page config
-- [ ] Renderer — Group bands (`groupHeader`, `groupFooter` with `groupBy`)
-- [ ] End-to-end test: invoice with 100+ line items renders correctly across pages
+- [x] Renderer — LiquidJS integration and custom filters (`money`, `date`, etc.)
+- [x] Renderer — Layout engine: two-pass measure + render
+- [x] Renderer — Detail bands: iterate over `dataSource` arrays
+- [x] Renderer — Column headers: repeat after page breaks
+- [x] Renderer — Page headers/footers with `_pageNumber` and `_totalPages`
+- [x] Renderer — Conditional bands (`condition` property)
+- [x] Renderer — `pageBreakBefore` on bands
+- [x] Renderer — `lastPageFooter`, `summary`, `noData` bands
+- [x] Renderer — Multi-section support with per-section page config
+- [x] Renderer — Group bands (`groupHeader`, `groupFooter` with `groupBy`)
+- [x] End-to-end test: invoice with 100+ line items renders correctly across pages
 
 ### Phase 3: More Plugins + Advanced Features
 
