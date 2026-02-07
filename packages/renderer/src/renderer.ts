@@ -74,7 +74,13 @@ function createMeasureChildCallback(
     const resolvedProperties = await env.engine.resolveProps(childEl.properties, scope);
     const plugin = env.registry.get(childEl.type);
     const props = plugin.resolveProps(resolvedProperties);
-    const measureCtx = createMeasureContext(childEl, env.fonts, env.styles, env.doc, env.imageCache);
+    const measureCtx = createMeasureContext(
+      childEl,
+      env.fonts,
+      env.styles,
+      env.doc,
+      env.imageCache,
+    );
 
     if (childEl.elements?.length) {
       measureCtx.children = childEl.elements;
@@ -194,9 +200,7 @@ async function renderElementAtPosition(
         childMeasureCtx.measureChild = createMeasureChildCallback(env, scope, depth + 1);
       }
       const measured = await childPlugin.measure(childProps, childMeasureCtx);
-      const childPadding = normalizePadding(
-        resolveElementStyle(childEl, env.styles).padding,
-      );
+      const childPadding = normalizePadding(resolveElementStyle(childEl, env.styles).padding);
       const childMeasuredHeight = measured.height + childPadding.top + childPadding.bottom;
 
       await renderElementAtPosition(

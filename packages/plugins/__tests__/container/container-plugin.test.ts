@@ -90,7 +90,14 @@ describe('containerPlugin.resolveProps', () => {
 
 describe('containerPlugin.validate', () => {
   it('returns no errors for valid props', () => {
-    expect(containerPlugin.validate({ layout: 'horizontal', gap: 10, gridColumns: 3, alignItems: 'center' })).toEqual([]);
+    expect(
+      containerPlugin.validate({
+        layout: 'horizontal',
+        gap: 10,
+        gridColumns: 3,
+        alignItems: 'center',
+      }),
+    ).toEqual([]);
   });
 
   it('returns no errors for minimal props', () => {
@@ -157,10 +164,7 @@ describe('containerPlugin.measure', () => {
       measureChild: stubMeasureChild,
       availableWidth: 210,
     });
-    const result = await containerPlugin.measure(
-      { layout: 'grid', gridColumns: 2, gap: 10 },
-      ctx,
-    );
+    const result = await containerPlugin.measure({ layout: 'grid', gridColumns: 2, gap: 10 }, ctx);
     // Row 1: c1 (h=20), c2 (h=30) → row height = 30
     // Row 2: c3 (h=25) → row height = 25
     // Total: 30 + 10 + 25 = 65
