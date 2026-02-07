@@ -18,7 +18,8 @@
   },
   "dependencies": {
     "@jsonpdf/core": "workspace:*",
+    "@jsonpdf/plugins": "workspace:*",
     "@jsonpdf/template": "workspace:*",
-    "@jsonpdf/plugins": "workspace:*"
+    "pdf-lib": "^1.17.1"
   }
 }

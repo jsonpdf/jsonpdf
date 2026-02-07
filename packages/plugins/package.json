@@ -17,6 +17,7 @@
     "typecheck": "tsc --build --noEmit"
   },
   "dependencies": {
-    "@jsonpdf/core": "workspace:*"
+    "@jsonpdf/core": "workspace:*",
+    "pdf-lib": "^1.17.1"
   }
 }

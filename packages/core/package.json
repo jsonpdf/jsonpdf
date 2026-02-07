@@ -15,5 +15,8 @@
   "scripts": {
     "build": "tsc --build",
     "typecheck": "tsc --build --noEmit"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1"
   }
 }

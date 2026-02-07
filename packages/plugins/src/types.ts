@@ -1,0 +1,60 @@
+import type { PDFFont, PDFPage } from 'pdf-lib';
+import type { Style, JSONSchema, ValidationError } from '@jsonpdf/core';
+
+/** Map of font key to embedded PDFFont. */
+export type FontMap = Map<string, PDFFont>;
+
+/** Build a font key from style properties. */
+export function fontKey(
+  family: string,
+  weight: 'normal' | 'bold',
+  style: 'normal' | 'italic',
+): string {
+  return `${family}:${weight}:${style}`;
+}
+
+/** Context available during the measure pass. */
+export interface MeasureContext {
+  /** Embedded fonts keyed by fontKey(). */
+  fonts: FontMap;
+  /** Available width for the element content (element width minus padding). */
+  availableWidth: number;
+  /** Available height for the element content (element height minus padding). */
+  availableHeight: number;
+  /** Resolve a named style to its full Style object. */
+  resolveStyle: (name: string) => Style;
+  /** The element's computed style (defaults + named + overrides merged). */
+  elementStyle: Style;
+}
+
+/** Context available during the render pass. */
+export interface RenderContext extends MeasureContext {
+  /** The pdf-lib page to draw on. */
+  page: PDFPage;
+  /** X position of the content area in pdf-lib coordinates. */
+  x: number;
+  /** Y position of the top of the content area in pdf-lib coordinates. */
+  y: number;
+  /** Content width (element width minus padding). */
+  width: number;
+  /** Content height (element height minus padding, may be measured). */
+  height: number;
+}
+
+/** An element plugin that can measure and render a specific element type. */
+export interface Plugin<TProps = Record<string, unknown>> {
+  /** Unique plugin type identifier (e.g., 'text', 'line', 'list'). */
+  type: string;
+  /** JSON Schema that validates element.properties for this plugin. */
+  propsSchema: JSONSchema;
+  /** Default properties. */
+  defaultProps: TProps;
+  /** Merge raw element properties with defaults to produce typed props. */
+  resolveProps(raw: Record<string, unknown>): TProps;
+  /** Custom validation beyond JSON Schema. */
+  validate(props: TProps): ValidationError[];
+  /** Measure content size (for autoHeight). */
+  measure(props: TProps, ctx: MeasureContext): Promise<{ width: number; height: number }>;
+  /** Render the element onto a PDF page. */
+  render(props: TProps, ctx: RenderContext): Promise<void>;
+}
