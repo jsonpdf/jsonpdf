@@ -248,9 +248,9 @@ export async function renderPdf(
 
           page.pushOperators(
             pushGraphicsState(),
-            translate(-centerX, -centerY),
-            rotateDegrees(-rotation),
             translate(centerX, centerY),
+            rotateDegrees(-rotation),
+            translate(-centerX, -centerY),
           );
         }
 
