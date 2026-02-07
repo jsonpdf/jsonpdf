@@ -1,5 +1,5 @@
 import type { PDFDocument } from 'pdf-lib';
-import type { Element, Template, Band, BandType, PageConfig, Style } from '@jsonpdf/core';
+import type { Element, Template, Band, BandType, PageConfig, Section, Style } from '@jsonpdf/core';
 import type { FontMap, Plugin, ImageCache } from '@jsonpdf/plugins';
 import { createMeasureContext } from './context.js';
 import { resolveElementStyle, normalizePadding } from './style-resolver.js';
@@ -59,6 +59,45 @@ interface BandMeasurement {
   elementHeights: Map<string, number>;
 }
 
+/** Context for frame measurement support during the layout pass. */
+interface FrameMeasureCtx {
+  engine: ExpressionEngine;
+  data: Record<string, unknown>;
+  totalPagesHint: number;
+}
+
+/**
+ * Create a measureBands callback for frame elements during the layout pass.
+ * Expands the frame's bands and measures each expanded content band.
+ */
+function createFrameMeasureBands(
+  fonts: FontMap,
+  styles: Record<string, Style>,
+  getPlugin: (type: string) => Plugin,
+  pdfDoc: PDFDocument,
+  imageCache: ImageCache,
+  fCtx: FrameMeasureCtx,
+): (bands: Band[]) => Promise<{ totalHeight: number }> {
+  return async (bands: Band[]) => {
+    const pseudoSection: Section = { id: '__frame', bands };
+    const expanded = await expandBands(pseudoSection, fCtx.data, fCtx.engine, fCtx.totalPagesHint);
+    let totalHeight = 0;
+    for (const instance of expanded.contentBands) {
+      const m = await measureBand(
+        instance.band,
+        fonts,
+        styles,
+        getPlugin,
+        pdfDoc,
+        imageCache,
+        fCtx,
+      );
+      totalHeight += m.height;
+    }
+    return { totalHeight };
+  };
+}
+
 /**
  * Create a measureChild callback for container elements during the layout pass.
  * This allows the container plugin to measure its children during band autoHeight computation.
@@ -70,6 +109,7 @@ function createLayoutMeasureChild(
   pdfDoc: PDFDocument,
   imageCache: ImageCache,
   depth: number = 0,
+  fCtx?: FrameMeasureCtx,
 ): (element: Element) => Promise<{ width: number; height: number }> {
   return async (childEl: Element) => {
     if (depth + 1 > MAX_CONTAINER_DEPTH) {
@@ -87,6 +127,18 @@ function createLayoutMeasureChild(
         pdfDoc,
         imageCache,
         depth + 1,
+        fCtx,
+      );
+    }
+    // Provide measureBands callback for frame elements
+    if (childEl.type === 'frame' && fCtx) {
+      measureCtx.measureBands = createFrameMeasureBands(
+        fonts,
+        styles,
+        getPlugin,
+        pdfDoc,
+        imageCache,
+        fCtx,
       );
     }
     return plugin.measure(props, measureCtx);
@@ -101,6 +153,7 @@ async function measureBand(
   getPlugin: (type: string) => Plugin,
   pdfDoc: PDFDocument,
   imageCache: ImageCache,
+  fCtx?: FrameMeasureCtx,
 ): Promise<BandMeasurement> {
   const elementHeights = new Map<string, number>();
   let bandHeight = band.height;
@@ -127,6 +180,19 @@ async function measureBand(
           getPlugin,
           pdfDoc,
           imageCache,
+          0,
+          fCtx,
+        );
+      }
+      // Provide measureBands callback for frame elements
+      if (element.type === 'frame' && fCtx) {
+        measureCtx.measureBands = createFrameMeasureBands(
+          fonts,
+          styles,
+          getPlugin,
+          pdfDoc,
+          imageCache,
+          fCtx,
         );
       }
       const measured = await plugin.measure(props, measureCtx);
@@ -153,11 +219,12 @@ async function measureBandList(
   getPlugin: (type: string) => Plugin,
   pdfDoc: PDFDocument,
   imageCache: ImageCache,
+  fCtx?: FrameMeasureCtx,
 ): Promise<{ total: number; measurements: BandMeasurement[] }> {
   const measurements: BandMeasurement[] = [];
   let total = 0;
   for (const band of bands) {
-    const result = await measureBand(band, fonts, styles, getPlugin, pdfDoc, imageCache);
+    const result = await measureBand(band, fonts, styles, getPlugin, pdfDoc, imageCache, fCtx);
     measurements.push(result);
     total += result.height;
   }
@@ -248,6 +315,8 @@ export async function layoutTemplate(
       pdfDoc,
       imageCache,
       columnConfig,
+      engine,
+      data,
     );
 
     allPages.push(...sectionPages);
@@ -269,7 +338,11 @@ async function layoutSection(
   pdfDoc: PDFDocument,
   imageCache: ImageCache,
   columnConfig: SectionColumnConfig,
+  engine: ExpressionEngine,
+  data: Record<string, unknown>,
 ): Promise<LayoutPage[]> {
+  const fCtx: FrameMeasureCtx = { engine, data, totalPagesHint };
+
   // Measure structural band heights (storing per-band measurements)
   const pageHeaderResult = await measureBandList(
     expanded.pageHeaderBands,
@@ -278,6 +351,7 @@ async function layoutSection(
     getPlugin,
     pdfDoc,
     imageCache,
+    fCtx,
   );
   const pageFooterResult = await measureBandList(
     expanded.pageFooterBands,
@@ -286,6 +360,7 @@ async function layoutSection(
     getPlugin,
     pdfDoc,
     imageCache,
+    fCtx,
   );
   const lastPageFooterResult = await measureBandList(
     expanded.lastPageFooterBands,
@@ -294,6 +369,7 @@ async function layoutSection(
     getPlugin,
     pdfDoc,
     imageCache,
+    fCtx,
   );
   const columnHeaderResult = await measureBandList(
     expanded.columnHeaderBands,
@@ -302,6 +378,7 @@ async function layoutSection(
     getPlugin,
     pdfDoc,
     imageCache,
+    fCtx,
   );
   const columnFooterResult = await measureBandList(
     expanded.columnFooterBands,
@@ -310,6 +387,7 @@ async function layoutSection(
     getPlugin,
     pdfDoc,
     imageCache,
+    fCtx,
   );
   const backgroundResult = await measureBandList(
     expanded.backgroundBands,
@@ -318,6 +396,7 @@ async function layoutSection(
     getPlugin,
     pdfDoc,
     imageCache,
+    fCtx,
   );
 
   const pageHeaderHeight = pageHeaderResult.total;
@@ -564,7 +643,15 @@ async function layoutSection(
     instance: BandInstance,
     lastUsed: BandInstance,
   ): Promise<BandInstance> {
-    const measured = await measureBand(instance.band, fonts, styles, getPlugin, pdfDoc, imageCache);
+    const measured = await measureBand(
+      instance.band,
+      fonts,
+      styles,
+      getPlugin,
+      pdfDoc,
+      imageCache,
+      fCtx,
+    );
     const bandHeight = measured.height;
     const scope = pageScope(instance, globalPageOffset + pages.length);
 
@@ -590,6 +677,7 @@ async function layoutSection(
           getPlugin,
           pdfDoc,
           imageCache,
+          fCtx,
         );
         const fitOffsetY = pageHeaderHeight + columnHeaderHeight + cursorY;
         currentBands.push(createLayoutBand(splitResult.fitBand, fitOffsetY, fitMeasured, scope));
@@ -685,6 +773,7 @@ async function layoutSection(
         getPlugin,
         pdfDoc,
         imageCache,
+        fCtx,
       );
       const bandHeight = measured.height;
       const scope = pageScope(instance, globalPageOffset + pages.length);

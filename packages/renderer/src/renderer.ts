@@ -8,7 +8,7 @@ import {
   translate,
 } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
-import type { Element, Style, Template } from '@jsonpdf/core';
+import type { Band, Element, Section, Style, Template } from '@jsonpdf/core';
 import { parseColor, validateTemplateSchema } from '@jsonpdf/core';
 import type { FontMap, ImageCache, RenderContext } from '@jsonpdf/plugins';
 import {
@@ -22,6 +22,7 @@ import {
   tablePlugin,
   barcodePlugin,
   chartPlugin,
+  framePlugin,
   createImageCache,
 } from '@jsonpdf/plugins';
 import { embedFonts, collectFontSpecs } from './fonts.js';
@@ -30,6 +31,7 @@ import { createMeasureContext } from './context.js';
 import { templateToPdf } from './coordinate.js';
 import { createExpressionEngine, type ExpressionEngine } from './expression.js';
 import { validateData } from './data.js';
+import { expandBands } from './band-expander.js';
 import { collectAnchors } from './anchors.js';
 import { buildPdfOutline, type BookmarkEntry } from './bookmarks.js';
 import { resolveElementStyle, resolveNamedStyle, normalizePadding } from './style-resolver.js';
@@ -61,6 +63,77 @@ interface RenderEnv {
 }
 
 /**
+ * Create a measureBands callback for frame elements during the render pass.
+ * Expands the frame's bands and measures each expanded content band.
+ */
+function createRenderMeasureBands(
+  env: RenderEnv,
+  scope: Record<string, unknown>,
+): (bands: Band[]) => Promise<{ totalHeight: number }> {
+  return async (bands: Band[]) => {
+    const pseudoSection: Section = { id: '__frame', bands };
+    const totalPages = Number(scope._totalPages) || 0;
+    const expanded = await expandBands(pseudoSection, scope, env.engine, totalPages);
+    let totalHeight = 0;
+    for (const instance of expanded.contentBands) {
+      const m = await measureBandForFrame(instance.band, env, instance.scope);
+      totalHeight += m.height;
+    }
+    return { totalHeight };
+  };
+}
+
+/** Measure a band's height for frame rendering (with expression resolution). */
+async function measureBandForFrame(
+  band: Band,
+  env: RenderEnv,
+  scope: Record<string, unknown>,
+): Promise<{ height: number; elementHeights: Map<string, number> }> {
+  const elementHeights = new Map<string, number>();
+  let bandHeight = band.height;
+
+  if (band.autoHeight) {
+    let maxElementBottom = band.height;
+    for (const element of band.elements) {
+      const plugin = env.registry.get(element.type);
+      // Protect frame bands from Liquid resolution (same pattern as renderElementAtPosition)
+      let nestedFrameBands: Band[] | undefined;
+      if (element.type === 'frame' && Array.isArray(element.properties.bands)) {
+        nestedFrameBands = element.properties.bands as Band[];
+      }
+      const resolvedProperties = await env.engine.resolveProps(element.properties, scope);
+      if (nestedFrameBands) {
+        resolvedProperties.bands = nestedFrameBands;
+      }
+      const props = plugin.resolveProps(resolvedProperties);
+      const measureCtx = createMeasureContext(
+        element,
+        env.fonts,
+        env.styles,
+        env.doc,
+        env.imageCache,
+      );
+      if (element.elements?.length) {
+        measureCtx.children = element.elements;
+        measureCtx.measureChild = createMeasureChildCallback(env, scope, 0);
+      }
+      if (element.type === 'frame') {
+        measureCtx.measureBands = createRenderMeasureBands(env, scope);
+      }
+      const measured = await plugin.measure(props, measureCtx);
+      const padding = normalizePadding(resolveElementStyle(element, env.styles).padding);
+      const totalElementHeight = measured.height + padding.top + padding.bottom;
+      elementHeights.set(element.id, totalElementHeight);
+      const elementBottom = element.y + totalElementHeight;
+      maxElementBottom = Math.max(maxElementBottom, elementBottom);
+    }
+    bandHeight = maxElementBottom;
+  }
+
+  return { height: bandHeight, elementHeights };
+}
+
+/**
  * Create a measureChild callback for container elements.
  * Recursively supports nested containers.
  */
@@ -88,6 +161,11 @@ function createMeasureChildCallback(
     if (childEl.elements?.length) {
       measureCtx.children = childEl.elements;
       measureCtx.measureChild = createMeasureChildCallback(env, scope, depth + 1);
+    }
+
+    // Provide measureBands callback for frame elements
+    if (childEl.type === 'frame') {
+      measureCtx.measureBands = createRenderMeasureBands(env, scope);
     }
 
     return plugin.measure(props, measureCtx);
@@ -124,8 +202,15 @@ async function renderElementAtPosition(
     if (!show) return;
   }
 
-  // 2. Resolve expressions in properties
+  // 2. Resolve expressions in properties (protect frame bands from Liquid resolution)
+  let frameBands: Band[] | undefined;
+  if (element.type === 'frame' && Array.isArray(element.properties.bands)) {
+    frameBands = element.properties.bands as Band[];
+  }
   const resolvedProperties = await env.engine.resolveProps(element.properties, scope);
+  if (frameBands) {
+    resolvedProperties.bands = frameBands;
+  }
 
   // 3. Apply conditional styles
   let effectiveElement = element;
@@ -187,9 +272,16 @@ async function renderElementAtPosition(
       const childPdfX = renderCtx.x + offsetX;
       const childPdfY = renderCtx.y - offsetY;
 
-      // Measure child for correct height
+      // Measure child for correct height (protect frame bands from Liquid resolution)
       const childPlugin = env.registry.get(childEl.type);
+      let childFrameBands: Band[] | undefined;
+      if (childEl.type === 'frame' && Array.isArray(childEl.properties.bands)) {
+        childFrameBands = childEl.properties.bands as Band[];
+      }
       const childResolvedProps = await env.engine.resolveProps(childEl.properties, scope);
+      if (childFrameBands) {
+        childResolvedProps.bands = childFrameBands;
+      }
       const childProps = childPlugin.resolveProps(childResolvedProps);
       const childMeasureCtx = createMeasureContext(
         childEl,
@@ -201,6 +293,9 @@ async function renderElementAtPosition(
       if (childEl.elements?.length) {
         childMeasureCtx.children = childEl.elements;
         childMeasureCtx.measureChild = createMeasureChildCallback(env, scope, depth + 1);
+      }
+      if (childEl.type === 'frame') {
+        childMeasureCtx.measureBands = createRenderMeasureBands(env, scope);
       }
       const measured = await childPlugin.measure(childProps, childMeasureCtx);
       const childPadding = normalizePadding(resolveElementStyle(childEl, env.styles).padding);
@@ -216,6 +311,39 @@ async function renderElementAtPosition(
         childMeasuredHeight,
         depth + 1,
       );
+    };
+  }
+
+  // 7b. Add frame callbacks for frame elements
+  if (effectiveElement.type === 'frame') {
+    renderCtx.measureBands = createRenderMeasureBands(env, scope);
+    renderCtx.renderBands = async (bands: Band[]) => {
+      const pseudoSection: Section = { id: '__frame', bands };
+      const totalPages = Number(scope._totalPages) || 0;
+      const expanded = await expandBands(pseudoSection, scope, env.engine, totalPages);
+
+      let cursorY = 0;
+      for (const instance of expanded.contentBands) {
+        const bandM = await measureBandForFrame(instance.band, env, instance.scope);
+
+        for (const el of instance.band.elements) {
+          const elMeasuredH = bandM.elementHeights.get(el.id);
+          const elPdfX = renderCtx.x + el.x;
+          const elPdfY = renderCtx.y - cursorY - el.y;
+
+          await renderElementAtPosition(
+            el,
+            instance.scope,
+            page,
+            elPdfX,
+            elPdfY,
+            env,
+            elMeasuredH,
+            depth + 1,
+          );
+        }
+        cursorY += bandM.height;
+      }
     };
   }
 
@@ -253,6 +381,7 @@ function createDefaultRegistry(): PluginRegistry {
   registry.register(tablePlugin);
   registry.register(barcodePlugin);
   registry.register(chartPlugin);
+  registry.register(framePlugin);
   return registry;
 }
 

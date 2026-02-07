@@ -1,5 +1,5 @@
 import type { PDFDocument, PDFFont, PDFImage, PDFPage } from 'pdf-lib';
-import type { Element, Style, JSONSchema, ValidationError } from '@jsonpdf/core';
+import type { Band, Element, Style, JSONSchema, ValidationError } from '@jsonpdf/core';
 
 /** An embedded image with its natural dimensions. */
 export interface EmbeddedImage {
@@ -45,6 +45,8 @@ export interface MeasureContext {
   children?: Element[];
   /** Measure a child element's content size. Only available for container plugins. */
   measureChild?: (element: Element) => Promise<{ width: number; height: number }>;
+  /** Expand and measure nested bands. Only available for frame plugins. */
+  measureBands?: (bands: Band[]) => Promise<{ totalHeight: number }>;
 }
 
 /** Context available during the render pass. */
@@ -61,6 +63,8 @@ export interface RenderContext extends MeasureContext {
   height: number;
   /** Render a child element at an offset from the container's content area. */
   renderChild?: (element: Element, offsetX: number, offsetY: number) => Promise<void>;
+  /** Expand and render nested bands within the frame's content area. Only available for frame plugins. */
+  renderBands?: (bands: Band[]) => Promise<void>;
 }
 
 /** An element plugin that can measure and render a specific element type. */
