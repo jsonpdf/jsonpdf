@@ -70,3 +70,7 @@ export { chartPlugin } from './chart/chart-plugin.js';
 export { type ChartProps, type ChartFit } from './chart/chart-types.js';
 export { generateChart, createChartCache, buildFinalSpec } from './chart/chart-generator.js';
 export type { ChartCache } from './chart/chart-generator.js';
+
+// Frame plugin
+export { framePlugin } from './frame/frame-plugin.js';
+export { type FrameProps } from './frame/frame-types.js';

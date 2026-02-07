@@ -161,7 +161,7 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 - [x] Barcode/QR plugin (bwip-js, 19 formats, two-level caching)
 - [x] SVG support in image plugin (@resvg/resvg-js rasterization)
 - [x] Chart plugin (Vega-Lite → SVG → image plugin)
-- [ ] Frame plugin (nested band container for side-by-side repeating content)
+- [x] Frame plugin (nested band container for side-by-side repeating content)
 
 ### Phase 6: Editor MVP
 
