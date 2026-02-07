@@ -2,7 +2,8 @@ import { StandardFonts } from 'pdf-lib';
 import type { PDFDocument } from 'pdf-lib';
 import type { FontMap } from '@jsonpdf/plugins';
 import { fontKey } from '@jsonpdf/plugins';
-import type { Template, Style, StyledRun } from '@jsonpdf/core';
+import type { Template, Style, StyledRun, FontDeclaration } from '@jsonpdf/core';
+import { loadFontBytes } from './font-loader.js';
 
 export interface FontSpec {
   family: string;
@@ -37,8 +38,43 @@ export function resolveStandardFont(spec: FontSpec): StandardFonts {
   return STANDARD_FONT_MAP[key] ?? StandardFonts.Helvetica;
 }
 
-/** Embed all required standard fonts. Always includes default Helvetica. */
-export async function embedFonts(doc: PDFDocument, specs: FontSpec[]): Promise<FontMap> {
+/** Map a numeric font weight to 'normal' or 'bold'. */
+export function mapWeight(weight?: number): 'normal' | 'bold' {
+  if (weight === undefined) return 'normal';
+  return weight > 500 ? 'bold' : 'normal';
+}
+
+/**
+ * Find a FontDeclaration that matches a given font spec.
+ * Matches by family (case-insensitive) and weight/style.
+ */
+function findDeclaration(
+  spec: FontSpec,
+  declarations: FontDeclaration[],
+): FontDeclaration | undefined {
+  return declarations.find((d) => {
+    const familyMatch = d.family.toLowerCase() === spec.family.toLowerCase();
+    const weightMatch = mapWeight(d.weight) === spec.weight;
+    const styleMatch = (d.style ?? 'normal') === spec.style;
+    return familyMatch && weightMatch && styleMatch;
+  });
+}
+
+/** Check whether a font key corresponds to a standard (built-in) font. */
+export function isStandardFont(key: string): boolean {
+  return key in STANDARD_FONT_MAP;
+}
+
+/**
+ * Embed all required fonts. Standard fonts use pdf-lib built-ins.
+ * Custom fonts are loaded from their FontDeclaration.src and embedded
+ * with subsetting via fontkit (fontkit must be registered on the doc first).
+ */
+export async function embedFonts(
+  doc: PDFDocument,
+  specs: FontSpec[],
+  fontDeclarations: FontDeclaration[] = [],
+): Promise<FontMap> {
   const fonts: FontMap = new Map();
   const uniqueKeys = new Set<string>();
 
@@ -49,10 +85,29 @@ export async function embedFonts(doc: PDFDocument, specs: FontSpec[]): Promise<F
     uniqueKeys.add(fontKey(spec.family, spec.weight, spec.style));
   }
 
+  // Embed default font first so we can reuse it for fallbacks
+  const defaultFont = await doc.embedFont(STANDARD_FONT_MAP[DEFAULT_FONT_KEY]);
+  fonts.set(DEFAULT_FONT_KEY, defaultFont);
+
   for (const key of uniqueKeys) {
-    const stdFont = STANDARD_FONT_MAP[key] ?? StandardFonts.Helvetica;
-    const embedded = await doc.embedFont(stdFont);
-    fonts.set(key, embedded);
+    if (fonts.has(key)) continue; // Already embedded (e.g. default)
+    if (key in STANDARD_FONT_MAP) {
+      const embedded = await doc.embedFont(STANDARD_FONT_MAP[key]);
+      fonts.set(key, embedded);
+    } else {
+      // Custom font: find matching declaration
+      const [family, weight, style] = key.split(':') as [string, 'normal' | 'bold', 'normal' | 'italic'];
+      const spec: FontSpec = { family, weight, style };
+      const decl = findDeclaration(spec, fontDeclarations);
+      if (!decl) {
+        console.warn(`[jsonpdf] No font declaration found for "${key}", falling back to Helvetica`);
+        fonts.set(key, defaultFont);
+      } else {
+        const bytes = await loadFontBytes(decl.src);
+        const embedded = await doc.embedFont(bytes, { subset: true });
+        fonts.set(key, embedded);
+      }
+    }
   }
 
   return fonts;
@@ -83,6 +138,18 @@ export function collectFontSpecs(template: Template): FontSpec[] {
       for (const element of band.elements) {
         if (element.styleOverrides) {
           addFromStyle(element.styleOverrides);
+        }
+
+        // Scan conditional styles for font references
+        if (element.conditionalStyles) {
+          for (const cs of element.conditionalStyles) {
+            if (cs.styleOverrides) {
+              addFromStyle(cs.styleOverrides);
+            }
+            if (cs.style && cs.style in template.styles) {
+              addFromStyle(template.styles[cs.style]);
+            }
+          }
         }
 
         // Scan rich text content for font references in StyledRuns

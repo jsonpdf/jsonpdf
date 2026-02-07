@@ -1,7 +1,16 @@
 import { PDFDocument, rgb } from 'pdf-lib';
+import fontkit from '@pdf-lib/fontkit';
 import type { Template } from '@jsonpdf/core';
 import { parseColor, validateTemplateSchema } from '@jsonpdf/core';
-import { PluginRegistry, textPlugin, linePlugin, listPlugin } from '@jsonpdf/plugins';
+import {
+  PluginRegistry,
+  textPlugin,
+  linePlugin,
+  listPlugin,
+  shapePlugin,
+  imagePlugin,
+  createImageCache,
+} from '@jsonpdf/plugins';
 import { embedFonts, collectFontSpecs } from './fonts.js';
 import { layoutTemplate, mergePageConfig } from './layout.js';
 import { createRenderContext } from './context.js';
@@ -30,6 +39,8 @@ function createDefaultRegistry(): PluginRegistry {
   registry.register(textPlugin);
   registry.register(linePlugin);
   registry.register(listPlugin);
+  registry.register(shapePlugin);
+  registry.register(imagePlugin);
   return registry;
 }
 
@@ -57,30 +68,33 @@ export async function renderPdf(
   // 4. Create PDF document
   const doc = await PDFDocument.create();
 
-  // 5. Create expression engine
+  // 5. Register fontkit for custom font embedding
+  if (template.fonts.length > 0) {
+    doc.registerFontkit(fontkit);
+  }
+
+  // 6. Create expression engine
   const engine = createExpressionEngine();
 
-  // 6. Collect and embed fonts
+  // 7. Collect and embed fonts
   const fontSpecs = collectFontSpecs(template);
-  const fonts = await embedFonts(doc, fontSpecs);
+  const fonts = await embedFonts(doc, fontSpecs, template.fonts);
 
-  // 7. Layout helper
+  // 8. Layout helpers
   const getPlugin = (type: string) => registry.get(type);
+  const imageCache = createImageCache();
 
-  // 8. Pass 1: measure layout to determine total page count
-  const measureLayout = await layoutTemplate(template, fonts, getPlugin, engine, data, 0);
-
-  // 9. Pass 2: layout with correct totalPages
-  const layout = await layoutTemplate(
-    template,
-    fonts,
-    getPlugin,
-    engine,
-    data,
-    measureLayout.totalPages,
+  // 9. Pass 1: measure layout to determine total page count
+  const measureLayout = await layoutTemplate(
+    template, fonts, getPlugin, engine, data, 0, doc, imageCache,
   );
 
-  // 10. Render pages
+  // 10. Pass 2: layout with correct totalPages
+  const layout = await layoutTemplate(
+    template, fonts, getPlugin, engine, data, measureLayout.totalPages, doc, imageCache,
+  );
+
+  // 11. Render pages
   for (const layoutPage of layout.pages) {
     const section = template.sections[layoutPage.sectionIndex];
     const pageConfig = mergePageConfig(template.page, section.page);
@@ -153,6 +167,8 @@ export async function renderPdf(
           pageConfig.height,
           pageConfig.margins.top,
           pageConfig.margins.left,
+          doc,
+          imageCache,
           measuredHeight,
         );
         await plugin.render(props, renderCtx);
@@ -160,7 +176,7 @@ export async function renderPdf(
     }
   }
 
-  // 11. Save
+  // 12. Save
   const bytes = await doc.save();
   return {
     bytes,

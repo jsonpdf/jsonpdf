@@ -1,5 +1,5 @@
-import type { PDFPage } from 'pdf-lib';
-import type { MeasureContext, RenderContext, FontMap } from '@jsonpdf/plugins';
+import type { PDFDocument, PDFPage } from 'pdf-lib';
+import type { MeasureContext, RenderContext, FontMap, ImageCache } from '@jsonpdf/plugins';
 import type { Element, Style } from '@jsonpdf/core';
 import { resolveElementStyle, resolveNamedStyle, normalizePadding } from './style-resolver.js';
 import { templateToPdf } from './coordinate.js';
@@ -9,6 +9,8 @@ export function createMeasureContext(
   element: Element,
   fonts: FontMap,
   styles: Record<string, Style>,
+  pdfDoc: PDFDocument,
+  imageCache: ImageCache,
 ): MeasureContext {
   const elementStyle = resolveElementStyle(element, styles);
   const padding = normalizePadding(elementStyle.padding);
@@ -18,6 +20,8 @@ export function createMeasureContext(
     availableHeight: element.height - padding.top - padding.bottom,
     resolveStyle: (name: string) => resolveNamedStyle(name, styles),
     elementStyle,
+    pdfDoc,
+    imageCache,
   };
 }
 
@@ -31,6 +35,8 @@ export function createRenderContext(
   pageHeight: number,
   marginTop: number,
   marginLeft: number,
+  pdfDoc: PDFDocument,
+  imageCache: ImageCache,
   measuredHeight?: number,
 ): RenderContext {
   const elementStyle = resolveElementStyle(element, styles);
@@ -49,6 +55,8 @@ export function createRenderContext(
     availableHeight: height - padding.top - padding.bottom,
     resolveStyle: (name: string) => resolveNamedStyle(name, styles),
     elementStyle,
+    pdfDoc,
+    imageCache,
     page,
     x: x + padding.left,
     y: y - padding.top,

@@ -134,12 +134,12 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 
 ### Phase 3: More Plugins + Advanced Features
 
-- [ ] Image plugin (URL, file path, base64, fit modes, SVG rasterization via resvg-js)
-- [ ] Container plugin (horizontal, vertical, absolute, grid layout)
-- [ ] Shape plugin (rectangle, circle, ellipse with fill, stroke, dashPattern)
-- [ ] Font loading via fontsource
+- [x] Image plugin (URL, file path, base64, fit modes: contain, cover, fill, none)
+- [ ] Container plugin (horizontal, vertical, absolute, grid layout) — deferred to Phase 5
+- [x] Shape plugin (rectangle, circle, ellipse with fill, stroke, dashPattern, borderRadius)
+- [x] Font loading via fontkit (custom TTF/OTF/WOFF embedding with subsetting)
 - [ ] Renderer — Element rotation support
-- [ ] Renderer — Conditional element styles (`conditionalStyles`)
+- [x] Renderer — Conditional element styles (`conditionalStyles`) — completed in Phase 2
 - [ ] Renderer — Hyperlinks (`link` on StyledRun) and PDF bookmarks (`bookmark` on Section/Band)
 - [ ] Renderer — Cross-references (`anchor` on Element/Band, `{{ ref("id") }}` Liquid function)
 - [ ] Renderer — Widow/orphan control (`widows`, `orphans` in Style)

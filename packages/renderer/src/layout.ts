@@ -1,6 +1,8 @@
+import type { PDFDocument } from 'pdf-lib';
 import type { Template, Band, PageConfig, Style } from '@jsonpdf/core';
-import type { FontMap, Plugin } from '@jsonpdf/plugins';
+import type { FontMap, Plugin, ImageCache } from '@jsonpdf/plugins';
 import { createMeasureContext } from './context.js';
+import { resolveElementStyle, normalizePadding } from './style-resolver.js';
 import type { ExpressionEngine } from './expression.js';
 import { expandBands } from './band-expander.js';
 import type { BandInstance, ExpandedSection } from './band-expander.js';
@@ -45,6 +47,8 @@ async function measureBand(
   fonts: FontMap,
   styles: Record<string, Style>,
   getPlugin: (type: string) => Plugin,
+  pdfDoc: PDFDocument,
+  imageCache: ImageCache,
 ): Promise<BandMeasurement> {
   const elementHeights = new Map<string, number>();
   let bandHeight = band.height;
@@ -61,10 +65,15 @@ async function measureBand(
           `Invalid properties for ${element.type} element "${element.id}": ${messages}`,
         );
       }
-      const measureCtx = createMeasureContext(element, fonts, styles);
+      const measureCtx = createMeasureContext(element, fonts, styles, pdfDoc, imageCache);
       const measured = await plugin.measure(props, measureCtx);
-      elementHeights.set(element.id, measured.height);
-      const elementBottom = element.y + measured.height;
+      // measured.height is the content height (within padding-adjusted space).
+      // Store the total element height (content + padding) so createRenderContext
+      // can correctly subtract padding without double-counting.
+      const padding = normalizePadding(resolveElementStyle(element, styles).padding);
+      const totalElementHeight = measured.height + padding.top + padding.bottom;
+      elementHeights.set(element.id, totalElementHeight);
+      const elementBottom = element.y + totalElementHeight;
       maxElementBottom = Math.max(maxElementBottom, elementBottom);
     }
     bandHeight = maxElementBottom;
@@ -79,11 +88,13 @@ async function measureBandList(
   fonts: FontMap,
   styles: Record<string, Style>,
   getPlugin: (type: string) => Plugin,
+  pdfDoc: PDFDocument,
+  imageCache: ImageCache,
 ): Promise<{ total: number; measurements: BandMeasurement[] }> {
   const measurements: BandMeasurement[] = [];
   let total = 0;
   for (const band of bands) {
-    const result = await measureBand(band, fonts, styles, getPlugin);
+    const result = await measureBand(band, fonts, styles, getPlugin, pdfDoc, imageCache);
     measurements.push(result);
     total += result.height;
   }
@@ -120,6 +131,8 @@ export async function layoutTemplate(
   engine: ExpressionEngine,
   data: Record<string, unknown>,
   totalPagesHint: number,
+  pdfDoc: PDFDocument,
+  imageCache: ImageCache,
 ): Promise<LayoutResult> {
   const allPages: LayoutPage[] = [];
   let globalPageIndex = 0;
@@ -137,6 +150,8 @@ export async function layoutTemplate(
       getPlugin,
       globalPageIndex,
       totalPagesHint,
+      pdfDoc,
+      imageCache,
     );
 
     allPages.push(...sectionPages);
@@ -155,43 +170,27 @@ async function layoutSection(
   getPlugin: (type: string) => Plugin,
   globalPageOffset: number,
   totalPagesHint: number,
+  pdfDoc: PDFDocument,
+  imageCache: ImageCache,
 ): Promise<LayoutPage[]> {
   // Measure structural band heights (storing per-band measurements)
   const pageHeaderResult = await measureBandList(
-    expanded.pageHeaderBands,
-    fonts,
-    styles,
-    getPlugin,
+    expanded.pageHeaderBands, fonts, styles, getPlugin, pdfDoc, imageCache,
   );
   const pageFooterResult = await measureBandList(
-    expanded.pageFooterBands,
-    fonts,
-    styles,
-    getPlugin,
+    expanded.pageFooterBands, fonts, styles, getPlugin, pdfDoc, imageCache,
   );
   const lastPageFooterResult = await measureBandList(
-    expanded.lastPageFooterBands,
-    fonts,
-    styles,
-    getPlugin,
+    expanded.lastPageFooterBands, fonts, styles, getPlugin, pdfDoc, imageCache,
   );
   const columnHeaderResult = await measureBandList(
-    expanded.columnHeaderBands,
-    fonts,
-    styles,
-    getPlugin,
+    expanded.columnHeaderBands, fonts, styles, getPlugin, pdfDoc, imageCache,
   );
   const columnFooterResult = await measureBandList(
-    expanded.columnFooterBands,
-    fonts,
-    styles,
-    getPlugin,
+    expanded.columnFooterBands, fonts, styles, getPlugin, pdfDoc, imageCache,
   );
   const backgroundResult = await measureBandList(
-    expanded.backgroundBands,
-    fonts,
-    styles,
-    getPlugin,
+    expanded.backgroundBands, fonts, styles, getPlugin, pdfDoc, imageCache,
   );
 
   const pageHeaderHeight = pageHeaderResult.total;
@@ -256,12 +255,16 @@ async function layoutSection(
 
   // Finalize a page by adding footer/background bands
   function finalizePage(scope: Record<string, unknown>, isLastPage: boolean): void {
-    // Background bands (behind everything — renderer will draw first)
+    // Background bands must be rendered first (behind everything).
+    // Prepend them to the beginning of the bands array so the renderer
+    // draws them before any content.
+    const bgBands: LayoutBand[] = [];
     for (let i = 0; i < expanded.backgroundBands.length; i++) {
       const band = expanded.backgroundBands[i];
       const m = backgroundResult.measurements[i];
-      currentBands.push(createLayoutBand(band, 0, m, scope));
+      bgBands.push(createLayoutBand(band, 0, m, scope));
     }
+    currentBands.unshift(...bgBands);
 
     // Determine which footer to use
     const useLastFooter = isLastPage && expanded.lastPageFooterBands.length > 0;
@@ -309,7 +312,7 @@ async function layoutSection(
   let lastUsedInstance = expanded.contentBands[0];
   for (let i = 0; i < expanded.contentBands.length; i++) {
     const instance = expanded.contentBands[i];
-    const measured = await measureBand(instance.band, fonts, styles, getPlugin);
+    const measured = await measureBand(instance.band, fonts, styles, getPlugin, pdfDoc, imageCache);
     const bandHeight = measured.height;
     const scope = pageScope(instance, globalPageOffset + pages.length);
 
