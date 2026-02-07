@@ -131,7 +131,8 @@ export async function renderPdf(
   for (const layoutPage of layout.pages) {
     const section = template.sections[layoutPage.sectionIndex];
     const pageConfig = mergePageConfig(template.page, section.page);
-    const page = doc.addPage([pageConfig.width, pageConfig.height]);
+    const pageHeight = layoutPage.computedHeight ?? pageConfig.height;
+    const page = doc.addPage([pageConfig.width, pageHeight]);
 
     // Section bookmark (only on first page of each section)
     if (layoutPage.sectionIndex !== lastSectionIndex && section.bookmark) {
@@ -140,7 +141,7 @@ export async function renderPdf(
       bookmarkEntries.push({
         title,
         page,
-        top: pageConfig.height,
+        top: pageHeight,
         left: 0,
         level: 0,
       });
@@ -148,15 +149,21 @@ export async function renderPdf(
     lastSectionIndex = layoutPage.sectionIndex;
 
     for (const layoutBand of layoutPage.bands) {
+      // Compute column-aware effective values
+      const effectiveMarginLeft = pageConfig.margins.left + (layoutBand.columnOffsetX ?? 0);
+      const effectiveContentWidth =
+        layoutBand.columnWidth ??
+        pageConfig.width - pageConfig.margins.left - pageConfig.margins.right;
+
       // Band bookmark
       if (layoutBand.band.bookmark) {
         const title = await engine.resolve(layoutBand.band.bookmark, layoutBand.scope);
-        const pdfY = pageConfig.height - pageConfig.margins.top - layoutBand.offsetY;
+        const pdfY = pageHeight - pageConfig.margins.top - layoutBand.offsetY;
         bookmarkEntries.push({
           title,
           page,
           top: pdfY,
-          left: pageConfig.margins.left,
+          left: effectiveMarginLeft,
           level: 1,
         });
       }
@@ -165,14 +172,11 @@ export async function renderPdf(
       if (layoutBand.band.backgroundColor) {
         const bgColor = parseColor(layoutBand.band.backgroundColor);
         const bgY =
-          pageConfig.height -
-          pageConfig.margins.top -
-          layoutBand.offsetY -
-          layoutBand.measuredHeight;
+          pageHeight - pageConfig.margins.top - layoutBand.offsetY - layoutBand.measuredHeight;
         page.drawRectangle({
-          x: pageConfig.margins.left,
+          x: effectiveMarginLeft,
           y: bgY,
-          width: pageConfig.width - pageConfig.margins.left - pageConfig.margins.right,
+          width: effectiveContentWidth,
           height: layoutBand.measuredHeight,
           color: rgb(bgColor.r, bgColor.g, bgColor.b),
         });
@@ -224,9 +228,9 @@ export async function renderPdf(
           template.styles,
           page,
           layoutBand.offsetY,
-          pageConfig.height,
+          pageHeight,
           pageConfig.margins.top,
-          pageConfig.margins.left,
+          effectiveMarginLeft,
           doc,
           imageCache,
           measuredHeight,
@@ -239,9 +243,9 @@ export async function renderPdf(
           const { x: preX, y: preY } = templateToPdf(
             effectiveElement.x,
             layoutBand.offsetY + effectiveElement.y,
-            pageConfig.height,
+            pageHeight,
             pageConfig.margins.top,
-            pageConfig.margins.left,
+            effectiveMarginLeft,
           );
           const centerX = preX + effectiveElement.width / 2;
           const centerY = preY - elementHeight / 2;

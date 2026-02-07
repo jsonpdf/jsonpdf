@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 import type { PDFFont } from 'pdf-lib';
-import { wrapText, measureTextWidth } from '../../src/text/word-wrap.js';
+import { wrapText, measureTextWidth, type WrapOptions } from '../../src/text/word-wrap.js';
 
 let font: PDFFont;
 const fontSize = 12;
@@ -127,6 +127,33 @@ describe('wrapText', () => {
     // Trailing spaces should not create empty lines
     expect(result.lines).toEqual(['Hello']);
     expect(result.height).toBe(lineHeight);
+  });
+});
+
+describe('wrapText: widow/orphan options (plumbing)', () => {
+  it('accepts WrapOptions with widows and orphans', () => {
+    const opts: WrapOptions = { widows: 3, orphans: 2 };
+    const result = wrapText('Hello World', font, fontSize, 500, lineHeight, opts);
+    expect(result.lines).toEqual(['Hello World']);
+    expect(result.height).toBe(lineHeight);
+  });
+
+  it('produces same result with and without options', () => {
+    const text = 'The quick brown fox jumps over the lazy dog';
+    const without = wrapText(text, font, fontSize, 100, lineHeight);
+    const withOpts = wrapText(text, font, fontSize, 100, lineHeight, { widows: 2, orphans: 2 });
+    expect(withOpts.lines).toEqual(without.lines);
+    expect(withOpts.height).toBe(without.height);
+  });
+
+  it('accepts undefined options', () => {
+    const result = wrapText('Hello', font, fontSize, 500, lineHeight, undefined);
+    expect(result.lines).toEqual(['Hello']);
+  });
+
+  it('accepts empty options object', () => {
+    const result = wrapText('Hello', font, fontSize, 500, lineHeight, {});
+    expect(result.lines).toEqual(['Hello']);
   });
 });
 

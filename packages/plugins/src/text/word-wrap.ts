@@ -7,11 +7,22 @@ export interface WrapResult {
   height: number;
 }
 
+/** Options for widow/orphan control (plumbing for Phase 8). */
+export interface WrapOptions {
+  /** Minimum lines at the bottom of a column/page. */
+  widows?: number;
+  /** Minimum lines at the top of a column/page. */
+  orphans?: number;
+}
+
 /**
  * Wrap text to fit within a given width.
  *
  * Splits on explicit newlines first, then wraps each paragraph.
  * Words longer than maxWidth are broken at character level.
+ *
+ * The `options` parameter accepts `widows`/`orphans` for future
+ * cross-page line splitting (Phase 8). Currently accepted but unused.
  */
 export function wrapText(
   text: string,
@@ -19,6 +30,8 @@ export function wrapText(
   fontSize: number,
   maxWidth: number,
   lineHeight: number,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _options?: WrapOptions,
 ): WrapResult {
   if (text === '') {
     return { lines: [''], height: lineHeight };

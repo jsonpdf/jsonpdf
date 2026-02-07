@@ -135,17 +135,16 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 ### Phase 3: More Plugins + Advanced Features
 
 - [x] Image plugin (URL, file path, base64, fit modes: contain, cover, fill, none)
-- [ ] Container plugin (horizontal, vertical, absolute, grid layout) — deferred to Phase 5
 - [x] Shape plugin (rectangle, circle, ellipse with fill, stroke, dashPattern, borderRadius)
 - [x] Font loading via fontkit (custom TTF/OTF/WOFF embedding with subsetting)
 - [x] Renderer — Element rotation support
 - [x] Renderer — Conditional element styles (`conditionalStyles`) — completed in Phase 2
 - [x] Renderer — Hyperlinks (`link` on StyledRun) and PDF bookmarks (`bookmark` on Section/Band)
 - [x] Renderer — Cross-references (`anchor` on Element/Band, `{{ "id" | ref }}` Liquid filter)
-- [ ] Renderer — Widow/orphan control (`widows`, `orphans` in Style)
-- [ ] Renderer — Multi-column sections (`columns`, `columnGap`)
-- [ ] Renderer — Asymmetric column widths (`columnWidths` on Section)
-- [ ] Renderer — Variable page height (`autoHeight` on PageConfig)
+- [x] Renderer — Widow/orphan control (`widows`, `orphans` in Style) — plumbing for Phase 8
+- [x] Renderer — Multi-column sections (`columns`, `columnGap`) — tile mode
+- [x] Renderer — Asymmetric column widths (`columnWidths` on Section)
+- [x] Renderer — Variable page height (`autoHeight` on PageConfig)
 
 ### Phase 4: CLI
 
@@ -157,6 +156,7 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 
 ### Phase 5: Advanced Plugins
 
+- [ ] Container plugin (horizontal, vertical, absolute, grid layout)
 - [ ] Table plugin (columns, headers, borders, auto page-break)
 - [ ] Chart plugin (Vega-Lite → image → PDF)
 - [ ] Barcode/QR plugin
