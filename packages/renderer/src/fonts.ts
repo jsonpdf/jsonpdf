@@ -96,7 +96,11 @@ export async function embedFonts(
       fonts.set(key, embedded);
     } else {
       // Custom font: find matching declaration
-      const [family, weight, style] = key.split(':') as [string, 'normal' | 'bold', 'normal' | 'italic'];
+      const [family, weight, style] = key.split(':') as [
+        string,
+        'normal' | 'bold',
+        'normal' | 'italic',
+      ];
       const spec: FontSpec = { family, weight, style };
       const decl = findDeclaration(spec, fontDeclarations);
       if (!decl) {

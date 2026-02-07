@@ -175,22 +175,52 @@ async function layoutSection(
 ): Promise<LayoutPage[]> {
   // Measure structural band heights (storing per-band measurements)
   const pageHeaderResult = await measureBandList(
-    expanded.pageHeaderBands, fonts, styles, getPlugin, pdfDoc, imageCache,
+    expanded.pageHeaderBands,
+    fonts,
+    styles,
+    getPlugin,
+    pdfDoc,
+    imageCache,
   );
   const pageFooterResult = await measureBandList(
-    expanded.pageFooterBands, fonts, styles, getPlugin, pdfDoc, imageCache,
+    expanded.pageFooterBands,
+    fonts,
+    styles,
+    getPlugin,
+    pdfDoc,
+    imageCache,
   );
   const lastPageFooterResult = await measureBandList(
-    expanded.lastPageFooterBands, fonts, styles, getPlugin, pdfDoc, imageCache,
+    expanded.lastPageFooterBands,
+    fonts,
+    styles,
+    getPlugin,
+    pdfDoc,
+    imageCache,
   );
   const columnHeaderResult = await measureBandList(
-    expanded.columnHeaderBands, fonts, styles, getPlugin, pdfDoc, imageCache,
+    expanded.columnHeaderBands,
+    fonts,
+    styles,
+    getPlugin,
+    pdfDoc,
+    imageCache,
   );
   const columnFooterResult = await measureBandList(
-    expanded.columnFooterBands, fonts, styles, getPlugin, pdfDoc, imageCache,
+    expanded.columnFooterBands,
+    fonts,
+    styles,
+    getPlugin,
+    pdfDoc,
+    imageCache,
   );
   const backgroundResult = await measureBandList(
-    expanded.backgroundBands, fonts, styles, getPlugin, pdfDoc, imageCache,
+    expanded.backgroundBands,
+    fonts,
+    styles,
+    getPlugin,
+    pdfDoc,
+    imageCache,
   );
 
   const pageHeaderHeight = pageHeaderResult.total;
