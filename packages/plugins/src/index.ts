@@ -64,3 +64,9 @@ export {
 } from './barcode/barcode-types.js';
 export { generateBarcode, createBarcodeCache, toBwipColor } from './barcode/barcode-generator.js';
 export type { BarcodeCache } from './barcode/barcode-generator.js';
+
+// Chart plugin
+export { chartPlugin } from './chart/chart-plugin.js';
+export { type ChartProps, type ChartFit } from './chart/chart-types.js';
+export { generateChart, createChartCache, buildFinalSpec } from './chart/chart-generator.js';
+export type { ChartCache } from './chart/chart-generator.js';

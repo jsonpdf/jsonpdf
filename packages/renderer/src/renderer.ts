@@ -21,6 +21,7 @@ import {
   containerPlugin,
   tablePlugin,
   barcodePlugin,
+  chartPlugin,
   createImageCache,
 } from '@jsonpdf/plugins';
 import { embedFonts, collectFontSpecs } from './fonts.js';
@@ -251,6 +252,7 @@ function createDefaultRegistry(): PluginRegistry {
   registry.register(containerPlugin);
   registry.register(tablePlugin);
   registry.register(barcodePlugin);
+  registry.register(chartPlugin);
   return registry;
 }
 
