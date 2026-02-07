@@ -1,0 +1,11 @@
+{
+  "files": [],
+  "references": [
+    { "path": "packages/core" },
+    { "path": "packages/template" },
+    { "path": "packages/plugins" },
+    { "path": "packages/renderer" },
+    { "path": "packages/cli" },
+    { "path": "packages/editor" }
+  ]
+}
