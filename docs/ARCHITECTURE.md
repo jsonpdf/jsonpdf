@@ -20,7 +20,7 @@ All measurements are in **points** (1/72 inch). The editor can display in mm, in
 
 ```typescript
 interface Template {
-  version: "1.0";
+  version: '1.0';
   name: string;
   description?: string;
   author?: string;
@@ -43,10 +43,10 @@ interface Template {
 }
 
 interface PageConfig {
-  width: number;          // in points (612 = US Letter, 595 = A4)
-  height: number;         // in points (792 = US Letter, 842 = A4)
-  autoHeight?: boolean;   // if true, page height grows to fit content (Phase 3)
-  orientation?: "portrait" | "landscape";
+  width: number; // in points (612 = US Letter, 595 = A4)
+  height: number; // in points (792 = US Letter, 842 = A4)
+  autoHeight?: boolean; // if true, page height grows to fit content (Phase 3)
+  orientation?: 'portrait' | 'landscape';
   margins: {
     top: number;
     right: number;
@@ -58,65 +58,66 @@ interface PageConfig {
 interface Section {
   id: string;
   name?: string;
-  page?: Partial<PageConfig>;   // overrides template-level page config
-  columns?: number;             // multi-column layout (default: 1)
-  columnWidths?: number[];      // asymmetric column widths as ratios (e.g., [1, 2]) (Phase 3)
-  columnGap?: number;           // gap between columns in points
-  columnMode?: "tile" | "flow"; // "tile" (default): detail bands fill columns; "flow": text reflows across columns (Phase 8)
-  bookmark?: string;            // PDF outline entry (Liquid expression supported)
+  page?: Partial<PageConfig>; // overrides template-level page config
+  columns?: number; // multi-column layout (default: 1)
+  columnWidths?: number[]; // asymmetric column widths as ratios (e.g., [1, 2]) (Phase 3)
+  columnGap?: number; // gap between columns in points
+  columnMode?: 'tile' | 'flow'; // "tile" (default): detail bands fill columns; "flow": text reflows across columns (Phase 8)
+  bookmark?: string; // PDF outline entry (Liquid expression supported)
   bands: Band[];
 }
 
 interface Band {
   id: string;
   type: BandType;
-  height: number;               // declared height in points
-  autoHeight?: boolean;         // if true, height is minimum; band grows to fit
-  condition?: string;           // Liquid expression; band skipped if falsy
-  dataSource?: string;          // dot-path to array (for detail bands)
-  itemName?: string;            // loop variable name (default: "item")
-  groupBy?: string;             // dot-path for group bands
-  float?: boolean;              // for columnFooter: sit under last detail row
-  pageBreakBefore?: boolean;    // force a page break before this band
-  bookmark?: string;            // PDF outline entry (Liquid expression supported)
-  anchor?: string;              // cross-reference target (use {{ ref("id") }} to get page number)
+  height: number; // declared height in points
+  autoHeight?: boolean; // if true, height is minimum; band grows to fit
+  condition?: string; // Liquid expression; band skipped if falsy
+  dataSource?: string; // dot-path to array (for detail bands)
+  itemName?: string; // loop variable name (default: "item")
+  groupBy?: string; // dot-path for group bands
+  float?: boolean; // for columnFooter: sit under last detail row
+  pageBreakBefore?: boolean; // force a page break before this band
+  bookmark?: string; // PDF outline entry (Liquid expression supported)
+  anchor?: string; // cross-reference target (use {{ ref("id") }} to get page number)
   backgroundColor?: string;
   elements: Element[];
 }
 
 type BandType =
-  | "title"           // once, first page only
-  | "pageHeader"      // top of every page
-  | "pageFooter"      // bottom of every page
-  | "lastPageFooter"  // replaces pageFooter on final page
-  | "columnHeader"    // before first detail, repeats after page breaks
-  | "detail"          // repeats per record in dataSource
-  | "columnFooter"    // after detail rows on each page
-  | "summary"         // once, after all detail rows
-  | "body"            // static content, no data binding iteration
-  | "background"      // behind all content on every page
-  | "noData"          // shown when dataSource is empty
-  | "groupHeader"     // when groupBy expression changes (Phase 2)
-  | "groupFooter";    // before groupBy expression changes (Phase 2)
+  | 'title' // once, first page only
+  | 'pageHeader' // top of every page
+  | 'pageFooter' // bottom of every page
+  | 'lastPageFooter' // replaces pageFooter on final page
+  | 'columnHeader' // before first detail, repeats after page breaks
+  | 'detail' // repeats per record in dataSource
+  | 'columnFooter' // after detail rows on each page
+  | 'summary' // once, after all detail rows
+  | 'body' // static content, no data binding iteration
+  | 'background' // behind all content on every page
+  | 'noData' // shown when dataSource is empty
+  | 'groupHeader' // when groupBy expression changes (Phase 2)
+  | 'groupFooter'; // before groupBy expression changes (Phase 2)
 
 interface Element {
   id: string;
-  type: string;                 // matches a plugin type (e.g., "text", "image")
-  x: number;                    // horizontal position within band
-  y: number;                    // vertical position within band
+  type: string; // matches a plugin type (e.g., "text", "image")
+  x: number; // horizontal position within band
+  y: number; // vertical position within band
   width: number;
   height: number;
-  rotation?: number;            // rotation in degrees (clockwise)
-  anchor?: string;              // cross-reference target (use {{ ref("id") }} to get page number)
-  style?: string;               // reference to a named style
+  rotation?: number; // rotation in degrees (clockwise)
+  anchor?: string; // cross-reference target (use {{ ref("id") }} to get page number)
+  style?: string; // reference to a named style
   styleOverrides?: Partial<Style>;
-  condition?: string;           // Liquid expression
-  conditionalStyles?: Array<{   // dynamic style selection
-    condition: string;          // Liquid expression
+  condition?: string; // Liquid expression
+  conditionalStyles?: Array<{
+    // dynamic style selection
+    condition: string; // Liquid expression
     style?: string;
     styleOverrides?: Partial<Style>;
   }>;
-  properties: Record<string, unknown>;  // plugin-specific props
+  properties: Record<string, unknown>; // plugin-specific props
 }
 
 /**
@@ -127,22 +128,22 @@ interface Element {
 type RichContent = string | StyledRun[];
 
 interface StyledRun {
-  text: string;                 // text content (supports Liquid expressions)
-  style?: string;               // reference to a named style
-  styleOverrides?: Partial<Style>;  // inline style overrides for this run
-  link?: string;                // URL or internal bookmark reference
-  footnote?: RichContent;        // footnote content, rendered at page bottom (Phase 8)
+  text: string; // text content (supports Liquid expressions)
+  style?: string; // reference to a named style
+  styleOverrides?: Partial<Style>; // inline style overrides for this run
+  link?: string; // URL or internal bookmark reference
+  footnote?: RichContent; // footnote content, rendered at page bottom (Phase 8)
 }
 
 interface Style {
   fontFamily?: string;
   fontSize?: number;
-  fontWeight?: "normal" | "bold";
-  fontStyle?: "normal" | "italic";
-  textDecoration?: "none" | "underline" | "line-through" | "underline line-through";
+  fontWeight?: 'normal' | 'bold';
+  fontStyle?: 'normal' | 'italic';
+  textDecoration?: 'none' | 'underline' | 'line-through' | 'underline line-through';
   color?: string;
   backgroundColor?: string;
-  textAlign?: "left" | "center" | "right";
+  textAlign?: 'left' | 'center' | 'right';
   lineHeight?: number;
   letterSpacing?: number;
   borderWidth?: number;
@@ -154,35 +155,35 @@ interface Style {
   borderRadius?: number;
   padding?: number | { top: number; right: number; bottom: number; left: number };
   opacity?: number;
-  widows?: number;              // minimum lines at top of page after break (Phase 2)
-  orphans?: number;             // minimum lines at bottom of page before break (Phase 2)
+  widows?: number; // minimum lines at top of page after break (Phase 2)
+  orphans?: number; // minimum lines at bottom of page before break (Phase 2)
 }
 
 interface FontDeclaration {
   family: string;
   weight?: number;
-  style?: "normal" | "italic";
-  src: string;  // URL, file path, or fontsource identifier
+  style?: 'normal' | 'italic';
+  src: string; // URL, file path, or fontsource identifier
 }
 ```
 
 ## Band Types
 
-| Band Type | Renders | Description |
-|-----------|---------|-------------|
-| `background` | Every page, behind all content | Watermarks, page borders, letterhead backgrounds |
-| `title` | Once, first page only | Cover page content, report title |
-| `pageHeader` | Top of every page | Running headers, logo, document title |
-| `columnHeader` | Before first detail row, repeats after page breaks | Table column headers |
-| `detail` | Once per record in `dataSource` | The main repeating content band |
-| `columnFooter` | After detail rows on each page | Per-page subtotals. `float: true` sits under last detail row |
-| `pageFooter` | Bottom of every page | Page numbers, running footers |
-| `lastPageFooter` | Replaces `pageFooter` on the final page | Signatures, "end of report" |
-| `summary` | Once, after all detail rows | Grand totals, conclusions |
-| `body` | Once, in document flow | Static content (certificates, letters, free-form sections) |
-| `noData` | Only when `dataSource` is empty | "No records found" fallback |
-| `groupHeader` | When `groupBy` expression changes | Group break headers (Phase 2) |
-| `groupFooter` | Before `groupBy` expression changes | Group subtotals (Phase 2) |
+| Band Type        | Renders                                            | Description                                                  |
+| ---------------- | -------------------------------------------------- | ------------------------------------------------------------ |
+| `background`     | Every page, behind all content                     | Watermarks, page borders, letterhead backgrounds             |
+| `title`          | Once, first page only                              | Cover page content, report title                             |
+| `pageHeader`     | Top of every page                                  | Running headers, logo, document title                        |
+| `columnHeader`   | Before first detail row, repeats after page breaks | Table column headers                                         |
+| `detail`         | Once per record in `dataSource`                    | The main repeating content band                              |
+| `columnFooter`   | After detail rows on each page                     | Per-page subtotals. `float: true` sits under last detail row |
+| `pageFooter`     | Bottom of every page                               | Page numbers, running footers                                |
+| `lastPageFooter` | Replaces `pageFooter` on the final page            | Signatures, "end of report"                                  |
+| `summary`        | Once, after all detail rows                        | Grand totals, conclusions                                    |
+| `body`           | Once, in document flow                             | Static content (certificates, letters, free-form sections)   |
+| `noData`         | Only when `dataSource` is empty                    | "No records found" fallback                                  |
+| `groupHeader`    | When `groupBy` expression changes                  | Group break headers (Phase 2)                                |
+| `groupFooter`    | Before `groupBy` expression changes                | Group subtotals (Phase 2)                                    |
 
 ## Multi-Column Sections
 
@@ -205,13 +206,31 @@ Sections support a `columns` property for grid-style layouts like product catalo
       "dataSource": "products",
       "height": 200,
       "elements": [
-        { "type": "image", "x": 0, "y": 0, "width": 160, "height": 120,
-          "properties": { "src": "{{ item.image }}" } },
-        { "type": "text", "x": 0, "y": 130, "width": 160, "height": 20,
+        {
+          "type": "image",
+          "x": 0,
+          "y": 0,
+          "width": 160,
+          "height": 120,
+          "properties": { "src": "{{ item.image }}" }
+        },
+        {
+          "type": "text",
+          "x": 0,
+          "y": 130,
+          "width": 160,
+          "height": 20,
           "styleOverrides": { "fontWeight": "bold" },
-          "properties": { "content": "{{ item.name }}" } },
-        { "type": "text", "x": 0, "y": 155, "width": 160, "height": 20,
-          "properties": { "content": "{{ item.price | money }}" } }
+          "properties": { "content": "{{ item.name }}" }
+        },
+        {
+          "type": "text",
+          "x": 0,
+          "y": 155,
+          "width": 160,
+          "height": 20,
+          "properties": { "content": "{{ item.price | money }}" }
+        }
       ]
     }
   ]
@@ -233,11 +252,14 @@ Simple — plain string:
 Rich — styled runs with per-segment formatting:
 
 ```json
-{ "content": [
+{
+  "content": [
     { "text": "Invoice for " },
     { "text": "{{ client.name }}", "styleOverrides": { "fontWeight": "bold" } },
     { "text": " — " },
-    { "text": "OVERDUE", "styleOverrides": {
+    {
+      "text": "OVERDUE",
+      "styleOverrides": {
         "color": "#e74c3c",
         "fontWeight": "bold",
         "textDecoration": "underline"
@@ -255,14 +277,14 @@ Each element type is implemented as a plugin with a standardized interface:
 
 ```typescript
 interface Plugin<TProps = Record<string, unknown>> {
-  type: string;                                    // unique identifier
-  propsSchema: JSONSchema;                         // validates element properties
-  defaultProps: TProps;                            // sensible defaults
-  validate(props: TProps): ValidationError[];      // custom validation
+  type: string; // unique identifier
+  propsSchema: JSONSchema; // validates element properties
+  defaultProps: TProps; // sensible defaults
+  validate(props: TProps): ValidationError[]; // custom validation
   measure(props: TProps, ctx: MeasureContext): Promise<{ width: number; height: number }>;
   render(props: TProps, ctx: RenderContext): Promise<void>;
-  editorComponent?: React.ComponentType;           // optional: drag-and-drop canvas
-  propPanelComponent?: React.ComponentType;        // optional: property editor UI
+  editorComponent?: React.ComponentType; // optional: drag-and-drop canvas
+  propPanelComponent?: React.ComponentType; // optional: property editor UI
 }
 ```
 
@@ -270,28 +292,28 @@ The `measure()` function is critical — it enables the two-pass rendering pipel
 
 ### Phase 1 Plugins
 
-| Plugin | Properties | Description |
-|--------|-----------|-------------|
-| `text` | `content: RichContent`, `autoHeight` | Text with rich formatting, word wrapping, multi-line. Content is a plain string or array of styled runs. |
-| `line` | `color`, `thickness`, `direction`, `dashPattern` | Horizontal/vertical lines, dividers. `dashPattern` is an array of dash/gap lengths (e.g., `[4, 2]` for dashed, `[1, 2]` for dotted). |
-| `list` | `listType`, `items`, `bulletStyle`, `indent`, `itemSpacing` | Bullet, numbered, or lettered lists with nesting. Items use `RichContent` for mixed formatting. |
+| Plugin | Properties                                                  | Description                                                                                                                          |
+| ------ | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `text` | `content: RichContent`, `autoHeight`                        | Text with rich formatting, word wrapping, multi-line. Content is a plain string or array of styled runs.                             |
+| `line` | `color`, `thickness`, `direction`, `dashPattern`            | Horizontal/vertical lines, dividers. `dashPattern` is an array of dash/gap lengths (e.g., `[4, 2]` for dashed, `[1, 2]` for dotted). |
+| `list` | `listType`, `items`, `bulletStyle`, `indent`, `itemSpacing` | Bullet, numbered, or lettered lists with nesting. Items use `RichContent` for mixed formatting.                                      |
 
 ### Phase 3 Plugins
 
-| Plugin | Properties | Description |
-|--------|-----------|-------------|
-| `image` | `src`, `fit`, `alt` | Images from URL, file path, or base64. Supports JPEG, PNG, and SVG. SVGs are rasterized at high DPI (default 300) for embedding. Fit modes: contain, cover, fill. |
-| `container` | `layout`, `columns`, `gap`, `elements` | Groups child elements. Layout: horizontal, vertical, absolute, or grid. Grid mode uses `columns` for static multi-column layouts. |
-| `shape` | `shapeType`, `fill`, `stroke`, `strokeWidth`, `dashPattern` | Rectangle, circle, ellipse primitives with fill and stroke styling |
+| Plugin      | Properties                                                  | Description                                                                                                                                                       |
+| ----------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `image`     | `src`, `fit`, `alt`                                         | Images from URL, file path, or base64. Supports JPEG, PNG, and SVG. SVGs are rasterized at high DPI (default 300) for embedding. Fit modes: contain, cover, fill. |
+| `container` | `layout`, `columns`, `gap`, `elements`                      | Groups child elements. Layout: horizontal, vertical, absolute, or grid. Grid mode uses `columns` for static multi-column layouts.                                 |
+| `shape`     | `shapeType`, `fill`, `stroke`, `strokeWidth`, `dashPattern` | Rectangle, circle, ellipse primitives with fill and stroke styling                                                                                                |
 
 ### Phase 5 Plugins
 
-| Plugin | Properties | Description |
-|--------|-----------|-------------|
-| `table` | `dataSource`, `columns`, `borders`, `headerStyle`, `cellStyle` | Declarative tables with auto page-break support |
-| `chart` | `spec`, `dataSource` | Charts via Vega-Lite. Rendered to image then embedded |
-| `barcode` | `value`, `format` | Barcodes and QR codes via bwip-js |
-| `frame` | `bands` | A nested band container (similar to JasperReports subreports). Contains its own bands with independent data iteration and page-break logic. Enables side-by-side repeating content like two tables with different data sources. |
+| Plugin    | Properties                                                     | Description                                                                                                                                                                                                                     |
+| --------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `table`   | `dataSource`, `columns`, `borders`, `headerStyle`, `cellStyle` | Declarative tables with auto page-break support                                                                                                                                                                                 |
+| `chart`   | `spec`, `dataSource`                                           | Charts via Vega-Lite. Rendered to image then embedded                                                                                                                                                                           |
+| `barcode` | `value`, `format`                                              | Barcodes and QR codes via bwip-js                                                                                                                                                                                               |
+| `frame`   | `bands`                                                        | A nested band container (similar to JasperReports subreports). Contains its own bands with independent data iteration and page-break logic. Enables side-by-side repeating content like two tables with different data sources. |
 
 ## Packages
 
@@ -378,6 +400,7 @@ Element type implementations. Each plugin is self-contained with measure, render
 Takes a template + data and produces a PDF. This is the most complex package.
 
 **Pipeline**:
+
 1. **Validate** — Check template schema + data against `dataSchema`
 2. **Resolve** — Process LiquidJS expressions with provided data
 3. **Measure** — Call each plugin's `measure()` to compute element/band sizes
@@ -412,17 +435,17 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
 
 ## Key Design Decisions
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| Content model | Sections > Bands > Elements | Bands flow vertically with automatic pagination. Sections allow mixed page sizes/orientations. Proven model from JasperReports. |
-| Pages | Rendering artifact | Pages are created by the renderer, not defined in the template. Supports both fixed layouts (certificates) and dynamic content (invoices with variable line items). |
-| Positioning | Absolute within bands | Elements use (x, y, width, height) relative to band origin. Ideal for drag-and-drop editing. Bands themselves stack vertically. |
-| Units | Points (1/72 inch) | Native PDF unit. Editor converts to mm/inches for display. |
-| Coordinate origin | Top-left in schema | Intuitive for authors and the editor. Renderer translates to pdf-lib's bottom-left internally. |
-| Data schema | JSON Schema (draft 2020-12) | Industry standard. Free validation via `ajv`. Interoperable with APIs. |
-| Template expressions | LiquidJS | Mature syntax, filters, conditionals. Resolved by renderer before reaching plugins. |
-| Styling | Named styles + inline overrides | Reusable styles without cascade complexity. Simple to serialize and reason about. |
-| Plugin isolation | Plugins receive resolved values | Plugins never call LiquidJS. They get plain strings/numbers. This keeps them testable, decoupled, and swappable. |
+| Decision             | Choice                          | Rationale                                                                                                                                                           |
+| -------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Content model        | Sections > Bands > Elements     | Bands flow vertically with automatic pagination. Sections allow mixed page sizes/orientations. Proven model from JasperReports.                                     |
+| Pages                | Rendering artifact              | Pages are created by the renderer, not defined in the template. Supports both fixed layouts (certificates) and dynamic content (invoices with variable line items). |
+| Positioning          | Absolute within bands           | Elements use (x, y, width, height) relative to band origin. Ideal for drag-and-drop editing. Bands themselves stack vertically.                                     |
+| Units                | Points (1/72 inch)              | Native PDF unit. Editor converts to mm/inches for display.                                                                                                          |
+| Coordinate origin    | Top-left in schema              | Intuitive for authors and the editor. Renderer translates to pdf-lib's bottom-left internally.                                                                      |
+| Data schema          | JSON Schema (draft 2020-12)     | Industry standard. Free validation via `ajv`. Interoperable with APIs.                                                                                              |
+| Template expressions | LiquidJS                        | Mature syntax, filters, conditionals. Resolved by renderer before reaching plugins.                                                                                 |
+| Styling              | Named styles + inline overrides | Reusable styles without cascade complexity. Simple to serialize and reason about.                                                                                   |
+| Plugin isolation     | Plugins receive resolved values | Plugins never call LiquidJS. They get plain strings/numbers. This keeps them testable, decoupled, and swappable.                                                    |
 
 ## Example: Invoice Template
 
@@ -562,20 +585,29 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
             {
               "id": "logo",
               "type": "image",
-              "x": 0, "y": 0, "width": 60, "height": 60,
+              "x": 0,
+              "y": 0,
+              "width": 60,
+              "height": 60,
               "properties": { "src": "{{ company.logo }}" }
             },
             {
               "id": "companyName",
               "type": "text",
-              "x": 70, "y": 10, "width": 200, "height": 25,
+              "x": 70,
+              "y": 10,
+              "width": 200,
+              "height": 25,
               "style": "companyName",
               "properties": { "content": "{{ company.name }}" }
             },
             {
               "id": "companyDetails",
               "type": "text",
-              "x": 70, "y": 38, "width": 200, "height": 40,
+              "x": 70,
+              "y": 38,
+              "width": 200,
+              "height": 40,
               "style": "bodyText",
               "properties": {
                 "content": "{{ company.address }}\n{{ company.phone }}\n{{ company.email }}"
@@ -584,7 +616,10 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
             {
               "id": "invoiceTitle",
               "type": "text",
-              "x": 370, "y": 0, "width": 162, "height": 30,
+              "x": 370,
+              "y": 0,
+              "width": 162,
+              "height": 30,
               "style": "label",
               "styleOverrides": { "fontSize": 24, "textAlign": "right" },
               "properties": { "content": "INVOICE" }
@@ -592,7 +627,10 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
             {
               "id": "invoiceNumber",
               "type": "text",
-              "x": 370, "y": 34, "width": 162, "height": 14,
+              "x": 370,
+              "y": 34,
+              "width": 162,
+              "height": 14,
               "style": "bodyText",
               "styleOverrides": { "textAlign": "right" },
               "properties": { "content": "#{{ invoice.number }}" }
@@ -600,7 +638,10 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
             {
               "id": "invoiceDate",
               "type": "text",
-              "x": 370, "y": 50, "width": 162, "height": 14,
+              "x": 370,
+              "y": 50,
+              "width": 162,
+              "height": 14,
               "style": "bodyText",
               "styleOverrides": { "textAlign": "right" },
               "properties": { "content": "Date: {{ invoice.date | date: '%B %d, %Y' }}" }
@@ -608,7 +649,10 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
             {
               "id": "dueDate",
               "type": "text",
-              "x": 370, "y": 66, "width": 162, "height": 14,
+              "x": 370,
+              "y": 66,
+              "width": 162,
+              "height": 14,
               "style": "bodyText",
               "styleOverrides": { "textAlign": "right" },
               "properties": { "content": "Due: {{ invoice.dueDate | date: '%B %d, %Y' }}" }
@@ -616,14 +660,20 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
             {
               "id": "billToLabel",
               "type": "text",
-              "x": 0, "y": 85, "width": 100, "height": 12,
+              "x": 0,
+              "y": 85,
+              "width": 100,
+              "height": 12,
               "style": "label",
               "properties": { "content": "BILL TO" }
             },
             {
               "id": "clientName",
               "type": "text",
-              "x": 0, "y": 99, "width": 250, "height": 14,
+              "x": 0,
+              "y": 99,
+              "width": 250,
+              "height": 14,
               "style": "bodyText",
               "styleOverrides": { "fontWeight": "bold" },
               "properties": { "content": "{{ client.name }}" }
@@ -631,7 +681,10 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
             {
               "id": "clientAddress",
               "type": "text",
-              "x": 0, "y": 115, "width": 250, "height": 14,
+              "x": 0,
+              "y": 115,
+              "width": 250,
+              "height": 14,
               "style": "bodyText",
               "properties": { "content": "{{ client.address }}" }
             }
@@ -646,14 +699,20 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
             {
               "id": "thDesc",
               "type": "text",
-              "x": 8, "y": 6, "width": 280, "height": 14,
+              "x": 8,
+              "y": 6,
+              "width": 280,
+              "height": 14,
               "style": "tableHeader",
               "properties": { "content": "Description" }
             },
             {
               "id": "thQty",
               "type": "text",
-              "x": 296, "y": 6, "width": 60, "height": 14,
+              "x": 296,
+              "y": 6,
+              "width": 60,
+              "height": 14,
               "style": "tableHeader",
               "styleOverrides": { "textAlign": "center" },
               "properties": { "content": "Qty" }
@@ -661,7 +720,10 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
             {
               "id": "thPrice",
               "type": "text",
-              "x": 364, "y": 6, "width": 80, "height": 14,
+              "x": 364,
+              "y": 6,
+              "width": 80,
+              "height": 14,
               "style": "tableHeader",
               "styleOverrides": { "textAlign": "right" },
               "properties": { "content": "Unit Price" }
@@ -669,7 +731,10 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
             {
               "id": "thTotal",
               "type": "text",
-              "x": 452, "y": 6, "width": 80, "height": 14,
+              "x": 452,
+              "y": 6,
+              "width": 80,
+              "height": 14,
               "style": "tableHeader",
               "styleOverrides": { "textAlign": "right" },
               "properties": { "content": "Total" }
@@ -686,14 +751,20 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
             {
               "id": "tdDesc",
               "type": "text",
-              "x": 8, "y": 4, "width": 280, "height": 14,
+              "x": 8,
+              "y": 4,
+              "width": 280,
+              "height": 14,
               "style": "tableCell",
               "properties": { "content": "{{ item.description }}" }
             },
             {
               "id": "tdQty",
               "type": "text",
-              "x": 296, "y": 4, "width": 60, "height": 14,
+              "x": 296,
+              "y": 4,
+              "width": 60,
+              "height": 14,
               "style": "tableCell",
               "styleOverrides": { "textAlign": "center" },
               "properties": { "content": "{{ item.quantity }}" }
@@ -701,7 +772,10 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
             {
               "id": "tdPrice",
               "type": "text",
-              "x": 364, "y": 4, "width": 80, "height": 14,
+              "x": 364,
+              "y": 4,
+              "width": 80,
+              "height": 14,
               "style": "tableCell",
               "styleOverrides": { "textAlign": "right" },
               "properties": { "content": "{{ item.unitPrice | money }}" }
@@ -709,7 +783,10 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
             {
               "id": "tdTotal",
               "type": "text",
-              "x": 452, "y": 4, "width": 80, "height": 14,
+              "x": 452,
+              "y": 4,
+              "width": 80,
+              "height": 14,
               "style": "tableCell",
               "styleOverrides": { "textAlign": "right" },
               "properties": { "content": "{{ item.total | money }}" }
@@ -724,7 +801,10 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
             {
               "id": "subtotalLabel",
               "type": "text",
-              "x": 332, "y": 10, "width": 120, "height": 14,
+              "x": 332,
+              "y": 10,
+              "width": 120,
+              "height": 14,
               "style": "totalLabel",
               "styleOverrides": { "fontSize": 10, "fontWeight": "normal" },
               "properties": { "content": "Subtotal" }
@@ -732,7 +812,10 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
             {
               "id": "subtotalValue",
               "type": "text",
-              "x": 452, "y": 10, "width": 80, "height": 14,
+              "x": 452,
+              "y": 10,
+              "width": 80,
+              "height": 14,
               "style": "totalLabel",
               "styleOverrides": { "fontSize": 10, "fontWeight": "normal" },
               "properties": { "content": "{{ subtotal | money }}" }
@@ -740,7 +823,10 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
             {
               "id": "taxLabel",
               "type": "text",
-              "x": 332, "y": 28, "width": 120, "height": 14,
+              "x": 332,
+              "y": 28,
+              "width": 120,
+              "height": 14,
               "style": "totalLabel",
               "styleOverrides": { "fontSize": 10, "fontWeight": "normal" },
               "properties": { "content": "Tax ({{ taxRate }}%)" }
@@ -748,7 +834,10 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
             {
               "id": "taxValue",
               "type": "text",
-              "x": 452, "y": 28, "width": 80, "height": 14,
+              "x": 452,
+              "y": 28,
+              "width": 80,
+              "height": 14,
               "style": "totalLabel",
               "styleOverrides": { "fontSize": 10, "fontWeight": "normal" },
               "properties": { "content": "{{ taxAmount | money }}" }
@@ -756,20 +845,29 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
             {
               "id": "divider",
               "type": "line",
-              "x": 332, "y": 48, "width": 200, "height": 1,
+              "x": 332,
+              "y": 48,
+              "width": 200,
+              "height": 1,
               "properties": { "color": "#cccccc", "thickness": 1 }
             },
             {
               "id": "totalLabel",
               "type": "text",
-              "x": 332, "y": 54, "width": 120, "height": 20,
+              "x": 332,
+              "y": 54,
+              "width": 120,
+              "height": 20,
               "style": "totalLabel",
               "properties": { "content": "TOTAL" }
             },
             {
               "id": "totalValue",
               "type": "text",
-              "x": 452, "y": 54, "width": 80, "height": 20,
+              "x": 452,
+              "y": 54,
+              "width": 80,
+              "height": 20,
               "style": "totalValue",
               "properties": { "content": "{{ total | money }}" }
             }
@@ -785,14 +883,20 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
             {
               "id": "notesLabel",
               "type": "text",
-              "x": 0, "y": 10, "width": 100, "height": 12,
+              "x": 0,
+              "y": 10,
+              "width": 100,
+              "height": 12,
               "style": "label",
               "properties": { "content": "NOTES" }
             },
             {
               "id": "notesText",
               "type": "text",
-              "x": 0, "y": 24, "width": 532, "height": 30,
+              "x": 0,
+              "y": 24,
+              "width": 532,
+              "height": 30,
               "style": "bodyText",
               "properties": { "content": "{{ invoice.notes }}" }
             }
@@ -806,7 +910,10 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
             {
               "id": "footerText",
               "type": "text",
-              "x": 0, "y": 10, "width": 532, "height": 12,
+              "x": 0,
+              "y": 10,
+              "width": 532,
+              "height": 12,
               "style": "footer",
               "properties": {
                 "content": "Thank you for your business! | Page {{ _pageNumber }} of {{ _totalPages }}"
@@ -821,6 +928,7 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
 ```
 
 Key features demonstrated:
+
 - **Data binding**: `{{ company.name }}`, `{{ item.total | money }}` — LiquidJS syntax with filters
 - **Detail band**: `dataSource: "lineItems"` iterates automatically, one band instance per array item
 - **Column header**: Repeats after each page break so table headers are always visible
