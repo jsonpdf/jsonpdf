@@ -158,8 +158,9 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 
 - [x] Container plugin (horizontal, vertical, absolute, grid layout)
 - [x] Table plugin (columns, headers, borders, auto page-break)
-- [ ] Chart plugin (Vega-Lite → image → PDF)
-- [ ] Barcode/QR plugin
+- [x] Barcode/QR plugin (bwip-js, 19 formats, two-level caching)
+- [ ] SVG support in image plugin (@resvg/resvg-js rasterization)
+- [ ] Chart plugin (Vega-Lite → SVG → image plugin)
 - [ ] Frame plugin (nested band container for side-by-side repeating content)
 
 ### Phase 6: Editor MVP

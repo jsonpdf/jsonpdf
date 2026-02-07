@@ -20,6 +20,7 @@ import {
   imagePlugin,
   containerPlugin,
   tablePlugin,
+  barcodePlugin,
   createImageCache,
 } from '@jsonpdf/plugins';
 import { embedFonts, collectFontSpecs } from './fonts.js';
@@ -249,6 +250,7 @@ function createDefaultRegistry(): PluginRegistry {
   registry.register(imagePlugin);
   registry.register(containerPlugin);
   registry.register(tablePlugin);
+  registry.register(barcodePlugin);
   return registry;
 }
 
