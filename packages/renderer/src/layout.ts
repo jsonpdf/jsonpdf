@@ -1,5 +1,5 @@
 import type { PDFDocument } from 'pdf-lib';
-import type { Template, Band, BandType, PageConfig, Style } from '@jsonpdf/core';
+import type { Element, Template, Band, BandType, PageConfig, Style } from '@jsonpdf/core';
 import type { FontMap, Plugin, ImageCache } from '@jsonpdf/plugins';
 import { createMeasureContext } from './context.js';
 import { resolveElementStyle, normalizePadding } from './style-resolver.js';
@@ -7,6 +7,9 @@ import type { ExpressionEngine } from './expression.js';
 import { expandBands } from './band-expander.js';
 import type { BandInstance, ExpandedSection } from './band-expander.js';
 import { computeColumnLayout, type ColumnLayout } from './columns.js';
+
+/** Maximum nesting depth for container elements to prevent infinite recursion. */
+export const MAX_CONTAINER_DEPTH = 10;
 
 export interface LayoutBand {
   band: Band;
@@ -56,6 +59,40 @@ interface BandMeasurement {
   elementHeights: Map<string, number>;
 }
 
+/**
+ * Create a measureChild callback for container elements during the layout pass.
+ * This allows the container plugin to measure its children during band autoHeight computation.
+ */
+function createLayoutMeasureChild(
+  fonts: FontMap,
+  styles: Record<string, Style>,
+  getPlugin: (type: string) => Plugin,
+  pdfDoc: PDFDocument,
+  imageCache: ImageCache,
+  depth: number = 0,
+): (element: Element) => Promise<{ width: number; height: number }> {
+  return async (childEl: Element) => {
+    if (depth + 1 > MAX_CONTAINER_DEPTH) {
+      throw new Error('Maximum container nesting depth exceeded');
+    }
+    const plugin = getPlugin(childEl.type);
+    const props = plugin.resolveProps(childEl.properties);
+    const measureCtx = createMeasureContext(childEl, fonts, styles, pdfDoc, imageCache);
+    if (childEl.elements?.length) {
+      measureCtx.children = childEl.elements;
+      measureCtx.measureChild = createLayoutMeasureChild(
+        fonts,
+        styles,
+        getPlugin,
+        pdfDoc,
+        imageCache,
+        depth + 1,
+      );
+    }
+    return plugin.measure(props, measureCtx);
+  };
+}
+
 /** Measure a single band's height. Returns the measured height and per-element heights. */
 async function measureBand(
   band: Band,
@@ -81,6 +118,17 @@ async function measureBand(
         );
       }
       const measureCtx = createMeasureContext(element, fonts, styles, pdfDoc, imageCache);
+      // Provide child measurement for container elements
+      if (element.elements?.length) {
+        measureCtx.children = element.elements;
+        measureCtx.measureChild = createLayoutMeasureChild(
+          fonts,
+          styles,
+          getPlugin,
+          pdfDoc,
+          imageCache,
+        );
+      }
       const measured = await plugin.measure(props, measureCtx);
       // measured.height is the content height (within padding-adjusted space).
       // Store the total element height (content + padding) so createRenderContext

@@ -110,6 +110,8 @@ export interface Element {
   condition?: string;
   conditionalStyles?: ConditionalStyle[];
   properties: Record<string, unknown>;
+  /** Child elements for container-like plugins. */
+  elements?: Element[];
 }
 
 export interface ConditionalStyle {

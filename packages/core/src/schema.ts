@@ -149,6 +149,7 @@ export const templateSchema: JSONSchema = {
           items: { $ref: '#/$defs/ConditionalStyle' },
         },
         properties: { type: 'object' },
+        elements: { type: 'array', items: { $ref: '#/$defs/Element' } },
       },
     },
     ConditionalStyle: {

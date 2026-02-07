@@ -41,3 +41,6 @@ export { shapePlugin, type ShapeProps, roundedRectPath } from './shape/shape-plu
 export { imagePlugin, type ImageProps, computeFitDimensions } from './image/image-plugin.js';
 export { createImageCache, loadImageBytes, detectFormat } from './image/image-loader.js';
 export type { ImageFormat, LoadedImage } from './image/image-loader.js';
+
+// Container plugin
+export { containerPlugin, type ContainerProps } from './container/container-plugin.js';
