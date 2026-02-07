@@ -105,16 +105,16 @@ export const imagePlugin: Plugin<ImageProps> = {
     if (!props.src || typeof props.src !== 'string' || props.src.trim().length === 0) {
       errors.push({ path: '/src', message: 'src is required and must be a non-empty string' });
     }
-    if (
-      props.fit !== undefined &&
-      !['contain', 'cover', 'fill', 'none'].includes(props.fit)
-    ) {
+    if (props.fit !== undefined && !['contain', 'cover', 'fill', 'none'].includes(props.fit)) {
       errors.push({ path: '/fit', message: 'fit must be contain, cover, fill, or none' });
     }
     return errors;
   },
 
-  async measure(props: ImageProps, ctx: MeasureContext): Promise<{ width: number; height: number }> {
+  async measure(
+    props: ImageProps,
+    ctx: MeasureContext,
+  ): Promise<{ width: number; height: number }> {
     const embedded = await getImage(props.src, ctx);
     const fit = props.fit ?? 'contain';
     const { drawWidth, drawHeight } = computeFitDimensions(

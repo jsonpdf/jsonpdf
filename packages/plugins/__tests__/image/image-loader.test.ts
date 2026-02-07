@@ -6,7 +6,8 @@ const TINY_PNG_BASE64 =
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
 
 // Minimal JPEG (smallest valid JFIF)
-const TINY_JPEG_BASE64 = '/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP8B////AP////8A//8A//8A/////wD/2wBDAP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP8B////AP////8A//8A//8A/////wD/wAARCAABAAEDASIAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8AKwA//9k=';
+const TINY_JPEG_BASE64 =
+  '/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP8B////AP////8A//8A//8A/////wD/2wBDAP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP//AP8B////AP////8A//8A//8A/////wD/wAARCAABAAEDASIAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8AKwA//9k=';
 
 describe('detectFormat', () => {
   it('detects PNG format', () => {
@@ -54,9 +55,7 @@ describe('loadImageBytes', () => {
 
   it('loads image from HTTP URL', async () => {
     const pngBytes = Uint8Array.from(atob(TINY_PNG_BASE64), (c) => c.charCodeAt(0));
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(pngBytes, { status: 200 }),
-    );
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(pngBytes, { status: 200 }));
 
     const result = await loadImageBytes('https://example.com/image.png');
     expect(result.format).toBe('png');
@@ -89,14 +88,10 @@ describe('createImageCache', () => {
     const cache = createImageCache();
 
     // First: fail with bad data URI
-    await expect(
-      cache.getOrEmbed('data:image/png;base64,BADDATA', doc),
-    ).rejects.toThrow();
+    await expect(cache.getOrEmbed('data:image/png;base64,BADDATA', doc)).rejects.toThrow();
 
     // Retry same key should attempt again (not return cached rejection)
     // Still fails because the data is still bad, but it's a fresh attempt
-    await expect(
-      cache.getOrEmbed('data:image/png;base64,BADDATA', doc),
-    ).rejects.toThrow();
+    await expect(cache.getOrEmbed('data:image/png;base64,BADDATA', doc)).rejects.toThrow();
   });
 });

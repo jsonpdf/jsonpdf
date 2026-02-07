@@ -1,7 +1,13 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { PDFDocument } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
-import { resolveStandardFont, embedFonts, collectFontSpecs, mapWeight, isStandardFont } from '../src/fonts.js';
+import {
+  resolveStandardFont,
+  embedFonts,
+  collectFontSpecs,
+  mapWeight,
+  isStandardFont,
+} from '../src/fonts.js';
 import { fontKey } from '@jsonpdf/plugins';
 import { createTemplate, addStyle, addSection, addBand, addElement } from '@jsonpdf/template';
 
@@ -135,9 +141,7 @@ describe('collectFontSpecs', () => {
       width: 200,
       height: 30,
       properties: { content: 'test' },
-      conditionalStyles: [
-        { condition: 'true', style: 'mono' },
-      ],
+      conditionalStyles: [{ condition: 'true', style: 'mono' }],
     });
 
     const specs = collectFontSpecs(t);
@@ -256,9 +260,7 @@ describe('embedFonts with custom fonts', () => {
 
   it('standard fonts work without fontDeclarations parameter', async () => {
     const doc = await PDFDocument.create();
-    const fonts = await embedFonts(doc, [
-      { family: 'Courier', weight: 'normal', style: 'normal' },
-    ]);
+    const fonts = await embedFonts(doc, [{ family: 'Courier', weight: 'normal', style: 'normal' }]);
     expect(fonts.has(fontKey('Courier', 'normal', 'normal'))).toBe(true);
   });
 });

@@ -172,19 +172,13 @@ describe('imagePlugin.measure', () => {
   });
 
   it('returns element dimensions for fill', async () => {
-    const result = await imagePlugin.measure(
-      { src: PNG_DATA_URI, fit: 'fill' },
-      makeMeasureCtx(),
-    );
+    const result = await imagePlugin.measure({ src: PNG_DATA_URI, fit: 'fill' }, makeMeasureCtx());
     expect(result.width).toBe(200);
     expect(result.height).toBe(100);
   });
 
   it('returns natural dimensions for none', async () => {
-    const result = await imagePlugin.measure(
-      { src: PNG_DATA_URI, fit: 'none' },
-      makeMeasureCtx(),
-    );
+    const result = await imagePlugin.measure({ src: PNG_DATA_URI, fit: 'none' }, makeMeasureCtx());
     // 1x1 PNG
     expect(result.width).toBe(1);
     expect(result.height).toBe(1);

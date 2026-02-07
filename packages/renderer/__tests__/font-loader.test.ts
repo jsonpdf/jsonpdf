@@ -7,9 +7,7 @@ describe('loadFontBytes', () => {
   });
 
   it('loads bytes from a local file path', async () => {
-    const bytes = await loadFontBytes(
-      new URL('../package.json', import.meta.url).pathname,
-    );
+    const bytes = await loadFontBytes(new URL('../package.json', import.meta.url).pathname);
     expect(bytes).toBeInstanceOf(Uint8Array);
     expect(bytes.length).toBeGreaterThan(0);
   });
@@ -27,9 +25,7 @@ describe('loadFontBytes', () => {
 
   it('fetches bytes from an HTTPS URL with timeout signal', async () => {
     const fakeBytes = new Uint8Array([0x00, 0x01, 0x02]);
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(fakeBytes, { status: 200 }),
-    );
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(fakeBytes, { status: 200 }));
 
     const result = await loadFontBytes('https://example.com/font.ttf');
     expect(result).toEqual(fakeBytes);
@@ -51,9 +47,7 @@ describe('loadFontBytes', () => {
 
   it('fetches bytes from an HTTP URL', async () => {
     const fakeBytes = new Uint8Array([0x10, 0x20]);
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(fakeBytes, { status: 200 }),
-    );
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(fakeBytes, { status: 200 }));
 
     const result = await loadFontBytes('http://example.com/font.otf');
     expect(result).toEqual(fakeBytes);

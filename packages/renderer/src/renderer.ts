@@ -86,12 +86,26 @@ export async function renderPdf(
 
   // 9. Pass 1: measure layout to determine total page count
   const measureLayout = await layoutTemplate(
-    template, fonts, getPlugin, engine, data, 0, doc, imageCache,
+    template,
+    fonts,
+    getPlugin,
+    engine,
+    data,
+    0,
+    doc,
+    imageCache,
   );
 
   // 10. Pass 2: layout with correct totalPages
   const layout = await layoutTemplate(
-    template, fonts, getPlugin, engine, data, measureLayout.totalPages, doc, imageCache,
+    template,
+    fonts,
+    getPlugin,
+    engine,
+    data,
+    measureLayout.totalPages,
+    doc,
+    imageCache,
   );
 
   // 11. Render pages

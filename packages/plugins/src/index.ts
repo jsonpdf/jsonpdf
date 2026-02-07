@@ -1,5 +1,12 @@
 // Plugin system types
-export type { Plugin, MeasureContext, RenderContext, FontMap, EmbeddedImage, ImageCache } from './types.js';
+export type {
+  Plugin,
+  MeasureContext,
+  RenderContext,
+  FontMap,
+  EmbeddedImage,
+  ImageCache,
+} from './types.js';
 export { fontKey } from './types.js';
 
 // Registry

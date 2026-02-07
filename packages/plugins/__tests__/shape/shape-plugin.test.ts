@@ -162,10 +162,7 @@ describe('shapePlugin.render', () => {
   it('renders rect with stroke and strokeWidth', async () => {
     const ctx = makeRenderCtx();
     const spy = vi.spyOn(ctx.page, 'drawRectangle');
-    await shapePlugin.render(
-      { shapeType: 'rect', stroke: '#000000', strokeWidth: 2 },
-      ctx,
-    );
+    await shapePlugin.render({ shapeType: 'rect', stroke: '#000000', strokeWidth: 2 }, ctx);
     expect(spy).toHaveBeenCalledOnce();
     const args = spy.mock.calls[0]![0]!;
     expect(args.borderWidth).toBe(2);
@@ -202,10 +199,7 @@ describe('shapePlugin.render', () => {
   it('renders rect with borderRadius via drawSvgPath', async () => {
     const ctx = makeRenderCtx();
     const spy = vi.spyOn(ctx.page, 'drawSvgPath');
-    await shapePlugin.render(
-      { shapeType: 'rect', fill: '#0000ff', borderRadius: 10 },
-      ctx,
-    );
+    await shapePlugin.render({ shapeType: 'rect', fill: '#0000ff', borderRadius: 10 }, ctx);
     expect(spy).toHaveBeenCalledOnce();
     spy.mockRestore();
   });
@@ -232,10 +226,7 @@ describe('shapePlugin.render', () => {
   it('renders circle with stroke', async () => {
     const ctx = makeRenderCtx();
     const spy = vi.spyOn(ctx.page, 'drawCircle');
-    await shapePlugin.render(
-      { shapeType: 'circle', stroke: '#ff0000', strokeWidth: 3 },
-      ctx,
-    );
+    await shapePlugin.render({ shapeType: 'circle', stroke: '#ff0000', strokeWidth: 3 }, ctx);
     const args = spy.mock.calls[0]![0]!;
     expect(args.borderWidth).toBe(3);
     spy.mockRestore();

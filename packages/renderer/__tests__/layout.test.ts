@@ -2,7 +2,12 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 import { layoutTemplate } from '../src/layout.js';
 import {
-  PluginRegistry, textPlugin, linePlugin, listPlugin, fontKey, createImageCache,
+  PluginRegistry,
+  textPlugin,
+  linePlugin,
+  listPlugin,
+  fontKey,
+  createImageCache,
 } from '@jsonpdf/plugins';
 import type { FontMap, Plugin, ImageCache } from '@jsonpdf/plugins';
 import { createTemplate, addSection, addBand, addElement, addStyle } from '@jsonpdf/template';
@@ -35,7 +40,16 @@ function getPlugin(type: string): Plugin {
 }
 
 function doLayout(template: ReturnType<typeof createTemplate>, data = {}, totalPagesHint = 0) {
-  return layoutTemplate(template, fonts, getPlugin, engine, data, totalPagesHint, pdfDoc, imageCache);
+  return layoutTemplate(
+    template,
+    fonts,
+    getPlugin,
+    engine,
+    data,
+    totalPagesHint,
+    pdfDoc,
+    imageCache,
+  );
 }
 
 describe('layoutTemplate: backward-compatible body band tests', () => {

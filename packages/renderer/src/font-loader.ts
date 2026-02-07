@@ -14,7 +14,9 @@ const FETCH_TIMEOUT_MS = 30_000;
 export async function loadFontBytes(src: string): Promise<Uint8Array> {
   if (src.startsWith('http://') || src.startsWith('https://')) {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => { controller.abort(); }, FETCH_TIMEOUT_MS);
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, FETCH_TIMEOUT_MS);
     try {
       const response = await fetch(src, { signal: controller.signal });
       if (!response.ok) {

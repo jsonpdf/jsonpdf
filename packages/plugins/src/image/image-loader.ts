@@ -40,7 +40,9 @@ export async function loadImageBytes(src: string): Promise<LoadedImage> {
   } else if (src.startsWith('http://') || src.startsWith('https://')) {
     // URL with timeout
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => { controller.abort(); }, FETCH_TIMEOUT_MS);
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, FETCH_TIMEOUT_MS);
     try {
       const response = await fetch(src, { signal: controller.signal });
       if (!response.ok) {
@@ -60,10 +62,7 @@ export async function loadImageBytes(src: string): Promise<LoadedImage> {
 }
 
 /** Embed an image into a PDF document. */
-async function embedImage(
-  doc: PDFDocument,
-  loaded: LoadedImage,
-): Promise<EmbeddedImage> {
+async function embedImage(doc: PDFDocument, loaded: LoadedImage): Promise<EmbeddedImage> {
   const image =
     loaded.format === 'png' ? await doc.embedPng(loaded.bytes) : await doc.embedJpg(loaded.bytes);
   return {
