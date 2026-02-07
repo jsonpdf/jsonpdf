@@ -138,10 +138,10 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 - [ ] Container plugin (horizontal, vertical, absolute, grid layout) — deferred to Phase 5
 - [x] Shape plugin (rectangle, circle, ellipse with fill, stroke, dashPattern, borderRadius)
 - [x] Font loading via fontkit (custom TTF/OTF/WOFF embedding with subsetting)
-- [ ] Renderer — Element rotation support
+- [x] Renderer — Element rotation support
 - [x] Renderer — Conditional element styles (`conditionalStyles`) — completed in Phase 2
-- [ ] Renderer — Hyperlinks (`link` on StyledRun) and PDF bookmarks (`bookmark` on Section/Band)
-- [ ] Renderer — Cross-references (`anchor` on Element/Band, `{{ ref("id") }}` Liquid function)
+- [x] Renderer — Hyperlinks (`link` on StyledRun) and PDF bookmarks (`bookmark` on Section/Band)
+- [x] Renderer — Cross-references (`anchor` on Element/Band, `{{ "id" | ref }}` Liquid filter)
 - [ ] Renderer — Widow/orphan control (`widows`, `orphans` in Style)
 - [ ] Renderer — Multi-column sections (`columns`, `columnGap`)
 - [ ] Renderer — Asymmetric column widths (`columnWidths` on Section)

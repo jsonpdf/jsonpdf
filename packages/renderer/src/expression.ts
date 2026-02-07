@@ -10,6 +10,8 @@ export interface ExpressionEngine {
   ): Promise<Record<string, unknown>>;
   /** Evaluate a Liquid expression as a boolean. */
   evaluate(expression: string, scope: Record<string, unknown>): Promise<boolean>;
+  /** Register a custom Liquid filter. */
+  registerFilter(name: string, fn: (value: unknown, ...args: unknown[]) => unknown): void;
 }
 
 /** Create a new expression engine with custom filters. */
@@ -87,5 +89,9 @@ export function createExpressionEngine(): ExpressionEngine {
     return result.trim() === 'true';
   }
 
-  return { resolve, resolveProps, evaluate };
+  function registerFilter(name: string, fn: (value: unknown, ...args: unknown[]) => unknown): void {
+    liquid.registerFilter(name, fn);
+  }
+
+  return { resolve, resolveProps, evaluate, registerFilter };
 }

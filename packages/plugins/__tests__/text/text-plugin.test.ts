@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import { PDFDocument, StandardFonts } from 'pdf-lib';
-import type { PDFFont, PDFPage } from 'pdf-lib';
+import { PDFDocument, StandardFonts, PDFName, PDFArray, PDFDict } from 'pdf-lib';
+import type { PDFFont, PDFPage, PDFRef } from 'pdf-lib';
 import { textPlugin } from '../../src/text/text-plugin.js';
 import { fontKey } from '../../src/types.js';
 import type { MeasureContext, RenderContext, FontMap, ImageCache } from '../../src/types.js';
@@ -203,5 +203,134 @@ describe('textPlugin rich text with nonexistent named style', () => {
     // Should use default style (Helvetica 12pt) — same as plain text
     const plainResult = await textPlugin.measure({ content: 'Hello' }, makeMeasureCtx());
     expect(result.height).toBe(plainResult.height);
+  });
+});
+
+describe('textPlugin: hyperlinks', () => {
+  it('adds link annotation for StyledRun with link', async () => {
+    const testDoc = await PDFDocument.create();
+    const testFont = await testDoc.embedFont(StandardFonts.Helvetica);
+    const testPage = testDoc.addPage([612, 792]);
+    const testFonts: FontMap = new Map();
+    testFonts.set(fontKey('Helvetica', 'normal', 'normal'), testFont);
+
+    await textPlugin.render(
+      {
+        content: [{ text: 'Click here', link: 'https://example.com' }],
+      },
+      makeRenderCtx({
+        page: testPage,
+        fonts: testFonts,
+        pdfDoc: testDoc,
+      }),
+    );
+
+    // Check that an annotation was added to the page
+    const annots = testPage.node.get(PDFName.of('Annots'));
+    expect(annots).toBeDefined();
+    expect(annots).toBeInstanceOf(PDFArray);
+    expect((annots as PDFArray).size()).toBeGreaterThan(0);
+  });
+
+  it('does not add annotation for StyledRun without link', async () => {
+    const testDoc = await PDFDocument.create();
+    const testFont = await testDoc.embedFont(StandardFonts.Helvetica);
+    const testPage = testDoc.addPage([612, 792]);
+    const testFonts: FontMap = new Map();
+    testFonts.set(fontKey('Helvetica', 'normal', 'normal'), testFont);
+
+    await textPlugin.render(
+      {
+        content: [{ text: 'No link here' }],
+      },
+      makeRenderCtx({
+        page: testPage,
+        fonts: testFonts,
+        pdfDoc: testDoc,
+      }),
+    );
+
+    // Page may have an empty Annots array from pdf-lib internals; verify no link annotations
+    const annots = testPage.node.get(PDFName.of('Annots'));
+    if (annots instanceof PDFArray) {
+      expect(annots.size()).toBe(0);
+    } else {
+      expect(annots).toBeUndefined();
+    }
+  });
+
+  it('adds multiple annotations for multiple linked words', async () => {
+    const testDoc = await PDFDocument.create();
+    const testFont = await testDoc.embedFont(StandardFonts.Helvetica);
+    const testPage = testDoc.addPage([612, 792]);
+    const testFonts: FontMap = new Map();
+    testFonts.set(fontKey('Helvetica', 'normal', 'normal'), testFont);
+
+    await textPlugin.render(
+      {
+        content: [{ text: 'Click this link', link: 'https://example.com' }],
+      },
+      makeRenderCtx({
+        page: testPage,
+        fonts: testFonts,
+        pdfDoc: testDoc,
+      }),
+    );
+
+    // "Click", "this", "link" = 3 words = 3 annotations
+    const annots = testPage.node.get(PDFName.of('Annots'));
+    expect(annots).toBeInstanceOf(PDFArray);
+    expect((annots as PDFArray).size()).toBe(3);
+  });
+
+  it('mixes linked and unlinked runs', async () => {
+    const testDoc = await PDFDocument.create();
+    const testFont = await testDoc.embedFont(StandardFonts.Helvetica);
+    const testPage = testDoc.addPage([612, 792]);
+    const testFonts: FontMap = new Map();
+    testFonts.set(fontKey('Helvetica', 'normal', 'normal'), testFont);
+
+    await textPlugin.render(
+      {
+        content: [
+          { text: 'Normal text ' },
+          { text: 'linked text', link: 'https://example.com' },
+          { text: ' more normal' },
+        ],
+      },
+      makeRenderCtx({
+        page: testPage,
+        fonts: testFonts,
+        pdfDoc: testDoc,
+      }),
+    );
+
+    // Only "linked" and "text" should have annotations (2 words)
+    const annots = testPage.node.get(PDFName.of('Annots'));
+    expect(annots).toBeInstanceOf(PDFArray);
+    expect((annots as PDFArray).size()).toBe(2);
+  });
+
+  it('produces valid PDF bytes with link annotations', async () => {
+    const testDoc = await PDFDocument.create();
+    const testFont = await testDoc.embedFont(StandardFonts.Helvetica);
+    const testPage = testDoc.addPage([612, 792]);
+    const testFonts: FontMap = new Map();
+    testFonts.set(fontKey('Helvetica', 'normal', 'normal'), testFont);
+
+    await textPlugin.render(
+      {
+        content: [{ text: 'Visit us', link: 'https://jsonpdf.dev' }],
+      },
+      makeRenderCtx({
+        page: testPage,
+        fonts: testFonts,
+        pdfDoc: testDoc,
+      }),
+    );
+
+    const bytes = await testDoc.save();
+    const header = new TextDecoder().decode(new Uint8Array(bytes).slice(0, 5));
+    expect(header).toBe('%PDF-');
   });
 });
