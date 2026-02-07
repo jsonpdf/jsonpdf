@@ -3,13 +3,15 @@ import type { Template } from '@jsonpdf/core';
 import { parseColor, validateTemplateSchema } from '@jsonpdf/core';
 import { PluginRegistry, textPlugin, linePlugin, listPlugin } from '@jsonpdf/plugins';
 import { embedFonts, collectFontSpecs } from './fonts.js';
-import { layoutTemplate } from './layout.js';
+import { layoutTemplate, mergePageConfig } from './layout.js';
 import { createRenderContext } from './context.js';
+import { createExpressionEngine } from './expression.js';
+import { validateData } from './data.js';
 
 export interface RenderOptions {
   /** Skip template validation. */
   skipValidation?: boolean;
-  /** Input data for template expressions (Phase 2). */
+  /** Input data for template expressions. */
   data?: Record<string, unknown>;
   /** Custom plugin registry. If not provided, a default registry with built-in plugins is used. */
   registry?: PluginRegistry;
@@ -36,7 +38,7 @@ export async function renderPdf(
   template: Template,
   options?: RenderOptions,
 ): Promise<RenderResult> {
-  // 1. Validate (schema-only; semantic validation is the caller's responsibility)
+  // 1. Validate template schema
   if (!options?.skipValidation) {
     const validation = validateTemplateSchema(template);
     if (!validation.valid) {
@@ -45,28 +47,43 @@ export async function renderPdf(
     }
   }
 
-  // 2. Set up plugin registry
+  // 2. Validate data against dataSchema
+  const data = options?.data ?? {};
+  validateData(data, template.dataSchema);
+
+  // 3. Set up plugin registry
   const registry = options?.registry ?? createDefaultRegistry();
 
-  // 3. Create PDF document
+  // 4. Create PDF document
   const doc = await PDFDocument.create();
 
-  // 4. Collect and embed fonts
+  // 5. Create expression engine
+  const engine = createExpressionEngine();
+
+  // 6. Collect and embed fonts
   const fontSpecs = collectFontSpecs(template);
   const fonts = await embedFonts(doc, fontSpecs);
 
-  // 5. Layout
+  // 7. Layout helper
   const getPlugin = (type: string) => registry.get(type);
-  const layout = await layoutTemplate(template, fonts, getPlugin);
 
-  // 6. Render pages
+  // 8. Pass 1: measure layout to determine total page count
+  const measureLayout = await layoutTemplate(template, fonts, getPlugin, engine, data, 0);
+
+  // 9. Pass 2: layout with correct totalPages
+  const layout = await layoutTemplate(
+    template,
+    fonts,
+    getPlugin,
+    engine,
+    data,
+    measureLayout.totalPages,
+  );
+
+  // 10. Render pages
   for (const layoutPage of layout.pages) {
     const section = template.sections[layoutPage.sectionIndex];
-    const pageConfig = {
-      ...template.page,
-      ...(section.page ?? {}),
-      margins: { ...template.page.margins, ...(section.page?.margins ?? {}) },
-    };
+    const pageConfig = mergePageConfig(template.page, section.page);
     const page = doc.addPage([pageConfig.width, pageConfig.height]);
 
     for (const layoutBand of layoutPage.bands) {
@@ -89,18 +106,46 @@ export async function renderPdf(
 
       // Render elements
       for (const element of layoutBand.band.elements) {
-        const plugin = registry.get(element.type);
-        const props = plugin.resolveProps(element.properties);
+        // Evaluate element condition
+        if (element.condition) {
+          const show = await engine.evaluate(element.condition, layoutBand.scope);
+          if (!show) continue;
+        }
+
+        // Resolve expressions in properties
+        const resolvedProperties = await engine.resolveProps(element.properties, layoutBand.scope);
+
+        // Apply conditional styles
+        let effectiveElement = element;
+        if (element.conditionalStyles?.length) {
+          let mergedOverrides = { ...(element.styleOverrides ?? {}) };
+          let mergedStyleName = element.style;
+          for (const cs of element.conditionalStyles) {
+            const matches = await engine.evaluate(cs.condition, layoutBand.scope);
+            if (matches) {
+              if (cs.style) mergedStyleName = cs.style;
+              if (cs.styleOverrides) mergedOverrides = { ...mergedOverrides, ...cs.styleOverrides };
+            }
+          }
+          effectiveElement = {
+            ...element,
+            style: mergedStyleName,
+            styleOverrides: mergedOverrides,
+          };
+        }
+
+        const plugin = registry.get(effectiveElement.type);
+        const props = plugin.resolveProps(resolvedProperties);
         const propErrors = plugin.validate(props);
         if (propErrors.length > 0) {
           const messages = propErrors.map((e) => `${e.path}: ${e.message}`).join('; ');
           throw new Error(
-            `Invalid properties for ${element.type} element "${element.id}": ${messages}`,
+            `Invalid properties for ${effectiveElement.type} element "${effectiveElement.id}": ${messages}`,
           );
         }
-        const measuredHeight = layoutBand.elementHeights.get(element.id);
+        const measuredHeight = layoutBand.elementHeights.get(effectiveElement.id);
         const renderCtx = createRenderContext(
-          element,
+          effectiveElement,
           fonts,
           template.styles,
           page,
@@ -115,10 +160,10 @@ export async function renderPdf(
     }
   }
 
-  // 7. Save
+  // 11. Save
   const bytes = await doc.save();
   return {
     bytes,
-    pageCount: layout.pages.length,
+    pageCount: layout.totalPages,
   };
 }

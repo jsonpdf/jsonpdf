@@ -108,3 +108,140 @@ describe('renderPdf', () => {
     await expect(renderPdf(t)).rejects.toThrow('Invalid properties for line element "bad-line"');
   });
 });
+
+describe('renderPdf: data binding', () => {
+  it('resolves Liquid expressions in text content', async () => {
+    let t = createTemplate({ name: 'Data Binding' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'b1', {
+      id: 'el1',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 20,
+      properties: { content: 'Hello {{ name }}' },
+    });
+
+    const result = await renderPdf(t, { data: { name: 'World' } });
+    expect(result.pageCount).toBe(1);
+    expect(result.bytes.length).toBeGreaterThan(0);
+  });
+
+  it('validates data against dataSchema', async () => {
+    let t = createTemplate({ name: 'Schema Validation' });
+    // Override dataSchema with required fields
+    t = {
+      ...t,
+      dataSchema: {
+        type: 'object',
+        properties: { name: { type: 'string' } },
+        required: ['name'],
+      },
+    };
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'b1', {
+      id: 'el1',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 20,
+      properties: { content: '{{ name }}' },
+    });
+
+    // Valid data
+    const result = await renderPdf(t, { data: { name: 'Test' } });
+    expect(result.pageCount).toBe(1);
+
+    // Invalid data (missing required field)
+    await expect(renderPdf(t, { data: {} })).rejects.toThrow('Data validation failed');
+  });
+
+  it('skips element when condition is false', async () => {
+    let t = createTemplate({ name: 'Conditional' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'b1', {
+      id: 'el1',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 20,
+      condition: 'showText',
+      properties: { content: 'Conditional text' },
+    });
+
+    // Element condition false — should still render page (just skip element)
+    const result = await renderPdf(t, { data: { showText: false } });
+    expect(result.pageCount).toBe(1);
+  });
+});
+
+describe('renderPdf: multi-page', () => {
+  it('renders detail bands across multiple pages', async () => {
+    let t = createTemplate({
+      name: 'Multi-Page Detail',
+      page: { width: 200, height: 200, margins: { top: 20, right: 20, bottom: 20, left: 20 } },
+    });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', {
+      id: 'detail',
+      type: 'detail',
+      height: 20,
+      dataSource: 'items',
+      elements: [],
+    });
+    t = addElement(t, 'detail', {
+      id: 'item-text',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 160,
+      height: 20,
+      properties: { content: '{{ item.name }}' },
+    });
+
+    const data = {
+      items: Array.from({ length: 20 }, (_, i) => ({ name: `Item ${i + 1}` })),
+    };
+    const result = await renderPdf(t, { data });
+    expect(result.pageCount).toBeGreaterThan(1);
+
+    const header = new TextDecoder().decode(result.bytes.slice(0, 5));
+    expect(header).toBe('%PDF-');
+  });
+
+  it('renders multi-section template', async () => {
+    let t = createTemplate({ name: 'Multi-Section' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'b1', {
+      id: 'el1',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 20,
+      properties: { content: 'Section 1' },
+    });
+
+    t = addSection(t, { id: 'sec2', bands: [] });
+    t = addBand(t, 'sec2', { id: 'b2', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'b2', {
+      id: 'el2',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 20,
+      properties: { content: 'Section 2' },
+    });
+
+    const result = await renderPdf(t);
+    expect(result.pageCount).toBe(2);
+  });
+});
