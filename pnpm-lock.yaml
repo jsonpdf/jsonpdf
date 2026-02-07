@@ -71,6 +71,9 @@ importers:
       '@jsonpdf/core':
         specifier: workspace:*
         version: link:../core
+      bwip-js:
+        specifier: ^4.8.0
+        version: 4.8.0
       pdf-lib:
         specifier: ^1.17.1
         version: 1.17.1
@@ -602,6 +605,10 @@ packages:
 
   brace-expansion@2.0.2:
     resolution: {integrity: sha512-Jt0vHyM+jmUBqojB7E1NIYadt0vI0Qxjxd2TErW94wDz+E2LAm5vKMXXwg6ZZBTHPuUlDgQHKXvjGBdfcF1ZDQ==}
+
+  bwip-js@4.8.0:
+    resolution: {integrity: sha512-gUDkDHSTv8/DJhomSIbO0fX/Dx0MO/sgllLxJyJfu4WixCQe9nfGJzmHm64ZCbxo+gUYQEsQcRmqcwcwPRwUkg==}
+    hasBin: true
 
   cac@6.7.14:
     resolution: {integrity: sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ==}
@@ -1535,6 +1542,8 @@ snapshots:
   brace-expansion@2.0.2:
     dependencies:
       balanced-match: 1.0.2
+
+  bwip-js@4.8.0: {}
 
   cac@6.7.14: {}
 

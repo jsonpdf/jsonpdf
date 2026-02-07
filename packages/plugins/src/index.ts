@@ -48,3 +48,13 @@ export { containerPlugin, type ContainerProps } from './container/container-plug
 // Table plugin
 export { tablePlugin } from './table/table-plugin.js';
 export { type TableProps, type TableColumn, computeColumnWidths } from './table/table-types.js';
+
+// Barcode plugin
+export { barcodePlugin } from './barcode/barcode-plugin.js';
+export {
+  type BarcodeProps,
+  type BarcodeFormat,
+  SUPPORTED_FORMATS,
+} from './barcode/barcode-types.js';
+export { generateBarcode, createBarcodeCache, toBwipColor } from './barcode/barcode-generator.js';
+export type { BarcodeCache } from './barcode/barcode-generator.js';
