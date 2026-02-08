@@ -135,6 +135,49 @@ describe('ExpressionEngine.resolveProps', () => {
     expect(result.a).toBeNull();
     expect(result.b).toBe('hello');
   });
+
+  it('returns raw array for pure expression referencing an array', async () => {
+    const engine = createExpressionEngine();
+    const data = [
+      { department: 'Sales', revenue: 100000 },
+      { department: 'Engineering', revenue: 200000 },
+    ];
+    const result = await engine.resolveProps(
+      { dataSource: '{{ departments }}' },
+      { departments: data },
+    );
+    expect(result.dataSource).toEqual(data);
+    expect(Array.isArray(result.dataSource)).toBe(true);
+  });
+
+  it('returns raw object for pure expression referencing an object', async () => {
+    const engine = createExpressionEngine();
+    const config = { color: 'blue', size: 12 };
+    const result = await engine.resolveProps(
+      { settings: '{{ config }}' },
+      { config },
+    );
+    expect(result.settings).toEqual(config);
+  });
+
+  it('returns string for pure expression resolving to a primitive', async () => {
+    const engine = createExpressionEngine();
+    const result = await engine.resolveProps(
+      { label: '{{ name }}' },
+      { name: 'Alice' },
+    );
+    expect(result.label).toBe('Alice');
+    expect(typeof result.label).toBe('string');
+  });
+
+  it('falls back to string for expressions with filters', async () => {
+    const engine = createExpressionEngine();
+    const result = await engine.resolveProps(
+      { amount: '{{ price | money }}' },
+      { price: 99.5 },
+    );
+    expect(result.amount).toBe('$99.50');
+  });
 });
 
 describe('ExpressionEngine custom filters', () => {
