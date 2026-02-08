@@ -995,3 +995,45 @@ describe('layoutTemplate: title and summary', () => {
     expect(summaryIdx).toBeGreaterThan(bodyIdx);
   });
 });
+
+describe('layoutTemplate: columnFooter float', () => {
+  it('columnFooter with float: true positions after content', async () => {
+    // Page: 400pt height, 20pt margins each → 360pt content area
+    // Body band of 50pt → content only takes 50pt of the 360pt
+    // With float: true, columnFooter should be placed right after the body content
+    // Without float, it would be pushed to the bottom (just above pageFooter)
+    let t = createTemplate({
+      page: { width: 300, height: 400, margins: { top: 20, right: 20, bottom: 20, left: 20 } },
+    });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 50, elements: [] });
+    t = addBand(t, 'sec1', {
+      id: 'cf',
+      type: 'columnFooter',
+      height: 30,
+      float: true,
+      elements: [],
+    });
+    t = addBand(t, 'sec1', { id: 'pf', type: 'pageFooter', height: 20, elements: [] });
+
+    const result = await doLayout(t);
+    expect(result.totalPages).toBe(1);
+
+    const bodyBand = result.pages[0]!.bands.find((b) => b.band.type === 'body')!;
+    const colFooter = result.pages[0]!.bands.find((b) => b.band.type === 'columnFooter')!;
+    const pageFooter = result.pages[0]!.bands.find((b) => b.band.type === 'pageFooter')!;
+
+    // columnFooter should float up to right after content
+    // bodyBand ends at bodyBand.offsetY + bodyBand.measuredHeight
+    const bodyBottom = bodyBand.offsetY + bodyBand.measuredHeight;
+    expect(colFooter.offsetY).toBeLessThanOrEqual(bodyBottom);
+
+    // columnFooter should be above pageFooter
+    expect(colFooter.offsetY).toBeLessThan(pageFooter.offsetY);
+
+    // With float, columnFooter should NOT be at the fixed bottom position
+    // Fixed position would be: 360 (content area) - 20 (pageFooter) - 30 (colFooter) = 310
+    const fixedPosition = 360 - 20 - 30;
+    expect(colFooter.offsetY).toBeLessThan(fixedPosition);
+  });
+});

@@ -84,6 +84,7 @@ export const chartPlugin: Plugin<ChartProps> = {
       y: imgY,
       width: drawWidth,
       height: drawHeight,
+      opacity: ctx.opacity,
     });
   },
 };

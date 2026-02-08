@@ -527,12 +527,19 @@ async function layoutSection(
     const footerTotalHeight = useLastFooter ? lastPageFooterHeight : pageFooterHeight;
 
     // Compute footer placement origin
+    const hasFloatColumnFooter = expanded.columnFooterBands.some((b) => b.float === true);
     let columnFooterStartOffset: number;
     let footerStartOffset: number;
     if (pageConfig.autoHeight) {
       const contentBottom = pageHeaderHeight + columnHeaderHeight + cursorY;
       columnFooterStartOffset = contentBottom;
       footerStartOffset = contentBottom + columnFooterHeight;
+    } else if (hasFloatColumnFooter) {
+      const floatPos = pageHeaderHeight + columnHeaderHeight + cursorY;
+      const fixedPos =
+        pageConfig.height - totalVerticalMargins - footerTotalHeight - columnFooterHeight;
+      columnFooterStartOffset = Math.min(floatPos, fixedPos);
+      footerStartOffset = pageConfig.height - totalVerticalMargins - footerTotalHeight;
     } else {
       columnFooterStartOffset =
         pageConfig.height - totalVerticalMargins - footerTotalHeight - columnFooterHeight;

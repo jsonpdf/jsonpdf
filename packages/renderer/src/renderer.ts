@@ -24,6 +24,7 @@ import {
   chartPlugin,
   framePlugin,
   createImageCache,
+  roundedRectPath,
 } from '@jsonpdf/plugins';
 import { embedFonts, collectFontSpecs } from './fonts.js';
 import { layoutTemplate, mergePageConfig, MAX_CONTAINER_DEPTH } from './layout.js';
@@ -175,6 +176,138 @@ function createMeasureChildCallback(
 }
 
 /**
+ * Draw element-level background and borders.
+ * Called BEFORE plugin.render() so backgrounds/borders appear behind content.
+ *
+ * @param page - The pdf-lib page
+ * @param pdfX - Left edge in pdf-lib coordinates
+ * @param pdfY - Top edge in pdf-lib coordinates (Y increases upward)
+ * @param width - Element width
+ * @param height - Element height
+ * @param style - Resolved element style
+ */
+function drawElementBordersAndBackground(
+  page: PDFPage,
+  pdfX: number,
+  pdfY: number,
+  width: number,
+  height: number,
+  style: Style,
+): void {
+  const opacity = style.opacity;
+  const hasBorderRadius = (style.borderRadius ?? 0) > 0;
+  const hasIndividualBorders = !!(
+    style.borderTop ||
+    style.borderRight ||
+    style.borderBottom ||
+    style.borderLeft
+  );
+
+  // 1. Background
+  if (style.backgroundColor) {
+    const bg = parseColor(style.backgroundColor);
+    const bgColor = rgb(bg.r, bg.g, bg.b);
+
+    if (hasBorderRadius) {
+      const path = roundedRectPath(width, height, style.borderRadius ?? 0);
+      page.drawSvgPath(path, {
+        x: pdfX,
+        y: pdfY,
+        color: bgColor,
+        opacity,
+      });
+    } else {
+      page.drawRectangle({
+        x: pdfX,
+        y: pdfY - height,
+        width,
+        height,
+        color: bgColor,
+        opacity,
+      });
+    }
+  }
+
+  // 2. Uniform border (skipped when individual borders are defined — they take precedence)
+  if ((style.borderWidth ?? 0) > 0 && !hasBorderRadius && !hasIndividualBorders) {
+    const borderColor = style.borderColor ? parseColor(style.borderColor) : { r: 0, g: 0, b: 0 };
+    page.drawRectangle({
+      x: pdfX,
+      y: pdfY - height,
+      width,
+      height,
+      borderColor: rgb(borderColor.r, borderColor.g, borderColor.b),
+      borderWidth: style.borderWidth,
+      opacity: 0,
+      borderOpacity: opacity,
+    });
+  }
+
+  // 2b. Uniform border with borderRadius (skipped when individual borders are defined)
+  if ((style.borderWidth ?? 0) > 0 && hasBorderRadius && !hasIndividualBorders) {
+    const borderColor = style.borderColor ? parseColor(style.borderColor) : { r: 0, g: 0, b: 0 };
+    const path = roundedRectPath(width, height, style.borderRadius ?? 0);
+    page.drawSvgPath(path, {
+      x: pdfX,
+      y: pdfY,
+      borderColor: rgb(borderColor.r, borderColor.g, borderColor.b),
+      borderWidth: style.borderWidth,
+      borderOpacity: opacity,
+      opacity: 0,
+    });
+  }
+
+  // 3. Individual borders (skipped when borderRadius is set — CSS behavior)
+  if (!hasBorderRadius) {
+    const top = pdfY;
+    const bottom = pdfY - height;
+    const left = pdfX;
+    const right = pdfX + width;
+
+    if (style.borderTop && style.borderTop.width > 0) {
+      const c = parseColor(style.borderTop.color ?? style.borderColor ?? '#000000');
+      page.drawLine({
+        start: { x: left, y: top },
+        end: { x: right, y: top },
+        thickness: style.borderTop.width,
+        color: rgb(c.r, c.g, c.b),
+        opacity,
+      });
+    }
+    if (style.borderBottom && style.borderBottom.width > 0) {
+      const c = parseColor(style.borderBottom.color ?? style.borderColor ?? '#000000');
+      page.drawLine({
+        start: { x: left, y: bottom },
+        end: { x: right, y: bottom },
+        thickness: style.borderBottom.width,
+        color: rgb(c.r, c.g, c.b),
+        opacity,
+      });
+    }
+    if (style.borderLeft && style.borderLeft.width > 0) {
+      const c = parseColor(style.borderLeft.color ?? style.borderColor ?? '#000000');
+      page.drawLine({
+        start: { x: left, y: bottom },
+        end: { x: left, y: top },
+        thickness: style.borderLeft.width,
+        color: rgb(c.r, c.g, c.b),
+        opacity,
+      });
+    }
+    if (style.borderRight && style.borderRight.width > 0) {
+      const c = parseColor(style.borderRight.color ?? style.borderColor ?? '#000000');
+      page.drawLine({
+        start: { x: right, y: bottom },
+        end: { x: right, y: top },
+        thickness: style.borderRight.width,
+        color: rgb(c.r, c.g, c.b),
+        opacity,
+      });
+    }
+  }
+}
+
+/**
  * Render a single element at a given position in pdf-lib coordinates.
  *
  * Handles: condition evaluation, expression resolution, conditional styles,
@@ -263,6 +396,7 @@ async function renderElementAtPosition(
     width: effectiveElement.width - padding.left - padding.right,
     height: height - padding.top - padding.bottom,
     anchorPageMap: env.anchorPageMap,
+    opacity: elementStyle.opacity,
   };
 
   // 7. Add child callbacks for container elements
@@ -361,6 +495,9 @@ async function renderElementAtPosition(
       translate(-centerX, -centerY),
     );
   }
+
+  // 8b. Draw element-level background and borders (behind content)
+  drawElementBordersAndBackground(page, pdfX, pdfY, effectiveElement.width, height, elementStyle);
 
   // 9. Render
   await plugin.render(props, renderCtx);

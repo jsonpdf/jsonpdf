@@ -206,6 +206,111 @@ describe('textPlugin rich text with nonexistent named style', () => {
   });
 });
 
+describe('textPlugin: Phase 6 features', () => {
+  it('renders justified text without throwing', async () => {
+    const ctx = makeRenderCtx({
+      elementStyle: { ...defaultStyle, textAlign: 'justify' },
+    });
+    await expect(
+      textPlugin.render({ content: 'Some words to justify across the line' }, ctx),
+    ).resolves.toBeUndefined();
+  });
+
+  it('renders text with letterSpacing without throwing', async () => {
+    const ctx = makeRenderCtx({
+      elementStyle: { ...defaultStyle, letterSpacing: 2 },
+    });
+    await expect(
+      textPlugin.render({ content: 'Letter spaced text' }, ctx),
+    ).resolves.toBeUndefined();
+  });
+
+  it('renders text with underline decoration without throwing', async () => {
+    const ctx = makeRenderCtx({
+      elementStyle: { ...defaultStyle, textDecoration: 'underline' },
+    });
+    await expect(textPlugin.render({ content: 'Underlined text' }, ctx)).resolves.toBeUndefined();
+  });
+
+  it('renders text with line-through decoration without throwing', async () => {
+    const ctx = makeRenderCtx({
+      elementStyle: { ...defaultStyle, textDecoration: 'line-through' },
+    });
+    await expect(
+      textPlugin.render({ content: 'Strikethrough text' }, ctx),
+    ).resolves.toBeUndefined();
+  });
+
+  it('renders text with underline line-through without throwing', async () => {
+    const ctx = makeRenderCtx({
+      elementStyle: { ...defaultStyle, textDecoration: 'underline line-through' },
+    });
+    await expect(textPlugin.render({ content: 'Both decorations' }, ctx)).resolves.toBeUndefined();
+  });
+
+  it('renders text with opacity without throwing', async () => {
+    const ctx = makeRenderCtx({
+      elementStyle: { ...defaultStyle, opacity: 0.5 },
+      opacity: 0.5,
+    });
+    await expect(
+      textPlugin.render({ content: 'Semi-transparent text' }, ctx),
+    ).resolves.toBeUndefined();
+  });
+
+  it('renders rich text with justify without throwing', async () => {
+    const ctx = makeRenderCtx({
+      elementStyle: { ...defaultStyle, textAlign: 'justify' },
+    });
+    await expect(
+      textPlugin.render(
+        {
+          content: [
+            { text: 'Justified ' },
+            { text: 'rich text', styleOverrides: { fontWeight: 'bold' } },
+            { text: ' with multiple runs across the line' },
+          ],
+        },
+        ctx,
+      ),
+    ).resolves.toBeUndefined();
+  });
+
+  it('renders rich text with letterSpacing without throwing', async () => {
+    const ctx = makeRenderCtx({
+      elementStyle: { ...defaultStyle, letterSpacing: 1.5 },
+    });
+    await expect(
+      textPlugin.render(
+        {
+          content: [
+            { text: 'Spaced ' },
+            { text: 'rich text', styleOverrides: { fontWeight: 'bold' } },
+          ],
+        },
+        ctx,
+      ),
+    ).resolves.toBeUndefined();
+  });
+
+  it('renders rich text with textDecoration without throwing', async () => {
+    const ctx = makeRenderCtx({
+      elementStyle: { ...defaultStyle, textDecoration: 'underline' },
+    });
+    await expect(
+      textPlugin.render(
+        {
+          content: [
+            { text: 'Underlined ' },
+            { text: 'bold text', styleOverrides: { fontWeight: 'bold' } },
+          ],
+        },
+        ctx,
+      ),
+    ).resolves.toBeUndefined();
+  });
+});
+
 describe('textPlugin: hyperlinks', () => {
   it('adds link annotation for StyledRun with link', async () => {
     const testDoc = await PDFDocument.create();

@@ -139,11 +139,20 @@ function measureRowHeight(
   font: PDFFont,
   fontSize: number,
   lineHeight: number,
+  letterSpacing?: number,
 ): number {
   let maxCellHeight = 0;
   for (let c = 0; c < cells.length; c++) {
     const contentWidth = Math.max(0, columnWidths[c] - 2 * cellPadding);
-    const wrapped = wrapText(cells[c], font, fontSize, contentWidth, lineHeight);
+    const wrapped = wrapText(
+      cells[c],
+      font,
+      fontSize,
+      contentWidth,
+      lineHeight,
+      undefined,
+      letterSpacing,
+    );
     maxCellHeight = Math.max(maxCellHeight, wrapped.height);
   }
   return maxCellHeight + 2 * cellPadding;
@@ -167,6 +176,7 @@ export function measureAllRows(props: TableProps, ctx: MeasureContext): TableMea
   let headerHeight = 0;
   if (showHeader) {
     const headerCells = props.columns.map((col) => col.header ?? col.key);
+    const headerLs = headerStyle.letterSpacing ?? 0;
     headerHeight = measureRowHeight(
       headerCells,
       columnWidths,
@@ -174,6 +184,7 @@ export function measureAllRows(props: TableProps, ctx: MeasureContext): TableMea
       headerFont,
       headerFontSize,
       headerLineHeight,
+      headerLs || undefined,
     );
   }
 
@@ -192,9 +203,20 @@ export function measureAllRows(props: TableProps, ctx: MeasureContext): TableMea
     const font = getFont(ctx.fonts, style);
     const fontSize = style.fontSize ?? 12;
     const lineHeight = getLineHeight(style);
+    const ls = style.letterSpacing ?? 0;
 
     const cells = props.columns.map((col) => props.rows[r][col.key] ?? '');
-    rowHeights.push(measureRowHeight(cells, columnWidths, cellPadding, font, fontSize, lineHeight));
+    rowHeights.push(
+      measureRowHeight(
+        cells,
+        columnWidths,
+        cellPadding,
+        font,
+        fontSize,
+        lineHeight,
+        ls || undefined,
+      ),
+    );
   }
 
   const totalHeight = headerHeight + rowHeights.reduce((sum, h) => sum + h, 0);

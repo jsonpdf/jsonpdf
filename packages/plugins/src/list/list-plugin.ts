@@ -1,9 +1,10 @@
-import { rgb } from 'pdf-lib';
+import { rgb, pushGraphicsState, popGraphicsState, setCharacterSpacing } from 'pdf-lib';
 import { parseColor } from '@jsonpdf/core';
 import type { ValidationError, JSONSchema } from '@jsonpdf/core';
 import type { Plugin, MeasureContext, RenderContext } from '../types.js';
 import { getFont, getLineHeight } from '../utils.js';
-import { wrapText } from '../text/word-wrap.js';
+import { wrapText, measureTextWidth } from '../text/word-wrap.js';
+import { drawTextDecoration } from '../text/text-decoration.js';
 import { toListItem } from './list-types.js';
 import type { ListItemInput, ListItem } from './list-types.js';
 
@@ -66,18 +67,28 @@ function measureItems(
   const fontSize = style.fontSize ?? 12;
   const lh = getLineHeight(style);
 
+  const ls = style.letterSpacing ?? 0;
+
   let totalHeight = 0;
 
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
     const depthIndent = depth * indent;
     const marker = getMarker(listType, i, bulletStyle);
-    const markerWidth = font.widthOfTextAtSize(marker + ' ', fontSize);
+    const markerWidth = measureTextWidth(marker + ' ', font, fontSize, ls || undefined);
     const contentWidth = ctx.availableWidth - depthIndent - markerWidth;
 
     const text =
       typeof item.content === 'string' ? item.content : item.content.map((r) => r.text).join('');
-    const wrapped = wrapText(text, font, fontSize, Math.max(contentWidth, 1), lh);
+    const wrapped = wrapText(
+      text,
+      font,
+      fontSize,
+      Math.max(contentWidth, 1),
+      lh,
+      undefined,
+      ls || undefined,
+    );
     totalHeight += wrapped.height;
 
     if (item.children && item.children.length > 0) {
@@ -118,6 +129,9 @@ function renderItems(
   const color = parseColor(style.color ?? '#000000');
   const pdfColor = rgb(color.r, color.g, color.b);
   const ascent = font.heightAtSize(fontSize, { descender: false });
+  const ls = style.letterSpacing ?? 0;
+  const decoration = style.textDecoration;
+  const needsCharSpacing = ls !== 0;
 
   let currentY = offsetY;
 
@@ -125,34 +139,75 @@ function renderItems(
     const item = items[i];
     const depthIndent = depth * indent;
     const marker = getMarker(listType, i, bulletStyle);
-    const markerWidth = font.widthOfTextAtSize(marker + ' ', fontSize);
+    const markerWidth = measureTextWidth(marker + ' ', font, fontSize, ls || undefined);
     const contentX = ctx.x + depthIndent + markerWidth;
     const contentWidth = ctx.width - depthIndent - markerWidth;
 
     // Draw marker
+    if (needsCharSpacing) {
+      ctx.page.pushOperators(pushGraphicsState(), setCharacterSpacing(ls));
+    }
     ctx.page.drawText(marker, {
       x: ctx.x + depthIndent,
       y: ctx.y - currentY - ascent,
       font,
       size: fontSize,
       color: pdfColor,
+      opacity: ctx.opacity,
     });
+    if (needsCharSpacing) {
+      ctx.page.pushOperators(popGraphicsState());
+    }
 
     // Draw content
     const text =
       typeof item.content === 'string' ? item.content : item.content.map((r) => r.text).join('');
-    const wrapped = wrapText(text, font, fontSize, Math.max(contentWidth, 1), lh);
+    const wrapped = wrapText(
+      text,
+      font,
+      fontSize,
+      Math.max(contentWidth, 1),
+      lh,
+      undefined,
+      ls || undefined,
+    );
 
     for (let j = 0; j < wrapped.lines.length; j++) {
       const line = wrapped.lines[j];
       if (line === '') continue;
+
+      const lineY = ctx.y - currentY - j * lh - ascent;
+
+      if (needsCharSpacing) {
+        ctx.page.pushOperators(pushGraphicsState(), setCharacterSpacing(ls));
+      }
       ctx.page.drawText(line, {
         x: contentX,
-        y: ctx.y - currentY - j * lh - ascent,
+        y: lineY,
         font,
         size: fontSize,
         color: pdfColor,
+        opacity: ctx.opacity,
       });
+      if (needsCharSpacing) {
+        ctx.page.pushOperators(popGraphicsState());
+      }
+
+      // Text decoration
+      if (decoration && decoration !== 'none') {
+        const lineWidth = measureTextWidth(line, font, fontSize, ls || undefined);
+        drawTextDecoration(
+          ctx.page,
+          decoration,
+          contentX,
+          lineY,
+          lineWidth,
+          font,
+          fontSize,
+          color,
+          ctx.opacity,
+        );
+      }
     }
 
     currentY += wrapped.height;

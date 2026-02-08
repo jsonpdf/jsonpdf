@@ -171,4 +171,60 @@ describe('measureTextWidth', () => {
     const w2 = measureTextWidth('Hello World', font, fontSize);
     expect(w2).toBeGreaterThan(w1);
   });
+
+  it('measureTextWidth with letterSpacing returns wider result', () => {
+    const without = measureTextWidth('Hello', font, fontSize);
+    const withSpacing = measureTextWidth('Hello', font, fontSize, 2);
+    // "Hello" has 5 chars → 4 gaps × 2pt = 8pt extra
+    expect(withSpacing).toBeGreaterThan(without);
+    expect(withSpacing).toBeCloseTo(without + 2 * (5 - 1), 1);
+  });
+});
+
+describe('wrapText with letterSpacing', () => {
+  it('wrapText with letterSpacing wraps earlier', () => {
+    const text = 'Hello World';
+    // Use a width that fits without letterSpacing but not with it
+    const widthWithout = measureTextWidth(text, font, fontSize);
+    const narrowWidth = widthWithout + 1; // fits without letterSpacing
+    const resultWithout = wrapText(text, font, fontSize, narrowWidth, lineHeight);
+    expect(resultWithout.lines).toEqual(['Hello World']); // fits on one line
+
+    // With letterSpacing, the same text should no longer fit on one line
+    const resultWith = wrapText(text, font, fontSize, narrowWidth, lineHeight, undefined, 3);
+    expect(resultWith.lines.length).toBeGreaterThan(1);
+  });
+});
+
+describe('wrapText: wordsPerLine and isLastInParagraph', () => {
+  it('wrapText returns correct wordsPerLine', () => {
+    const text = 'The quick brown fox jumps over the lazy dog';
+    const result = wrapText(text, font, fontSize, 100, lineHeight);
+    // wordsPerLine length should match lines length
+    expect(result.wordsPerLine.length).toBe(result.lines.length);
+    // Sum of all wordsPerLine should equal total word count
+    const totalWords = result.wordsPerLine.reduce((a, b) => a + b, 0);
+    expect(totalWords).toBe(9); // 9 words in the sentence
+  });
+
+  it('wrapText returns correct isLastInParagraph', () => {
+    const text = 'Line one\nLine two\nLine three';
+    const result = wrapText(text, font, fontSize, 500, lineHeight);
+    // Each explicit paragraph line should be marked as last in paragraph
+    expect(result.isLastInParagraph.length).toBe(result.lines.length);
+    expect(result.lines).toEqual(['Line one', 'Line two', 'Line three']);
+    // All three lines are single-line paragraphs, so all should be true
+    expect(result.isLastInParagraph).toEqual([true, true, true]);
+  });
+
+  it('wrapText marks wrapped lines as not last in paragraph', () => {
+    const text = 'The quick brown fox jumps over the lazy dog';
+    const result = wrapText(text, font, fontSize, 100, lineHeight);
+    // Only the very last line of the paragraph should be true
+    expect(result.isLastInParagraph[result.isLastInParagraph.length - 1]).toBe(true);
+    // All other lines should be false (they wrapped, not end of paragraph)
+    for (let i = 0; i < result.isLastInParagraph.length - 1; i++) {
+      expect(result.isLastInParagraph[i]).toBe(false);
+    }
+  });
 });

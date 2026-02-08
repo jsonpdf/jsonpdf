@@ -165,13 +165,13 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 
 ### Phase 6: Text & Style Rendering
 
-- [ ] Text — `textDecoration`: underline, line-through, underline+line-through
-- [ ] Text — `letterSpacing`: inter-character spacing in text rendering
-- [ ] Text — `textAlign: "justify"`: full justification with word spacing
-- [ ] Style — `opacity` (0–1): graphics state transparency on any element
-- [ ] Style — Individual borders (`borderTop`, `borderRight`, `borderBottom`, `borderLeft`) on all elements
-- [ ] Style — `borderRadius` on container and image elements (currently shape-only)
-- [ ] Layout — `columnFooter` float mode (`float: true` sits under last detail row)
+- [x] Text — `textDecoration`: underline, line-through, underline+line-through
+- [x] Text — `letterSpacing`: inter-character spacing in text rendering
+- [x] Text — `textAlign: "justify"`: full justification with word spacing
+- [x] Style — `opacity` (0–1): graphics state transparency on any element
+- [x] Style — Individual borders (`borderTop`, `borderRight`, `borderBottom`, `borderLeft`) on all elements
+- [x] Style — `borderRadius` on container and image elements (currently shape-only)
+- [x] Layout — `columnFooter` float mode (`float: true` sits under last detail row)
 
 ### Phase 7: Long-Form Document Support
 
@@ -180,6 +180,8 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 - [ ] Renderer — Text reflow across columns (`columnMode: "flow"` on Section)
 - [ ] Renderer — Auto-generated Table of Contents (`_bookmarks` built-in data source)
 - [ ] Style — Gradient fills (linear, radial) on `backgroundColor`
+- [ ] List plugin — Support `textAlign: "justify"` for list item content (currently left-aligns)
+- [ ] Layout — Per-band `float` on columnFooter (currently applies collectively to all columnFooter bands)
 
 ### Phase 8: Example Updates
 

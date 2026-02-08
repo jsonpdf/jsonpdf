@@ -159,6 +159,7 @@ export const imagePlugin: Plugin<ImageProps> = {
       y: imgY,
       width: drawWidth,
       height: drawHeight,
+      opacity: ctx.opacity,
     });
 
     if (needsClip) {
