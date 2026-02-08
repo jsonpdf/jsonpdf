@@ -11,12 +11,12 @@ export interface WrapResult {
   isLastInParagraph: boolean[];
 }
 
-/** Options for widow/orphan control (plumbing for Phase 8). */
+/** Options for widow/orphan control. */
 export interface WrapOptions {
-  /** Minimum lines at the bottom of a column/page. */
-  widows?: number;
-  /** Minimum lines at the top of a column/page. */
+  /** Minimum lines at the bottom of a column/page (before a break). */
   orphans?: number;
+  /** Minimum lines at the top of a column/page (after a break). */
+  widows?: number;
 }
 
 /**
@@ -24,9 +24,6 @@ export interface WrapOptions {
  *
  * Splits on explicit newlines first, then wraps each paragraph.
  * Words longer than maxWidth are broken at character level.
- *
- * The `options` parameter accepts `widows`/`orphans` for future
- * cross-page line splitting (Phase 8). Currently accepted but unused.
  */
 export function wrapText(
   text: string,
@@ -165,6 +162,46 @@ function breakLongWord(
     }
   }
   return current;
+}
+
+/**
+ * Split wrapped lines into two text strings at a given line index.
+ * Preserves paragraph boundaries (newlines) based on `isLastInParagraph` metadata.
+ *
+ * @param lines - Wrapped lines from `wrapText()`.
+ * @param isLastInParagraph - Parallel array indicating paragraph endings.
+ * @param splitIndex - Line index at which to split (lines 0..splitIndex-1 go to fit).
+ * @returns Two text strings: fit (before split) and overflow (after split).
+ */
+export function splitWrappedText(
+  lines: string[],
+  isLastInParagraph: boolean[],
+  splitIndex: number,
+): { fitText: string; overflowText: string } {
+  return {
+    fitText: joinLines(lines, isLastInParagraph, 0, splitIndex),
+    overflowText: joinLines(lines, isLastInParagraph, splitIndex, lines.length),
+  };
+}
+
+/** Join a range of wrapped lines back into text, using spaces within paragraphs and newlines between. */
+function joinLines(
+  lines: string[],
+  isLastInParagraph: boolean[],
+  start: number,
+  end: number,
+): string {
+  if (start >= end) return '';
+  let result = lines[start];
+  for (let i = start + 1; i < end; i++) {
+    // If the previous line was the last in its paragraph, join with newline
+    if (isLastInParagraph[i - 1]) {
+      result += '\n' + lines[i];
+    } else {
+      result += ' ' + lines[i];
+    }
+  }
+  return result;
 }
 
 /** Measure the width of a text string, accounting for optional letter spacing. */

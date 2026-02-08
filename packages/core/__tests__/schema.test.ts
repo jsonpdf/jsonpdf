@@ -179,4 +179,89 @@ describe('template schema validation', () => {
     const result = validateTemplateSchema(t);
     expect(result.valid).toBe(true);
   });
+
+  it('accepts style with linear gradient backgroundColor', () => {
+    const t = validTemplate();
+    t.styles = {
+      gradient: {
+        backgroundColor: {
+          type: 'linear',
+          angle: 90,
+          stops: [
+            { color: '#ff0000', position: 0 },
+            { color: '#0000ff', position: 1 },
+          ],
+        },
+      },
+    };
+    const result = validateTemplateSchema(t);
+    expect(result.valid).toBe(true);
+  });
+
+  it('accepts style with radial gradient backgroundColor', () => {
+    const t = validTemplate();
+    t.styles = {
+      gradient: {
+        backgroundColor: {
+          type: 'radial',
+          cx: 0.5,
+          cy: 0.5,
+          radius: 0.7,
+          stops: [
+            { color: '#ffffff', position: 0 },
+            { color: '#000000', position: 1 },
+          ],
+        },
+      },
+    };
+    const result = validateTemplateSchema(t);
+    expect(result.valid).toBe(true);
+  });
+
+  it('accepts band with gradient backgroundColor', () => {
+    const t = validTemplate();
+    t.sections[0]!.bands[0]!.backgroundColor = {
+      type: 'linear',
+      angle: 45,
+      stops: [
+        { color: '#ff6600', position: 0 },
+        { color: '#00cc66', position: 1 },
+      ],
+    };
+    const result = validateTemplateSchema(t);
+    expect(result.valid).toBe(true);
+  });
+
+  it('rejects gradient with fewer than 2 stops', () => {
+    const t = validTemplate();
+    t.styles = {
+      gradient: {
+        backgroundColor: {
+          type: 'linear',
+          angle: 0,
+          stops: [{ color: '#ff0000', position: 0 }],
+        } as never,
+      },
+    };
+    const result = validateTemplateSchema(t);
+    expect(result.valid).toBe(false);
+  });
+
+  it('rejects gradient stop with position > 1', () => {
+    const t = validTemplate();
+    t.styles = {
+      gradient: {
+        backgroundColor: {
+          type: 'linear',
+          angle: 0,
+          stops: [
+            { color: '#ff0000', position: 0 },
+            { color: '#0000ff', position: 1.5 },
+          ],
+        } as never,
+      },
+    };
+    const result = validateTemplateSchema(t);
+    expect(result.valid).toBe(false);
+  });
 });

@@ -175,18 +175,18 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 
 ### Phase 7: Long-Form Document Support
 
-- [ ] Text — Widow/orphan control (full implementation in word-wrap, currently plumbing-only)
-- [ ] Renderer — Footnotes (`footnote` on StyledRun, dynamic per-page space reservation)
-- [ ] Renderer — Text reflow across columns (`columnMode: "flow"` on Section)
-- [ ] Renderer — Auto-generated Table of Contents (`_bookmarks` built-in data source)
-- [ ] Style — Gradient fills (linear, radial) on `backgroundColor`
-- [ ] List plugin — Support `textAlign: "justify"` for list item content (currently left-aligns)
-- [ ] Layout — Per-band `float` on columnFooter (currently applies collectively to all columnFooter bands)
+- [x] Text — Widow/orphan control (full implementation with `splitWrappedText()` in text plugin)
+- [x] Renderer — Footnotes (`footnote` on StyledRun, per-page separator line + superscript markers)
+- [x] Renderer — Text reflow across columns (`columnMode: "flow"` with band splitting)
+- [x] Renderer — Auto-generated Table of Contents (`_bookmarks` built-in data source)
+- [x] Style — Gradient fills (linear, radial) on `backgroundColor` via PDF shading patterns
+- [x] List plugin — Support `textAlign: "justify"`, `"center"`, `"right"` for list item content
+- [x] Layout — Per-band `float` on columnFooter (`computeColumnFooterOffsets()`)
 
 ### Phase 8: Example Updates
 
-- [ ] Update existing examples to showcase Phase 6–7 features
-- [ ] Add new examples for long-form documents (footnotes, TOC, justified text)
+- [x] Update existing examples to showcase Phase 6–7 features (newsletter gradient masthead, technical-report auto-TOC)
+- [x] Add new examples for long-form documents (`longform-showcase`: footnotes, TOC, column flow, gradients, list alignment)
 
 ### Phase 9: Editor MVP
 

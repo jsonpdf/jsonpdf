@@ -124,7 +124,9 @@ export const templateSchema: JSONSchema = {
         pageBreakBefore: { type: 'boolean' },
         bookmark: { type: 'string' },
         anchor: { type: 'string' },
-        backgroundColor: { type: 'string' },
+        backgroundColor: {
+          oneOf: [{ type: 'string' }, { $ref: '#/$defs/Gradient' }],
+        },
         elements: { type: 'array', items: { $ref: '#/$defs/Element' } },
       },
     },
@@ -187,7 +189,9 @@ export const templateSchema: JSONSchema = {
         fontStyle: { type: 'string', enum: [...fontStyleValues] },
         textDecoration: { type: 'string', enum: [...textDecorationValues] },
         color: { type: 'string' },
-        backgroundColor: { type: 'string' },
+        backgroundColor: {
+          oneOf: [{ type: 'string' }, { $ref: '#/$defs/Gradient' }],
+        },
         textAlign: { type: 'string', enum: [...textAlignValues] },
         lineHeight: { type: 'number', exclusiveMinimum: 0 },
         letterSpacing: { type: 'number' },
@@ -225,6 +229,41 @@ export const templateSchema: JSONSchema = {
             right: { type: 'number', minimum: 0 },
             bottom: { type: 'number', minimum: 0 },
             left: { type: 'number', minimum: 0 },
+          },
+        },
+      ],
+    },
+    GradientStop: {
+      type: 'object',
+      required: ['color', 'position'],
+      additionalProperties: false,
+      properties: {
+        color: { type: 'string' },
+        position: { type: 'number', minimum: 0, maximum: 1 },
+      },
+    },
+    Gradient: {
+      oneOf: [
+        {
+          type: 'object',
+          required: ['type', 'angle', 'stops'],
+          additionalProperties: false,
+          properties: {
+            type: { const: 'linear' },
+            angle: { type: 'number' },
+            stops: { type: 'array', minItems: 2, items: { $ref: '#/$defs/GradientStop' } },
+          },
+        },
+        {
+          type: 'object',
+          required: ['type', 'stops'],
+          additionalProperties: false,
+          properties: {
+            type: { const: 'radial' },
+            cx: { type: 'number', minimum: 0, maximum: 1 },
+            cy: { type: 'number', minimum: 0, maximum: 1 },
+            radius: { type: 'number', minimum: 0, maximum: 1 },
+            stops: { type: 'array', minItems: 2, items: { $ref: '#/$defs/GradientStop' } },
           },
         },
       ],

@@ -8,8 +8,8 @@ import {
   translate,
 } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
-import type { Band, Element, Section, Style, Template } from '@jsonpdf/core';
-import { parseColor, validateTemplateSchema } from '@jsonpdf/core';
+import type { Band, Element, RichContent, Section, Style, Template } from '@jsonpdf/core';
+import { parseColor, isGradient, validateTemplateSchema } from '@jsonpdf/core';
 import type { FontMap, ImageCache, RenderContext } from '@jsonpdf/plugins';
 import {
   PluginRegistry,
@@ -36,6 +36,8 @@ import { expandBands } from './band-expander.js';
 import { collectAnchors } from './anchors.js';
 import { buildPdfOutline, type BookmarkEntry } from './bookmarks.js';
 import { resolveElementStyle, resolveNamedStyle, normalizePadding } from './style-resolver.js';
+import { drawGradientRect } from './gradient.js';
+import { renderFootnotes, measureFootnoteHeight, type FootnoteEntry } from './footnotes.js';
 
 export interface RenderOptions {
   /** Skip template validation. */
@@ -53,7 +55,7 @@ export interface RenderResult {
   pageCount: number;
 }
 
-/** Immutable dependencies shared across all element rendering calls. */
+/** Dependencies shared across all element rendering calls. */
 interface RenderEnv {
   engine: ExpressionEngine;
   registry: PluginRegistry;
@@ -62,6 +64,8 @@ interface RenderEnv {
   doc: PDFDocument;
   imageCache: ImageCache;
   anchorPageMap?: Map<string, PDFPage>;
+  /** Footnote marker callback — set per-page to collect footnotes. */
+  footnoteMarker?: (content: RichContent) => number;
 }
 
 /**
@@ -188,6 +192,7 @@ function createMeasureChildCallback(
  */
 function drawElementBordersAndBackground(
   page: PDFPage,
+  doc: PDFDocument,
   pdfX: number,
   pdfY: number,
   width: number,
@@ -205,26 +210,40 @@ function drawElementBordersAndBackground(
 
   // 1. Background
   if (style.backgroundColor) {
-    const bg = parseColor(style.backgroundColor);
-    const bgColor = rgb(bg.r, bg.g, bg.b);
-
-    if (hasBorderRadius) {
-      const path = roundedRectPath(width, height, style.borderRadius ?? 0);
-      page.drawSvgPath(path, {
-        x: pdfX,
-        y: pdfY,
-        color: bgColor,
-        opacity,
-      });
-    } else {
-      page.drawRectangle({
-        x: pdfX,
-        y: pdfY - height,
+    if (isGradient(style.backgroundColor)) {
+      // Gradient fill — bottom-left coordinates for drawGradientRect
+      drawGradientRect(
+        page,
+        doc,
+        pdfX,
+        pdfY - height,
         width,
         height,
-        color: bgColor,
+        style.backgroundColor,
         opacity,
-      });
+      );
+    } else {
+      const bg = parseColor(style.backgroundColor);
+      const bgColor = rgb(bg.r, bg.g, bg.b);
+
+      if (hasBorderRadius) {
+        const path = roundedRectPath(width, height, style.borderRadius ?? 0);
+        page.drawSvgPath(path, {
+          x: pdfX,
+          y: pdfY,
+          color: bgColor,
+          opacity,
+        });
+      } else {
+        page.drawRectangle({
+          x: pdfX,
+          y: pdfY - height,
+          width,
+          height,
+          color: bgColor,
+          opacity,
+        });
+      }
     }
   }
 
@@ -397,6 +416,7 @@ async function renderElementAtPosition(
     height: height - padding.top - padding.bottom,
     anchorPageMap: env.anchorPageMap,
     opacity: elementStyle.opacity,
+    footnoteMarker: env.footnoteMarker,
   };
 
   // 7. Add child callbacks for container elements
@@ -497,7 +517,15 @@ async function renderElementAtPosition(
   }
 
   // 8b. Draw element-level background and borders (behind content)
-  drawElementBordersAndBackground(page, pdfX, pdfY, effectiveElement.width, height, elementStyle);
+  drawElementBordersAndBackground(
+    page,
+    env.doc,
+    pdfX,
+    pdfY,
+    effectiveElement.width,
+    height,
+    elementStyle,
+  );
 
   // 9. Render
   await plugin.render(props, renderCtx);
@@ -582,13 +610,19 @@ export async function renderPdf(
     return anchorMap.get(String(anchorId)) ?? '??';
   });
 
-  // 10. Pass 2: layout with correct totalPages (and ref filter available)
+  // 9c. Inject _bookmarks from pass 1 for TOC data source
+  const dataWithBookmarks: Record<string, unknown> = {
+    ...data,
+    _bookmarks: measureLayout.bookmarks,
+  };
+
+  // 10. Pass 2: layout with correct totalPages, _bookmarks, and ref filter
   const layout = await layoutTemplate(
     template,
     fonts,
     getPlugin,
     engine,
-    data,
+    dataWithBookmarks,
     measureLayout.totalPages,
     doc,
     imageCache,
@@ -630,6 +664,15 @@ export async function renderPdf(
   let lastSectionIndex = -1;
 
   for (const { page, layoutPage, pageConfig, pageHeight } of pdfPages) {
+    // Set up per-page footnote collection
+    const pageFootnotes: FootnoteEntry[] = [];
+    let footnoteCounter = 0;
+    env.footnoteMarker = (content: RichContent) => {
+      footnoteCounter++;
+      pageFootnotes.push({ number: footnoteCounter, content });
+      return footnoteCounter;
+    };
+
     // Section bookmark (only on first page of each section)
     if (layoutPage.sectionIndex !== lastSectionIndex) {
       const section = template.sections[layoutPage.sectionIndex];
@@ -669,16 +712,28 @@ export async function renderPdf(
 
       // Draw band background
       if (layoutBand.band.backgroundColor) {
-        const bgColor = parseColor(layoutBand.band.backgroundColor);
         const bgY =
           pageHeight - pageConfig.margins.top - layoutBand.offsetY - layoutBand.measuredHeight;
-        page.drawRectangle({
-          x: effectiveMarginLeft,
-          y: bgY,
-          width: effectiveContentWidth,
-          height: layoutBand.measuredHeight,
-          color: rgb(bgColor.r, bgColor.g, bgColor.b),
-        });
+        if (isGradient(layoutBand.band.backgroundColor)) {
+          drawGradientRect(
+            page,
+            doc,
+            effectiveMarginLeft,
+            bgY,
+            effectiveContentWidth,
+            layoutBand.measuredHeight,
+            layoutBand.band.backgroundColor,
+          );
+        } else {
+          const bgColor = parseColor(layoutBand.band.backgroundColor);
+          page.drawRectangle({
+            x: effectiveMarginLeft,
+            y: bgY,
+            width: effectiveContentWidth,
+            height: layoutBand.measuredHeight,
+            color: rgb(bgColor.r, bgColor.g, bgColor.b),
+          });
+        }
       }
 
       // Render elements
@@ -702,6 +757,34 @@ export async function renderPdf(
           measuredHeight,
         );
       }
+    }
+
+    // Render footnotes at page bottom (above page footer)
+    if (pageFootnotes.length > 0) {
+      // Find the lowest non-footer band to determine where footnotes start
+      // Footnotes render above the page footer area
+      const footerBandTypes = new Set(['pageFooter', 'lastPageFooter']);
+      let footerTopY = pageConfig.margins.bottom; // fallback: bottom margin
+      for (const lb of layoutPage.bands) {
+        if (footerBandTypes.has(lb.band.type)) {
+          const bandBottomPdf = pageHeight - pageConfig.margins.top - lb.offsetY;
+          if (bandBottomPdf > footerTopY) {
+            footerTopY = bandBottomPdf;
+          }
+        }
+      }
+
+      // Measure footnote height and position just above the footer
+      const defaultStyle: Style = {
+        fontFamily: 'Helvetica',
+        fontSize: 12,
+      };
+      const fnHeight = measureFootnoteHeight(pageFootnotes, defaultStyle);
+      const fnY = footerTopY + fnHeight;
+      const marginLeft = pageConfig.margins.left;
+      const contentWidth = pageConfig.width - pageConfig.margins.left - pageConfig.margins.right;
+
+      renderFootnotes(page, pageFootnotes, marginLeft, fnY, contentWidth, defaultStyle, env.fonts);
     }
   }
 

@@ -1,0 +1,953 @@
+{
+  "version": "1.0",
+  "name": "Phase 7: Long-Form Document Showcase",
+  "description": "A multi-page showcase of Phase 7 features: gradient fills, column flow mode, footnotes, auto-generated TOC, widow/orphan control, list alignment, and columnFooter float.",
+  "page": {
+    "width": 612,
+    "height": 792,
+    "margins": { "top": 40, "right": 40, "bottom": 40, "left": 40 }
+  },
+  "dataSchema": {},
+  "styles": {
+    "cover-title": {
+      "fontSize": 28,
+      "fontWeight": "bold",
+      "color": "#ffffff",
+      "textAlign": "center",
+      "letterSpacing": 4
+    },
+    "cover-subtitle": {
+      "fontSize": 11,
+      "color": "#c0d6e4",
+      "textAlign": "center"
+    },
+    "toc-title": {
+      "fontSize": 16,
+      "fontWeight": "bold",
+      "color": "#1a1a2e"
+    },
+    "toc-entry-level0": {
+      "fontSize": 11,
+      "fontWeight": "bold",
+      "color": "#1a1a2e",
+      "lineHeight": 2.0
+    },
+    "toc-entry-level1": {
+      "fontSize": 10,
+      "color": "#444444",
+      "lineHeight": 2.0
+    },
+    "toc-page": {
+      "fontSize": 10,
+      "color": "#666666",
+      "textAlign": "right",
+      "lineHeight": 2.0
+    },
+    "article-header": {
+      "fontSize": 9,
+      "color": "#888888",
+      "letterSpacing": 1
+    },
+    "article-body": {
+      "fontSize": 9,
+      "color": "#333333",
+      "textAlign": "justify",
+      "lineHeight": 1.6,
+      "widows": 2,
+      "orphans": 2
+    },
+    "footer-text": {
+      "fontSize": 8,
+      "color": "#999999",
+      "textAlign": "center"
+    },
+    "fn-heading": {
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "color": "#1a1a2e"
+    },
+    "fn-body": {
+      "fontSize": 10,
+      "color": "#333333",
+      "lineHeight": 1.6,
+      "textAlign": "justify"
+    },
+    "gradient-heading": {
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "color": "#ffffff",
+      "textAlign": "center"
+    },
+    "gradient-label": {
+      "fontSize": 8,
+      "color": "#666666",
+      "textAlign": "center"
+    },
+    "gradient-overlay": {
+      "fontSize": 12,
+      "fontWeight": "bold",
+      "color": "#ffffff",
+      "textAlign": "center"
+    },
+    "list-heading": {
+      "fontSize": 11,
+      "fontWeight": "bold",
+      "color": "#1a1a2e"
+    },
+    "list-label": {
+      "fontSize": 8,
+      "color": "#888888",
+      "fontStyle": "italic",
+      "textAlign": "center"
+    },
+    "list-body": {
+      "fontSize": 9,
+      "color": "#333333",
+      "lineHeight": 1.5
+    },
+    "list-justify": {
+      "fontSize": 9,
+      "color": "#333333",
+      "lineHeight": 1.5,
+      "textAlign": "justify"
+    },
+    "list-center": {
+      "fontSize": 9,
+      "color": "#333333",
+      "lineHeight": 1.5,
+      "textAlign": "center"
+    },
+    "list-right": {
+      "fontSize": 9,
+      "color": "#333333",
+      "lineHeight": 1.5,
+      "textAlign": "right"
+    },
+    "detail-text": {
+      "fontSize": 9,
+      "color": "#333333"
+    },
+    "detail-header": {
+      "fontSize": 9,
+      "fontWeight": "bold",
+      "color": "#ffffff",
+      "backgroundColor": "#1a1a2e"
+    },
+    "float-footer": {
+      "fontSize": 8,
+      "color": "#666666",
+      "textAlign": "center",
+      "fontStyle": "italic"
+    },
+    "feature-note": {
+      "fontSize": 8,
+      "color": "#aaaaaa",
+      "textAlign": "center",
+      "fontStyle": "italic"
+    }
+  },
+  "fonts": [],
+  "sections": [
+    {
+      "id": "cover-section",
+      "bookmark": "Cover",
+      "bands": [
+        {
+          "id": "cover-band",
+          "type": "title",
+          "height": 180,
+          "backgroundColor": {
+            "type": "linear",
+            "angle": 135,
+            "stops": [
+              { "color": "#0f0c29", "position": 0 },
+              { "color": "#302b63", "position": 0.5 },
+              { "color": "#24243e", "position": 1 }
+            ]
+          },
+          "elements": [
+            {
+              "id": "cover-title",
+              "type": "text",
+              "x": 0,
+              "y": 50,
+              "width": 532,
+              "height": 40,
+              "style": "cover-title",
+              "properties": { "content": "THE ART OF TYPOGRAPHY" }
+            },
+            {
+              "id": "cover-line",
+              "type": "line",
+              "x": 180,
+              "y": 100,
+              "width": 172,
+              "height": 1,
+              "properties": { "color": "#c0d6e4", "thickness": 0.5 }
+            },
+            {
+              "id": "cover-subtitle",
+              "type": "text",
+              "x": 40,
+              "y": 115,
+              "width": 452,
+              "height": 30,
+              "style": "cover-subtitle",
+              "properties": { "content": "A showcase of long-form document features:\ngradients, footnotes, column flow, and more" }
+            }
+          ]
+        },
+        {
+          "id": "toc-heading-band",
+          "type": "title",
+          "height": 40,
+          "elements": [
+            {
+              "id": "toc-heading",
+              "type": "text",
+              "x": 0,
+              "y": 10,
+              "width": 532,
+              "height": 20,
+              "style": "toc-title",
+              "properties": { "content": "Contents" }
+            },
+            {
+              "id": "toc-line",
+              "type": "line",
+              "x": 0,
+              "y": 34,
+              "width": 532,
+              "height": 1,
+              "properties": { "color": "#cccccc", "thickness": 0.5 }
+            }
+          ]
+        },
+        {
+          "id": "toc-entry-band",
+          "type": "detail",
+          "dataSource": "_bookmarks",
+          "height": 20,
+          "elements": [
+            {
+              "id": "toc-item-title",
+              "type": "text",
+              "x": 20,
+              "y": 2,
+              "width": 420,
+              "height": 16,
+              "style": "toc-entry-level1",
+              "properties": { "content": "{{ item.title }}" },
+              "conditionalStyles": [
+                { "condition": "item.level == 0", "style": "toc-entry-level0" }
+              ]
+            },
+            {
+              "id": "toc-item-page",
+              "type": "text",
+              "x": 440,
+              "y": 2,
+              "width": 92,
+              "height": 16,
+              "style": "toc-page",
+              "properties": { "content": "{{ item.pageNumber }}" }
+            }
+          ]
+        },
+        {
+          "id": "cover-footer",
+          "type": "body",
+          "height": 18,
+          "elements": [
+            {
+              "id": "cover-footer-text",
+              "type": "text",
+              "x": 0,
+              "y": 4,
+              "width": 532,
+              "height": 12,
+              "style": "feature-note",
+              "properties": { "content": "jsonpdf Phase 7 -- Long-Form Document Features" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "article-section",
+      "bookmark": "Article",
+      "columns": 2,
+      "columnMode": "flow",
+      "columnGap": 16,
+      "bands": [
+        {
+          "id": "article-page-header",
+          "type": "pageHeader",
+          "height": 24,
+          "elements": [
+            {
+              "id": "article-header-text",
+              "type": "text",
+              "x": 0,
+              "y": 2,
+              "width": 532,
+              "height": 12,
+              "style": "article-header",
+              "properties": { "content": "THE ART OF TYPOGRAPHY" }
+            },
+            {
+              "id": "article-header-line",
+              "type": "line",
+              "x": 0,
+              "y": 18,
+              "width": 532,
+              "height": 1,
+              "properties": { "color": "#dddddd", "thickness": 0.5 }
+            }
+          ]
+        },
+        {
+          "id": "article-text-band",
+          "type": "detail",
+          "dataSource": "article",
+          "height": 2000,
+          "elements": [
+            {
+              "id": "article-text",
+              "type": "text",
+              "x": 0,
+              "y": 0,
+              "width": 258,
+              "height": 2000,
+              "style": "article-body",
+              "properties": { "content": "Introduction\n\nTypography is far more than the mere arrangement of letters on a page. It is an art form that bridges the gap between written language and visual communication, shaping how we perceive and interact with the written word. From the earliest days of carved inscriptions to the pixel-perfect rendering of modern screens, the discipline of typography has continuously evolved to meet the needs of each era. The choices a typographer makes regarding typeface, spacing, alignment, and hierarchy can profoundly influence a reader's experience, guiding the eye through content with an almost invisible hand. Good typography disappears into the background, allowing the message to shine through; poor typography creates friction, confusion, and fatigue.\n\nHistory of Typesetting\n\nThe history of typesetting begins long before the invention of the printing press. Ancient civilizations carved letters into stone and pressed symbols into clay tablets, establishing the earliest forms of standardized written communication. The Phoenician alphabet, developed around 1050 BCE, introduced the revolutionary concept of representing sounds rather than ideas, dramatically simplifying the writing process and laying the groundwork for virtually all Western writing systems. The Greeks adapted and refined this system, adding vowels and establishing the left-to-right reading direction that persists in many languages today. Roman scribes further developed letterforms, creating the majuscule capitals that still grace our most formal documents.\n\nThroughout the medieval period, monasteries served as centers of literacy and book production. Monks painstakingly copied manuscripts by hand, developing increasingly elaborate calligraphic styles that balanced beauty with legibility. The Carolingian minuscule, standardized under Charlemagne in the eighth century, introduced the lowercase letterforms that remain fundamental to Western typography. These scribal traditions established many conventions that persist in modern type design, including the interplay between thick and thin strokes, the rhythm of ascending and descending letters, and the careful attention to the spaces between characters that we now call kerning.\n\nThe invention of movable type by Johannes Gutenberg around 1440 marks the single most important milestone in the history of typography. His printing press made books affordable and widely available for the first time, catalyzing the spread of literacy across Europe. The typefaces he designed were based on the blackletter scripts of his era, but within decades, printers in Italy developed the Roman and italic forms that would come to dominate Western typography for centuries.\n\nThe Anatomy of Letterforms\n\nEvery typeface is built from a set of fundamental components that type designers manipulate to create distinctive visual identities. The baseline is the invisible line upon which most letters rest, while the x-height describes the distance from the baseline to the top of lowercase letters like a, e, and o. Ascenders rise above the x-height in letters such as b, d, and h, and descenders drop below the baseline in letters like g, p, and y. The cap height marks the top of uppercase letters and is typically slightly shorter than the tallest ascenders.\n\nBeyond these vertical metrics, letterforms are defined by their strokes and structural features. Serifs are the small projecting features at the ends of strokes, and their presence or absence defines the two broadest categories of typefaces. The stress of a letter refers to the angle at which its thick and thin strokes are oriented, a characteristic that reflects the historical influence of broad-nib pen calligraphy. Counters are the enclosed or partially enclosed spaces within letters like o, d, and e, and their size relative to the overall letter greatly affects legibility at small sizes.\n\nThe relationships between these elements determine a typeface's personality and readability. A large x-height relative to cap height produces a modern, approachable feel and improves legibility on screens. Generous counters make text easier to read at small sizes and in low-resolution environments. The weight of strokes, the contrast between thick and thin elements, and the treatment of terminals and junctions all contribute to the overall texture that a block of text creates on the page.\n\nTypeface Classification\n\nThe classification of typefaces into families and categories helps designers make informed choices about which faces to use for specific purposes. The most widely used classification system divides typefaces into several broad groups based on their historical origins and structural characteristics.\n\nOld-style typefaces, sometimes called Garalde or humanist serifs, emerged in the fifteenth and sixteenth centuries and are characterized by moderate stroke contrast, bracketed serifs, and a diagonal stress that echoes handwritten forms. Garamond, Caslon, and Palatino are well-known examples. These faces remain popular for book typography because their organic forms create an even, comfortable reading texture.\n\nTransitional typefaces appeared in the eighteenth century as a bridge between old-style and modern designs. They feature greater stroke contrast, more vertical stress, and sharper, more refined serifs. Baskerville and Times New Roman exemplify this category. Their increased precision reflects the improving quality of paper and printing technology during the Enlightenment.\n\nModern or Didone typefaces pushed stroke contrast to extremes, with hairline thin strokes and bold thick strokes meeting at sharp, unbracketed serifs. Bodoni and Didot are the defining examples. These elegant faces work beautifully at display sizes but can be challenging to read in long passages of body text, where the extreme contrast creates a dazzling effect that fatigues the eye.\n\nSans-serif typefaces emerged in the nineteenth century and became the dominant force in twentieth-century graphic design. Within this broad category, grotesque faces like Helvetica and Univers offer neutral, corporate aesthetics; geometric faces like Futura and Avant Garde are built from circles and straight lines; and humanist faces like Gill Sans and Frutiger blend sans-serif simplicity with the organic proportions of Renaissance letterforms.\n\nThe Digital Revolution\n\nThe digital revolution transformed typography from a physical craft into a software discipline. The introduction of PostScript by Adobe in 1984, followed by TrueType and later OpenType font formats, liberated type design from the constraints of metal and photographic media. Desktop publishing software placed typographic tools in the hands of millions, democratizing a practice that had long been the domain of specialists. Today, web fonts and variable font technology continue to push the boundaries of what is possible, allowing typefaces to adapt dynamically to screen sizes, reading conditions, and user preferences. Modern CSS and layout engines provide unprecedented control over typography, with features like subpixel rendering, optical sizing, and automatic ligature substitution that would have seemed like science fiction to the compositors of previous centuries.\n\nThe rise of responsive design has introduced new challenges for typographers. Text must remain readable across devices ranging from watches to wall-mounted displays, and layout systems must accommodate languages with vastly different character sets and reading directions. Variable fonts allow a single font file to contain an entire range of weights, widths, and optical sizes, enabling smooth interpolation between extremes. This technology, combined with modern layout algorithms, promises a future where typography can adapt intelligently to any context while maintaining the aesthetic principles that have guided the craft for over five hundred years.\n\nThe Psychology of Typography\n\nResearch in cognitive psychology has revealed that typography has a measurable impact on reading comprehension, emotional response, and trust. Studies have shown that readers process text set in familiar, well-designed typefaces significantly faster than text in unfamiliar or poorly crafted faces. The phenomenon of cognitive fluency suggests that when information is easy to process visually, readers perceive it as more truthful and more pleasant.\n\nTypeface choice also triggers emotional associations that operate largely below conscious awareness. Serif typefaces are commonly perceived as traditional, authoritative, and trustworthy, which explains their prevalence in legal documents, academic publications, and newspaper mastheads. Sans-serif faces are associated with modernity, clarity, and efficiency, making them the default choice for technology companies and user interfaces. Script and display faces carry strong personality signals that can evoke elegance, playfulness, urgency, or nostalgia depending on their specific characteristics.\n\nThe spacing and layout of text also affects comprehension in subtle ways. Line length, or measure, has a direct relationship with reading speed and comfort. Research consistently shows that lines of 45 to 75 characters provide the optimal reading experience for body text, with shorter measures working better for narrow columns and longer measures acceptable when line spacing is increased proportionally. Leading, the vertical space between lines, should generally be set to 120 to 145 percent of the type size for body text, with tighter values for display type and looser values for small text or wide measures.\n\nTypography and Accessibility\n\nAs the web has become an essential medium for information access, the role of typography in accessibility has gained critical importance. Approximately fifteen percent of the world's population lives with some form of disability, and many of these conditions directly affect how people perceive and process text. Dyslexia, low vision, color blindness, and cognitive disabilities all impose specific requirements on typographic design.\n\nFor readers with dyslexia, certain typographic features can significantly improve readability. Typefaces with distinct letterforms that minimize mirroring between characters like b and d or p and q reduce confusion. Generous letter spacing and word spacing help dyslexic readers parse individual words more easily. Some typefaces, such as OpenDyslexic and Lexie Readable, have been specifically designed with these readers in mind, though research on their effectiveness compared to well-set mainstream faces remains mixed.\n\nLow-vision readers require adequate contrast between text and background, sufficient font sizes, and the ability to scale text without breaking layouts. The Web Content Accessibility Guidelines recommend a minimum contrast ratio of 4.5 to 1 for normal text and 3 to 1 for large text. Responsive typography that scales smoothly with viewport size or user preferences ensures that content remains readable across the full spectrum of visual ability.\n\nLooking Forward\n\nThe future of typography lies at the intersection of technology and human-centered design. Artificial intelligence is beginning to play a role in type design, with machine learning models capable of generating new typefaces, suggesting optimal typographic settings, and even adapting layouts in real time based on reader behavior and preferences. These tools will not replace human designers but will augment their capabilities, handling routine decisions while freeing designers to focus on creative and strategic choices.\n\nAs screens continue to evolve in resolution, flexibility, and form factor, typography must evolve with them. The principles that have guided the craft for centuries remain relevant, but their application requires constant adaptation to new contexts and capabilities. The best typographers have always understood that their discipline is ultimately in service of communication, and that the highest achievement of typography is not to draw attention to itself but to make the reader's experience as effortless and rewarding as possible." }
+            }
+          ]
+        },
+        {
+          "id": "article-page-footer",
+          "type": "pageFooter",
+          "height": 18,
+          "elements": [
+            {
+              "id": "article-page-number",
+              "type": "text",
+              "x": 0,
+              "y": 4,
+              "width": 532,
+              "height": 12,
+              "style": "footer-text",
+              "properties": { "content": "{{ _pageNumber }}" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "footnotes-section",
+      "bookmark": "Footnotes",
+      "bands": [
+        {
+          "id": "fn-title-band",
+          "type": "title",
+          "height": 40,
+          "elements": [
+            {
+              "id": "fn-title",
+              "type": "text",
+              "x": 0,
+              "y": 8,
+              "width": 532,
+              "height": 20,
+              "style": "fn-heading",
+              "properties": { "content": "Footnotes in Action" }
+            },
+            {
+              "id": "fn-title-line",
+              "type": "line",
+              "x": 0,
+              "y": 34,
+              "width": 532,
+              "height": 1,
+              "properties": { "color": "#cccccc", "thickness": 0.5 }
+            }
+          ]
+        },
+        {
+          "id": "fn-body-band",
+          "type": "body",
+          "height": 200,
+          "elements": [
+            {
+              "id": "fn-text",
+              "type": "text",
+              "x": 0,
+              "y": 8,
+              "width": 532,
+              "height": 180,
+              "style": "fn-body",
+              "properties": {
+                "content": [
+                  { "text": "The history of typography is inseparable from the history of technology. " },
+                  { "text": "Gutenberg", "footnote": "Johannes Gutenberg (c. 1400-1468), a German goldsmith, invented the movable type printing press around 1440." },
+                  { "text": "'s invention of the movable type printing press around 1440 revolutionized the production of books. Before this breakthrough, each page had to be carved as a single block or copied by hand in a " },
+                  { "text": "scriptorium", "footnote": "A scriptorium was a room in medieval monasteries devoted to the copying and illumination of manuscripts by monks." },
+                  { "text": ". The new technology made it possible to produce hundreds of identical copies quickly and affordably, fueling the " },
+                  { "text": "Renaissance", "footnote": "The Renaissance (14th-17th century) was a cultural movement that profoundly affected European intellectual life, originating in Italy." },
+                  { "text": " and the spread of knowledge across Europe. Today, digital typography carries forward this tradition of democratizing access to the written word." }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gradient-section",
+      "bookmark": "Gradients",
+      "bands": [
+        {
+          "id": "gradient-title-band",
+          "type": "title",
+          "height": 60,
+          "backgroundColor": {
+            "type": "radial",
+            "cx": 0.5,
+            "cy": 0.5,
+            "radius": 0.7,
+            "stops": [
+              { "color": "#667eea", "position": 0 },
+              { "color": "#764ba2", "position": 1 }
+            ]
+          },
+          "elements": [
+            {
+              "id": "gradient-title",
+              "type": "text",
+              "x": 0,
+              "y": 16,
+              "width": 532,
+              "height": 26,
+              "style": "gradient-heading",
+              "properties": { "content": "Gradient Fills" }
+            }
+          ]
+        },
+        {
+          "id": "linear-gradients-band",
+          "type": "body",
+          "height": 130,
+          "elements": [
+            {
+              "id": "linear-label",
+              "type": "text",
+              "x": 0,
+              "y": 6,
+              "width": 532,
+              "height": 14,
+              "style": "list-heading",
+              "properties": { "content": "Linear Gradients" }
+            },
+            {
+              "id": "grad-0",
+              "type": "text",
+              "x": 0,
+              "y": 26,
+              "width": 120,
+              "height": 70,
+              "styleOverrides": {
+                "backgroundColor": {
+                  "type": "linear",
+                  "angle": 0,
+                  "stops": [
+                    { "color": "#ff6b6b", "position": 0 },
+                    { "color": "#feca57", "position": 1 }
+                  ]
+                }
+              },
+              "properties": { "content": "" }
+            },
+            {
+              "id": "grad-0-label",
+              "type": "text",
+              "x": 0,
+              "y": 100,
+              "width": 120,
+              "height": 14,
+              "style": "gradient-label",
+              "properties": { "content": "angle: 0 (L to R)" }
+            },
+            {
+              "id": "grad-45",
+              "type": "text",
+              "x": 138,
+              "y": 26,
+              "width": 120,
+              "height": 70,
+              "styleOverrides": {
+                "backgroundColor": {
+                  "type": "linear",
+                  "angle": 45,
+                  "stops": [
+                    { "color": "#a29bfe", "position": 0 },
+                    { "color": "#6c5ce7", "position": 1 }
+                  ]
+                }
+              },
+              "properties": { "content": "" }
+            },
+            {
+              "id": "grad-45-label",
+              "type": "text",
+              "x": 138,
+              "y": 100,
+              "width": 120,
+              "height": 14,
+              "style": "gradient-label",
+              "properties": { "content": "angle: 45 (diagonal)" }
+            },
+            {
+              "id": "grad-90",
+              "type": "text",
+              "x": 276,
+              "y": 26,
+              "width": 120,
+              "height": 70,
+              "styleOverrides": {
+                "backgroundColor": {
+                  "type": "linear",
+                  "angle": 90,
+                  "stops": [
+                    { "color": "#55efc4", "position": 0 },
+                    { "color": "#00b894", "position": 1 }
+                  ]
+                }
+              },
+              "properties": { "content": "" }
+            },
+            {
+              "id": "grad-90-label",
+              "type": "text",
+              "x": 276,
+              "y": 100,
+              "width": 120,
+              "height": 14,
+              "style": "gradient-label",
+              "properties": { "content": "angle: 90 (T to B)" }
+            },
+            {
+              "id": "grad-180",
+              "type": "text",
+              "x": 414,
+              "y": 26,
+              "width": 118,
+              "height": 70,
+              "styleOverrides": {
+                "backgroundColor": {
+                  "type": "linear",
+                  "angle": 180,
+                  "stops": [
+                    { "color": "#fd79a8", "position": 0 },
+                    { "color": "#e84393", "position": 1 }
+                  ]
+                }
+              },
+              "properties": { "content": "" }
+            },
+            {
+              "id": "grad-180-label",
+              "type": "text",
+              "x": 414,
+              "y": 100,
+              "width": 118,
+              "height": 14,
+              "style": "gradient-label",
+              "properties": { "content": "angle: 180 (R to L)" }
+            }
+          ]
+        },
+        {
+          "id": "special-gradients-band",
+          "type": "body",
+          "height": 140,
+          "elements": [
+            {
+              "id": "special-label",
+              "type": "text",
+              "x": 0,
+              "y": 6,
+              "width": 532,
+              "height": 14,
+              "style": "list-heading",
+              "properties": { "content": "Multi-Stop & Radial Gradients" }
+            },
+            {
+              "id": "grad-multi",
+              "type": "text",
+              "x": 0,
+              "y": 28,
+              "width": 250,
+              "height": 70,
+              "styleOverrides": {
+                "backgroundColor": {
+                  "type": "linear",
+                  "angle": 0,
+                  "stops": [
+                    { "color": "#e74c3c", "position": 0 },
+                    { "color": "#f39c12", "position": 0.25 },
+                    { "color": "#2ecc71", "position": 0.5 },
+                    { "color": "#3498db", "position": 0.75 },
+                    { "color": "#9b59b6", "position": 1 }
+                  ]
+                }
+              },
+              "properties": { "content": "" }
+            },
+            {
+              "id": "grad-multi-label",
+              "type": "text",
+              "x": 0,
+              "y": 102,
+              "width": 250,
+              "height": 14,
+              "style": "gradient-label",
+              "properties": { "content": "Multi-stop linear (5 colors)" }
+            },
+            {
+              "id": "grad-radial",
+              "type": "text",
+              "x": 282,
+              "y": 28,
+              "width": 250,
+              "height": 70,
+              "styleOverrides": {
+                "backgroundColor": {
+                  "type": "radial",
+                  "cx": 0.5,
+                  "cy": 0.5,
+                  "radius": 0.5,
+                  "stops": [
+                    { "color": "#ffffff", "position": 0 },
+                    { "color": "#74b9ff", "position": 0.5 },
+                    { "color": "#0984e3", "position": 1 }
+                  ]
+                }
+              },
+              "properties": { "content": "" }
+            },
+            {
+              "id": "grad-radial-label",
+              "type": "text",
+              "x": 282,
+              "y": 102,
+              "width": 250,
+              "height": 14,
+              "style": "gradient-label",
+              "properties": { "content": "Radial gradient (center)" }
+            }
+          ]
+        },
+        {
+          "id": "gradient-band-bg",
+          "type": "body",
+          "height": 80,
+          "backgroundColor": {
+            "type": "linear",
+            "angle": 0,
+            "stops": [
+              { "color": "#2c3e50", "position": 0 },
+              { "color": "#3498db", "position": 1 }
+            ]
+          },
+          "elements": [
+            {
+              "id": "grad-band-text",
+              "type": "text",
+              "x": 0,
+              "y": 25,
+              "width": 532,
+              "height": 30,
+              "style": "gradient-overlay",
+              "properties": { "content": "Gradient on Band Background" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lists-section",
+      "bookmark": "Lists & Layout",
+      "bands": [
+        {
+          "id": "list-title-band",
+          "type": "title",
+          "height": 30,
+          "elements": [
+            {
+              "id": "list-title",
+              "type": "text",
+              "x": 0,
+              "y": 4,
+              "width": 532,
+              "height": 20,
+              "style": "list-heading",
+              "properties": { "content": "List Alignment Modes" }
+            },
+            {
+              "id": "list-title-line",
+              "type": "line",
+              "x": 0,
+              "y": 26,
+              "width": 532,
+              "height": 1,
+              "properties": { "color": "#cccccc", "thickness": 0.5 }
+            }
+          ]
+        },
+        {
+          "id": "list-demo-band",
+          "type": "body",
+          "height": 230,
+          "elements": [
+            {
+              "id": "list-left-label",
+              "type": "text",
+              "x": 0,
+              "y": 0,
+              "width": 125,
+              "height": 14,
+              "style": "list-label",
+              "properties": { "content": "Left (default)" }
+            },
+            {
+              "id": "list-left",
+              "type": "list",
+              "x": 0,
+              "y": 16,
+              "width": 125,
+              "height": 200,
+              "style": "list-body",
+              "properties": {
+                "listType": "bullet",
+                "items": [
+                  "Serif typefaces convey tradition and authority",
+                  "Sans-serif feels clean and modern",
+                  "Monospace enables precise alignment"
+                ]
+              }
+            },
+            {
+              "id": "list-center-label",
+              "type": "text",
+              "x": 136,
+              "y": 0,
+              "width": 125,
+              "height": 14,
+              "style": "list-label",
+              "properties": { "content": "Center" }
+            },
+            {
+              "id": "list-center",
+              "type": "list",
+              "x": 136,
+              "y": 16,
+              "width": 125,
+              "height": 200,
+              "style": "list-center",
+              "properties": {
+                "listType": "bullet",
+                "items": [
+                  "Serif typefaces convey tradition and authority",
+                  "Sans-serif feels clean and modern",
+                  "Monospace enables precise alignment"
+                ]
+              }
+            },
+            {
+              "id": "list-right-label",
+              "type": "text",
+              "x": 272,
+              "y": 0,
+              "width": 125,
+              "height": 14,
+              "style": "list-label",
+              "properties": { "content": "Right" }
+            },
+            {
+              "id": "list-right",
+              "type": "list",
+              "x": 272,
+              "y": 16,
+              "width": 125,
+              "height": 200,
+              "style": "list-right",
+              "properties": {
+                "listType": "bullet",
+                "items": [
+                  "Serif typefaces convey tradition and authority",
+                  "Sans-serif feels clean and modern",
+                  "Monospace enables precise alignment"
+                ]
+              }
+            },
+            {
+              "id": "list-justify-label",
+              "type": "text",
+              "x": 408,
+              "y": 0,
+              "width": 124,
+              "height": 14,
+              "style": "list-label",
+              "properties": { "content": "Justify" }
+            },
+            {
+              "id": "list-justify",
+              "type": "list",
+              "x": 408,
+              "y": 16,
+              "width": 124,
+              "height": 200,
+              "style": "list-justify",
+              "properties": {
+                "listType": "bullet",
+                "items": [
+                  "Serif typefaces convey tradition and authority",
+                  "Sans-serif feels clean and modern",
+                  "Monospace enables precise alignment"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "float-heading-band",
+          "type": "body",
+          "height": 30,
+          "elements": [
+            {
+              "id": "float-heading",
+              "type": "text",
+              "x": 0,
+              "y": 6,
+              "width": 532,
+              "height": 16,
+              "style": "list-heading",
+              "properties": { "content": "Floating Column Footer" }
+            },
+            {
+              "id": "float-heading-line",
+              "type": "line",
+              "x": 0,
+              "y": 26,
+              "width": 532,
+              "height": 1,
+              "properties": { "color": "#cccccc", "thickness": 0.5 }
+            }
+          ]
+        },
+        {
+          "id": "typeface-header",
+          "type": "columnHeader",
+          "height": 20,
+          "elements": [
+            {
+              "id": "th-name",
+              "type": "text",
+              "x": 0,
+              "y": 2,
+              "width": 200,
+              "height": 16,
+              "style": "detail-header",
+              "properties": { "content": "Typeface" }
+            },
+            {
+              "id": "th-year",
+              "type": "text",
+              "x": 200,
+              "y": 2,
+              "width": 166,
+              "height": 16,
+              "style": "detail-header",
+              "properties": { "content": "Year" }
+            },
+            {
+              "id": "th-origin",
+              "type": "text",
+              "x": 366,
+              "y": 2,
+              "width": 166,
+              "height": 16,
+              "style": "detail-header",
+              "properties": { "content": "Origin" }
+            }
+          ]
+        },
+        {
+          "id": "typeface-detail",
+          "type": "detail",
+          "dataSource": "sampleItems",
+          "height": 18,
+          "elements": [
+            {
+              "id": "td-name",
+              "type": "text",
+              "x": 0,
+              "y": 2,
+              "width": 200,
+              "height": 14,
+              "style": "detail-text",
+              "properties": { "content": "{{ item.name }}" }
+            },
+            {
+              "id": "td-year",
+              "type": "text",
+              "x": 200,
+              "y": 2,
+              "width": 166,
+              "height": 14,
+              "style": "detail-text",
+              "properties": { "content": "{{ item.year }}" }
+            },
+            {
+              "id": "td-origin",
+              "type": "text",
+              "x": 366,
+              "y": 2,
+              "width": 166,
+              "height": 14,
+              "style": "detail-text",
+              "properties": { "content": "{{ item.origin }}" }
+            }
+          ]
+        },
+        {
+          "id": "typeface-footer",
+          "type": "columnFooter",
+          "height": 20,
+          "float": true,
+          "elements": [
+            {
+              "id": "typeface-footer-line",
+              "type": "line",
+              "x": 0,
+              "y": 2,
+              "width": 532,
+              "height": 1,
+              "properties": { "color": "#cccccc", "thickness": 0.5 }
+            },
+            {
+              "id": "typeface-footer-text",
+              "type": "text",
+              "x": 0,
+              "y": 6,
+              "width": 532,
+              "height": 12,
+              "style": "float-footer",
+              "properties": { "content": "This footer floats directly below the last detail row" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

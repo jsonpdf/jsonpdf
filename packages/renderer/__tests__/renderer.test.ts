@@ -597,3 +597,335 @@ describe('renderPdf: Phase 6 style features', () => {
     expect(header).toBe('%PDF-');
   });
 });
+
+describe('renderPdf: gradient fills', () => {
+  it('renders element with linear gradient backgroundColor', async () => {
+    let t = createTemplate({ name: 'Gradient Test' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'el1',
+      type: 'text',
+      x: 10,
+      y: 10,
+      width: 200,
+      height: 50,
+      styleOverrides: {
+        backgroundColor: {
+          type: 'linear',
+          angle: 90,
+          stops: [
+            { color: '#ff0000', position: 0 },
+            { color: '#0000ff', position: 1 },
+          ],
+        },
+      },
+      properties: { content: 'Gradient bg' },
+    });
+
+    const result = await renderPdf(t, { skipValidation: true });
+    expect(result.pageCount).toBe(1);
+    expect(result.bytes.length).toBeGreaterThan(0);
+
+    // Verify the PDF has shading resources
+    const pdfDoc = await PDFDocument.load(result.bytes);
+    const page = pdfDoc.getPage(0);
+    const resources = page.node.get(PDFName.of('Resources')) as PDFDict;
+    const shading = resources.get(PDFName.of('Shading')) as PDFDict;
+    expect(shading).toBeDefined();
+  });
+
+  it('renders element with radial gradient backgroundColor', async () => {
+    let t = createTemplate({ name: 'Radial Gradient' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'el1',
+      type: 'text',
+      x: 10,
+      y: 10,
+      width: 200,
+      height: 50,
+      styleOverrides: {
+        backgroundColor: {
+          type: 'radial',
+          cx: 0.5,
+          cy: 0.5,
+          radius: 0.5,
+          stops: [
+            { color: '#ffffff', position: 0 },
+            { color: '#000000', position: 1 },
+          ],
+        },
+      },
+      properties: { content: 'Radial' },
+    });
+
+    const result = await renderPdf(t, { skipValidation: true });
+    expect(result.pageCount).toBe(1);
+    expect(result.bytes.length).toBeGreaterThan(0);
+  });
+
+  it('renders band with gradient backgroundColor', async () => {
+    let t = createTemplate({ name: 'Band Gradient' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', {
+      id: 'band1',
+      type: 'body',
+      height: 80,
+      backgroundColor: {
+        type: 'linear',
+        angle: 0,
+        stops: [
+          { color: '#ff6600', position: 0 },
+          { color: '#ffcc00', position: 0.5 },
+          { color: '#00cc66', position: 1 },
+        ],
+      },
+      elements: [],
+    });
+    t = addElement(t, 'band1', {
+      id: 'el1',
+      type: 'text',
+      x: 10,
+      y: 10,
+      width: 200,
+      height: 20,
+      properties: { content: 'On gradient band' },
+    });
+
+    const result = await renderPdf(t, { skipValidation: true });
+    expect(result.pageCount).toBe(1);
+
+    // Verify the PDF has shading resources for the band gradient
+    const pdfDoc = await PDFDocument.load(result.bytes);
+    const page = pdfDoc.getPage(0);
+    const resources = page.node.get(PDFName.of('Resources')) as PDFDict;
+    const shading = resources.get(PDFName.of('Shading')) as PDFDict;
+    expect(shading).toBeDefined();
+  });
+
+  it('renders multi-stop linear gradient', async () => {
+    let t = createTemplate({ name: 'Multi-stop' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'el1',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 300,
+      height: 60,
+      styleOverrides: {
+        backgroundColor: {
+          type: 'linear',
+          angle: 45,
+          stops: [
+            { color: '#ff0000', position: 0 },
+            { color: '#00ff00', position: 0.33 },
+            { color: '#0000ff', position: 0.66 },
+            { color: '#ff00ff', position: 1 },
+          ],
+        },
+      },
+      properties: { content: 'Rainbow' },
+    });
+
+    const result = await renderPdf(t, { skipValidation: true });
+    expect(result.pageCount).toBe(1);
+    expect(result.bytes.length).toBeGreaterThan(0);
+  });
+
+  it('renders gradient with opacity', async () => {
+    let t = createTemplate({ name: 'Gradient Opacity' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'el1',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 40,
+      styleOverrides: {
+        opacity: 0.5,
+        backgroundColor: {
+          type: 'linear',
+          angle: 180,
+          stops: [
+            { color: '#000000', position: 0 },
+            { color: '#ffffff', position: 1 },
+          ],
+        },
+      },
+      properties: { content: 'Semi-transparent' },
+    });
+
+    const result = await renderPdf(t, { skipValidation: true });
+    expect(result.pageCount).toBe(1);
+
+    // Verify opacity graphics state was added
+    const pdfDoc = await PDFDocument.load(result.bytes);
+    const page = pdfDoc.getPage(0);
+    const resources = page.node.get(PDFName.of('Resources')) as PDFDict;
+    const extGState = resources.get(PDFName.of('ExtGState')) as PDFDict;
+    expect(extGState).toBeDefined();
+  });
+});
+
+describe('renderPdf: _bookmarks TOC data source', () => {
+  it('renders TOC section that iterates over _bookmarks', async () => {
+    let t = createTemplate();
+    t = addStyle(t, 'default', { fontFamily: 'Helvetica', fontSize: 10 });
+
+    // TOC section
+    t = addSection(t, { id: 'toc', bands: [] });
+    t = addBand(t, 'toc', { id: 'toc-title', type: 'title', height: 30, elements: [] });
+    t = addElement(t, 'toc-title', {
+      id: 'toc-heading',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 20,
+      style: 'default',
+      properties: { content: 'Table of Contents' },
+    });
+    t = addBand(t, 'toc', {
+      id: 'toc-entry',
+      type: 'detail',
+      height: 20,
+      dataSource: '_bookmarks',
+      itemName: 'bm',
+      elements: [],
+    });
+    t = addElement(t, 'toc-entry', {
+      id: 'toc-text',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 400,
+      height: 15,
+      style: 'default',
+      properties: { content: '{{ bm.title }} .... page {{ bm.pageNumber }}' },
+    });
+
+    // Content section with a bookmark
+    t = addSection(t, { id: 'content', bands: [], bookmark: 'Chapter 1: Introduction' });
+    t = addBand(t, 'content', { id: 'content-body', type: 'body', height: 50, elements: [] });
+    t = addElement(t, 'content-body', {
+      id: 'text1',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 30,
+      style: 'default',
+      properties: { content: 'Chapter content here' },
+    });
+
+    const result = await renderPdf(t, { skipValidation: true });
+    // Should produce 2 pages: TOC + content
+    expect(result.pageCount).toBe(2);
+    expect(result.bytes.length).toBeGreaterThan(0);
+  });
+});
+
+describe('renderPdf: footnotes', () => {
+  it('renders footnote marker as superscript in rich text', async () => {
+    let t = createTemplate({ name: 'Footnote Test' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'el1',
+      type: 'text',
+      x: 10,
+      y: 10,
+      width: 400,
+      height: 40,
+      properties: {
+        content: [
+          { text: 'This has a footnote' },
+          { text: ' reference', footnote: 'This is the footnote content.' },
+        ],
+      },
+    });
+
+    const result = await renderPdf(t, { skipValidation: true });
+    expect(result.pageCount).toBe(1);
+    expect(result.bytes.length).toBeGreaterThan(0);
+  });
+
+  it('renders multiple footnotes with sequential numbering', async () => {
+    let t = createTemplate({ name: 'Multiple Footnotes' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 200, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'el1',
+      type: 'text',
+      x: 10,
+      y: 10,
+      width: 400,
+      height: 60,
+      properties: {
+        content: [
+          { text: 'First', footnote: 'Footnote one.' },
+          { text: ' and ' },
+          { text: 'second', footnote: 'Footnote two.' },
+          { text: ' items.' },
+        ],
+      },
+    });
+
+    const result = await renderPdf(t, { skipValidation: true });
+    expect(result.pageCount).toBe(1);
+    expect(result.bytes.length).toBeGreaterThan(0);
+  });
+
+  it('renders footnote with rich content (StyledRun array)', async () => {
+    let t = createTemplate({ name: 'Rich Footnote' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'el1',
+      type: 'text',
+      x: 10,
+      y: 10,
+      width: 400,
+      height: 30,
+      properties: {
+        content: [
+          {
+            text: 'Noted',
+            footnote: [{ text: 'Rich ' }, { text: 'footnote content' }],
+          },
+        ],
+      },
+    });
+
+    const result = await renderPdf(t, { skipValidation: true });
+    expect(result.pageCount).toBe(1);
+    expect(result.bytes.length).toBeGreaterThan(0);
+  });
+
+  it('does not render footnotes when no StyledRun has footnote property', async () => {
+    let t = createTemplate({ name: 'No Footnotes' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'el1',
+      type: 'text',
+      x: 10,
+      y: 10,
+      width: 200,
+      height: 20,
+      properties: {
+        content: [{ text: 'No footnotes here' }],
+      },
+    });
+
+    const result = await renderPdf(t, { skipValidation: true });
+    expect(result.pageCount).toBe(1);
+    expect(result.bytes.length).toBeGreaterThan(0);
+  });
+});

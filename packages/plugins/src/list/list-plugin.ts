@@ -1,4 +1,10 @@
-import { rgb, pushGraphicsState, popGraphicsState, setCharacterSpacing } from 'pdf-lib';
+import {
+  rgb,
+  pushGraphicsState,
+  popGraphicsState,
+  setCharacterSpacing,
+  setWordSpacing,
+} from 'pdf-lib';
 import { parseColor } from '@jsonpdf/core';
 import type { ValidationError, JSONSchema } from '@jsonpdf/core';
 import type { Plugin, MeasureContext, RenderContext } from '../types.js';
@@ -172,36 +178,58 @@ function renderItems(
       ls || undefined,
     );
 
+    const textAlign = style.textAlign;
+
     for (let j = 0; j < wrapped.lines.length; j++) {
       const line = wrapped.lines[j];
       if (line === '') continue;
 
       const lineY = ctx.y - currentY - j * lh - ascent;
+      const lineWidth = measureTextWidth(line, font, fontSize, ls || undefined);
 
-      if (needsCharSpacing) {
-        ctx.page.pushOperators(pushGraphicsState(), setCharacterSpacing(ls));
+      // Compute X offset for alignment
+      let lineX = contentX;
+      if (textAlign === 'center') {
+        lineX = contentX + (contentWidth - lineWidth) / 2;
+      } else if (textAlign === 'right') {
+        lineX = contentX + contentWidth - lineWidth;
+      }
+
+      // Compute extra word spacing for justify
+      let extraWordSpacing = 0;
+      if (textAlign === 'justify' && !wrapped.isLastInParagraph[j] && wrapped.wordsPerLine[j] > 1) {
+        extraWordSpacing = (contentWidth - lineWidth) / (wrapped.wordsPerLine[j] - 1);
+      }
+
+      const needsWordSpacing = extraWordSpacing !== 0;
+      if (needsCharSpacing || needsWordSpacing) {
+        const ops = [pushGraphicsState()];
+        if (needsCharSpacing) ops.push(setCharacterSpacing(ls));
+        if (needsWordSpacing) ops.push(setWordSpacing(extraWordSpacing));
+        ctx.page.pushOperators(...ops);
       }
       ctx.page.drawText(line, {
-        x: contentX,
+        x: lineX,
         y: lineY,
         font,
         size: fontSize,
         color: pdfColor,
         opacity: ctx.opacity,
       });
-      if (needsCharSpacing) {
+      if (needsCharSpacing || needsWordSpacing) {
         ctx.page.pushOperators(popGraphicsState());
       }
 
       // Text decoration
       if (decoration && decoration !== 'none') {
-        const lineWidth = measureTextWidth(line, font, fontSize, ls || undefined);
+        const decoWidth =
+          textAlign === 'justify' && !wrapped.isLastInParagraph[j] ? contentWidth : lineWidth;
         drawTextDecoration(
           ctx.page,
           decoration,
-          contentX,
+          lineX,
           lineY,
-          lineWidth,
+          decoWidth,
           font,
           fontSize,
           color,

@@ -14,7 +14,7 @@ import { parseColor } from '@jsonpdf/core';
 import type { RichContent, StyledRun, Style, ValidationError, JSONSchema } from '@jsonpdf/core';
 import type { Plugin, MeasureContext, RenderContext } from '../types.js';
 import { getFont, getLineHeight } from '../utils.js';
-import { wrapText, measureTextWidth, type WrapOptions } from './word-wrap.js';
+import { wrapText, measureTextWidth, splitWrappedText, type WrapOptions } from './word-wrap.js';
 import { drawTextDecoration } from './text-decoration.js';
 
 export interface TextProps {
@@ -81,6 +81,71 @@ export const textPlugin: Plugin<TextProps> = {
       renderRichText(props.content, ctx);
     }
     return Promise.resolve();
+  },
+
+  canSplit: true,
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async split(
+    props: TextProps,
+    ctx: MeasureContext,
+    availableHeight: number,
+  ): Promise<{ fit: TextProps; overflow: TextProps } | null> {
+    // Only split plain text; rich text deferred to a future phase
+    if (typeof props.content !== 'string') return null;
+    if (!props.content) return null;
+
+    const style = ctx.elementStyle;
+    const font = getFont(ctx.fonts, style);
+    const fontSize = style.fontSize ?? 12;
+    const lh = getLineHeight(style);
+    const ls = style.letterSpacing ?? 0;
+    const wrapped = wrapText(
+      props.content,
+      font,
+      fontSize,
+      ctx.availableWidth,
+      lh,
+      undefined,
+      ls || undefined,
+    );
+
+    const totalLines = wrapped.lines.length;
+    if (totalLines <= 1) return null;
+
+    let fitLineCount = Math.floor(availableHeight / lh);
+
+    // Can't fit any lines
+    if (fitLineCount <= 0) return null;
+
+    // Everything already fits
+    if (fitLineCount >= totalLines) return null;
+
+    // Apply orphans constraint (min lines on current page)
+    const orphans = style.orphans ?? 1;
+    if (fitLineCount < orphans) return null;
+
+    // Apply widows constraint (min lines on new page)
+    const widows = style.widows ?? 1;
+    const overflowLines = totalLines - fitLineCount;
+    if (overflowLines < widows) {
+      fitLineCount = totalLines - widows;
+    }
+
+    // Re-check after widows adjustment
+    if (fitLineCount <= 0 || fitLineCount >= totalLines) return null;
+    if (fitLineCount < orphans) return null;
+
+    const { fitText, overflowText } = splitWrappedText(
+      wrapped.lines,
+      wrapped.isLastInParagraph,
+      fitLineCount,
+    );
+
+    return {
+      fit: { content: fitText, autoHeight: true },
+      overflow: { content: overflowText, autoHeight: true },
+    };
   },
 };
 
@@ -254,6 +319,10 @@ interface RichWord {
   decoration?: string;
   link?: string;
   opacity?: number;
+  /** If set, a superscript footnote number to render after this word. */
+  footnoteNumber?: number;
+  /** Width of the superscript footnote number (excluded from word.width for decoration). */
+  footnoteWidth?: number;
 }
 
 /** An accumulated visual line of rich text words. */
@@ -347,6 +416,7 @@ function accumulateRichLines(runs: StyledRun[], ctx: RenderContext): RichLine[] 
     const spaceWidth = font.widthOfTextAtSize(' ', fontSize);
 
     const segments = run.text.split(/(\s+|\n)/);
+    let wordsBeforeRun = currentLine.words.length;
 
     for (const segment of segments) {
       if (segment === '\n') {
@@ -363,6 +433,7 @@ function accumulateRichLines(runs: StyledRun[], ctx: RenderContext): RichLine[] 
           spaceCount: 0,
           isLastInParagraph: false,
         };
+        wordsBeforeRun = 0;
         continue;
       }
 
@@ -388,6 +459,7 @@ function accumulateRichLines(runs: StyledRun[], ctx: RenderContext): RichLine[] 
           spaceCount: 0,
           isLastInParagraph: false,
         };
+        wordsBeforeRun = 0;
       }
 
       currentLine.words.push({
@@ -405,6 +477,18 @@ function accumulateRichLines(runs: StyledRun[], ctx: RenderContext): RichLine[] 
       });
       currentLine.totalTextWidth += segWidth;
       currentLine.maxLineHeight = Math.max(currentLine.maxLineHeight, lh);
+    }
+
+    // Register footnote marker on the last word of this run
+    if (run.footnote && ctx.footnoteMarker && currentLine.words.length > wordsBeforeRun) {
+      const fnNumber = ctx.footnoteMarker(run.footnote);
+      const lastWord = currentLine.words[currentLine.words.length - 1];
+      lastWord.footnoteNumber = fnNumber;
+      // Track superscript width separately so it doesn't inflate word.width for decorations
+      const superFontSize = fontSize * 0.65;
+      const numWidth = font.widthOfTextAtSize(String(fnNumber), superFontSize);
+      lastWord.footnoteWidth = numWidth;
+      currentLine.totalTextWidth += numWidth;
     }
   }
 
@@ -485,6 +569,25 @@ function renderRichText(runs: StyledRun[], ctx: RenderContext): void {
         ctx.page.pushOperators(popGraphicsState());
       }
 
+      // Render footnote superscript number after the word text
+      if (word.footnoteNumber !== undefined) {
+        const numText = String(word.footnoteNumber);
+        const superFontSize = word.fontSize * 0.65;
+        const superAscent = word.font.heightAtSize(superFontSize, { descender: false });
+        const superRaise = word.ascent * 0.35;
+        // Superscript starts right after the word text
+        const superX = currentX + word.width;
+
+        ctx.page.drawText(numText, {
+          x: superX,
+          y: drawY + superRaise + (word.ascent - superAscent),
+          font: word.font,
+          size: superFontSize,
+          color: rgb(word.color.r, word.color.g, word.color.b),
+          opacity: word.opacity,
+        });
+      }
+
       // Accumulate decoration spans — extend or start new
       const wordDecoration = word.decoration && word.decoration !== 'none' ? word.decoration : null;
       if (wordDecoration) {
@@ -519,13 +622,13 @@ function renderRichText(runs: StyledRun[], ctx: RenderContext): void {
           ctx,
           currentX,
           currentY - line.maxLineHeight,
-          word.width,
+          word.width + (word.footnoteWidth ?? 0),
           line.maxLineHeight,
           word.link,
         );
       }
 
-      currentX += word.width;
+      currentX += word.width + (word.footnoteWidth ?? 0);
 
       // Add space after this word (with justify gap if applicable)
       // Use current word's font for space width to match measurement in accumulateRichLines

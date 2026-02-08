@@ -41,6 +41,18 @@ export function parseColor(hex: string): RGB {
   throw new Error(`Invalid color format: "${hex}" (must be #RGB or #RRGGBB)`);
 }
 
+import type { Gradient } from '../types.js';
+
+/** Check if a value is a gradient object (as opposed to a hex string). */
+export function isGradient(value: unknown): value is Gradient {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    'type' in value &&
+    ((value as Gradient).type === 'linear' || (value as Gradient).type === 'radial')
+  );
+}
+
 /** Clamp a value to the 0–1 range. */
 function clamp01(v: number): number {
   return Math.max(0, Math.min(1, v));

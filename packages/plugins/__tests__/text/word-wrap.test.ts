@@ -1,7 +1,12 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 import type { PDFFont } from 'pdf-lib';
-import { wrapText, measureTextWidth, type WrapOptions } from '../../src/text/word-wrap.js';
+import {
+  wrapText,
+  measureTextWidth,
+  splitWrappedText,
+  type WrapOptions,
+} from '../../src/text/word-wrap.js';
 
 let font: PDFFont;
 const fontSize = 12;
@@ -226,5 +231,47 @@ describe('wrapText: wordsPerLine and isLastInParagraph', () => {
     for (let i = 0; i < result.isLastInParagraph.length - 1; i++) {
       expect(result.isLastInParagraph[i]).toBe(false);
     }
+  });
+});
+
+describe('splitWrappedText', () => {
+  it('splits single paragraph at given index', () => {
+    const lines = ['Line one', 'Line two', 'Line three'];
+    const isLast = [false, false, true];
+    const { fitText, overflowText } = splitWrappedText(lines, isLast, 2);
+    expect(fitText).toBe('Line one Line two');
+    expect(overflowText).toBe('Line three');
+  });
+
+  it('splits multi-paragraph text preserving newlines', () => {
+    const lines = ['Paragraph one', 'Paragraph two line one', 'Paragraph two line two'];
+    const isLast = [true, false, true];
+    const { fitText, overflowText } = splitWrappedText(lines, isLast, 1);
+    expect(fitText).toBe('Paragraph one');
+    expect(overflowText).toBe('Paragraph two line one Paragraph two line two');
+  });
+
+  it('returns empty string for empty ranges', () => {
+    const lines = ['Only line'];
+    const isLast = [true];
+    const { fitText, overflowText } = splitWrappedText(lines, isLast, 0);
+    expect(fitText).toBe('');
+    expect(overflowText).toBe('Only line');
+  });
+
+  it('handles split at end returning empty overflow', () => {
+    const lines = ['Line one', 'Line two'];
+    const isLast = [false, true];
+    const { fitText, overflowText } = splitWrappedText(lines, isLast, 2);
+    expect(fitText).toBe('Line one Line two');
+    expect(overflowText).toBe('');
+  });
+
+  it('preserves paragraph break at split boundary', () => {
+    const lines = ['Para 1 line 1', 'Para 1 line 2', 'Para 2 line 1'];
+    const isLast = [false, true, true];
+    const { fitText, overflowText } = splitWrappedText(lines, isLast, 2);
+    expect(fitText).toBe('Para 1 line 1 Para 1 line 2');
+    expect(overflowText).toBe('Para 2 line 1');
   });
 });

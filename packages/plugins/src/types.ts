@@ -1,5 +1,5 @@
 import type { PDFDocument, PDFFont, PDFImage, PDFPage } from 'pdf-lib';
-import type { Band, Element, Style, JSONSchema, ValidationError } from '@jsonpdf/core';
+import type { Band, Element, Style, JSONSchema, ValidationError, RichContent } from '@jsonpdf/core';
 
 /** An embedded image with its natural dimensions. */
 export interface EmbeddedImage {
@@ -69,6 +69,8 @@ export interface RenderContext extends MeasureContext {
   anchorPageMap?: Map<string, PDFPage>;
   /** Opacity for this element (0-1). Plugins should pass this to pdf-lib draw calls. */
   opacity?: number;
+  /** Register a footnote and return the footnote number. Only available during the render pass. */
+  footnoteMarker?: (content: RichContent) => number;
 }
 
 /** An element plugin that can measure and render a specific element type. */

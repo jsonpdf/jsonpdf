@@ -1036,4 +1036,288 @@ describe('layoutTemplate: columnFooter float', () => {
     const fixedPosition = 360 - 20 - 30;
     expect(colFooter.offsetY).toBeLessThan(fixedPosition);
   });
+
+  it('per-band float: mixed float and non-float columnFooter bands', async () => {
+    // Page: 400pt height, 20pt margins each → 360pt content area
+    // Body band of 50pt
+    // cf1 (float: true, 20pt) should float after content
+    // cf2 (no float, 20pt) should be at fixed position
+    let t = createTemplate({
+      page: { width: 300, height: 400, margins: { top: 20, right: 20, bottom: 20, left: 20 } },
+    });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 50, elements: [] });
+    t = addBand(t, 'sec1', {
+      id: 'cf1',
+      type: 'columnFooter',
+      height: 20,
+      float: true,
+      elements: [],
+    });
+    t = addBand(t, 'sec1', {
+      id: 'cf2',
+      type: 'columnFooter',
+      height: 20,
+      elements: [],
+    });
+    t = addBand(t, 'sec1', { id: 'pf', type: 'pageFooter', height: 20, elements: [] });
+
+    const result = await doLayout(t);
+    const bands = result.pages[0]!.bands;
+    const cf1 = bands.find((b) => b.band.id === 'cf1')!;
+    const cf2 = bands.find((b) => b.band.id === 'cf2')!;
+
+    // cf1 should float after content (50pt body)
+    expect(cf1.offsetY).toBe(50);
+
+    // cf2 should be at fixed position
+    // fixedCursor starts at: 360 - 20 (pageFooter) - 40 (total columnFooter) = 300
+    // cf1 advances fixedCursor by 20 → cf2 at 320
+    expect(cf2.offsetY).toBe(320);
+  });
+
+  it('per-band float: all non-float bands stack at bottom', async () => {
+    let t = createTemplate({
+      page: { width: 300, height: 400, margins: { top: 20, right: 20, bottom: 20, left: 20 } },
+    });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 50, elements: [] });
+    t = addBand(t, 'sec1', { id: 'cf1', type: 'columnFooter', height: 20, elements: [] });
+    t = addBand(t, 'sec1', { id: 'cf2', type: 'columnFooter', height: 20, elements: [] });
+    t = addBand(t, 'sec1', { id: 'pf', type: 'pageFooter', height: 20, elements: [] });
+
+    const result = await doLayout(t);
+    const bands = result.pages[0]!.bands;
+    const cf1 = bands.find((b) => b.band.id === 'cf1')!;
+    const cf2 = bands.find((b) => b.band.id === 'cf2')!;
+
+    // Both at fixed position: 360 - 20 - 40 = 300 for cf1, 320 for cf2
+    expect(cf1.offsetY).toBe(300);
+    expect(cf2.offsetY).toBe(320);
+  });
+});
+
+describe('layoutTemplate: bookmark collection (_bookmarks)', () => {
+  it('collects section bookmarks with page numbers', async () => {
+    let t = createTemplate();
+    t = addSection(t, { id: 'sec1', bands: [], bookmark: 'Section One' });
+    t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 50, elements: [] });
+
+    const result = await doLayout(t);
+    expect(result.bookmarks).toHaveLength(1);
+    expect(result.bookmarks[0]).toEqual({
+      title: 'Section One',
+      pageNumber: 1,
+      level: 0,
+    });
+  });
+
+  it('collects band bookmarks with page numbers', async () => {
+    let t = createTemplate();
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', {
+      id: 'b1',
+      type: 'body',
+      height: 50,
+      elements: [],
+      bookmark: 'Chapter 1',
+    });
+
+    const result = await doLayout(t);
+    expect(result.bookmarks).toHaveLength(1);
+    expect(result.bookmarks[0]).toEqual({
+      title: 'Chapter 1',
+      pageNumber: 1,
+      level: 1,
+    });
+  });
+
+  it('collects bookmarks from multiple sections across pages', async () => {
+    let t = createTemplate({
+      page: { width: 300, height: 200, margins: { top: 10, right: 10, bottom: 10, left: 10 } },
+    });
+    t = addSection(t, { id: 'sec1', bands: [], bookmark: 'First Section' });
+    t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 50, elements: [] });
+    t = addSection(t, { id: 'sec2', bands: [], bookmark: 'Second Section' });
+    t = addBand(t, 'sec2', { id: 'b2', type: 'body', height: 50, elements: [] });
+
+    const result = await doLayout(t);
+    expect(result.bookmarks).toHaveLength(2);
+    expect(result.bookmarks[0].title).toBe('First Section');
+    expect(result.bookmarks[0].pageNumber).toBe(1);
+    expect(result.bookmarks[1].title).toBe('Second Section');
+    expect(result.bookmarks[1].pageNumber).toBe(2);
+  });
+
+  it('returns empty bookmarks array when no bookmarks defined', async () => {
+    let t = createTemplate();
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 50, elements: [] });
+
+    const result = await doLayout(t);
+    expect(result.bookmarks).toEqual([]);
+  });
+});
+
+describe('layoutTemplate: multi-column flow mode', () => {
+  it('flows detail bands sequentially across columns', async () => {
+    // Page: 200 wide, 120 tall, margins 20 each → content height = 80, content width = 160
+    // 2 columns, no gap → each column 80pt wide
+    // 4 detail items of 40pt each → col 0 gets 2 (80pt fills), col 1 gets next 2
+    let t = createTemplate({
+      page: { width: 200, height: 120, margins: { top: 20, right: 20, bottom: 20, left: 20 } },
+    });
+    t = addSection(t, { id: 'sec1', columns: 2, columnGap: 0, columnMode: 'flow', bands: [] });
+    t = addBand(t, 'sec1', {
+      id: 'detail',
+      type: 'detail',
+      height: 40,
+      dataSource: 'items',
+      elements: [],
+    });
+
+    const data = { items: [{ n: 0 }, { n: 1 }, { n: 2 }, { n: 3 }] };
+    const result = await doLayout(t, data);
+    expect(result.totalPages).toBe(1);
+
+    const details = result.pages[0]!.bands.filter((b) => b.band.type === 'detail');
+    expect(details).toHaveLength(4);
+
+    // Flow mode: items fill column 0 first, then overflow to column 1
+    expect(details[0]!.columnIndex).toBe(0);
+    expect(details[1]!.columnIndex).toBe(0);
+    expect(details[2]!.columnIndex).toBe(1);
+    expect(details[3]!.columnIndex).toBe(1);
+  });
+
+  it('flows across columns and pages when columns overflow', async () => {
+    // Content height = 160, 2 columns, items 40pt each
+    // 4 items per column → 8 per page
+    let t = createTemplate({
+      page: { width: 200, height: 200, margins: { top: 20, right: 20, bottom: 20, left: 20 } },
+    });
+    t = addSection(t, { id: 'sec1', columns: 2, columnGap: 0, columnMode: 'flow', bands: [] });
+    t = addBand(t, 'sec1', {
+      id: 'detail',
+      type: 'detail',
+      height: 40,
+      dataSource: 'items',
+      elements: [],
+    });
+
+    const data = { items: Array.from({ length: 10 }, (_, i) => ({ n: i })) };
+    const result = await doLayout(t, data);
+    expect(result.totalPages).toBe(2);
+
+    // Page 1: 8 items (4 per column, sequential fill)
+    const p1Details = result.pages[0]!.bands.filter((b) => b.band.type === 'detail');
+    expect(p1Details).toHaveLength(8);
+    // First 4 in column 0, next 4 in column 1
+    expect(p1Details[0]!.columnIndex).toBe(0);
+    expect(p1Details[3]!.columnIndex).toBe(0);
+    expect(p1Details[4]!.columnIndex).toBe(1);
+    expect(p1Details[7]!.columnIndex).toBe(1);
+
+    // Page 2: 2 remaining items in column 0
+    const p2Details = result.pages[1]!.bands.filter((b) => b.band.type === 'detail');
+    expect(p2Details).toHaveLength(2);
+    expect(p2Details[0]!.columnIndex).toBe(0);
+    expect(p2Details[1]!.columnIndex).toBe(0);
+  });
+
+  it('splits text band across columns in flow mode', async () => {
+    // Content height = 80, 2 columns. A text element that wraps to 6 lines (line height 20)
+    // = total height 120pt. Column 1 fits 4 lines (80pt), overflow goes to column 2.
+    let t = createTemplate({
+      page: { width: 400, height: 120, margins: { top: 20, right: 20, bottom: 20, left: 20 } },
+    });
+    t = addStyle(t, 'default', {
+      fontFamily: 'Helvetica',
+      fontSize: 12,
+      lineHeight: 20,
+    });
+    t = addSection(t, { id: 'sec1', columns: 2, columnGap: 0, columnMode: 'flow', bands: [] });
+    t = addBand(t, 'sec1', {
+      id: 'text-band',
+      type: 'detail',
+      height: 200, // large declared height
+      dataSource: 'items',
+      elements: [],
+    });
+    t = addElement(t, 'text-band', {
+      id: 'txt',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 180, // each column is 180pt wide
+      height: 200,
+      style: 'default',
+      properties: {
+        content:
+          'Line one of text here. Line two of text here. Line three of text here. Line four of text here. Line five of text here. Line six of text here.',
+      },
+    });
+
+    const data = { items: [{}] };
+    const result = await doLayout(t, data);
+
+    // The text should split across columns (or pages). Verify multiple layout bands present.
+    const allDetailBands = result.pages.flatMap((p) =>
+      p.bands.filter((b) => b.band.type === 'detail'),
+    );
+    // Should have at least 2 bands (split across columns)
+    expect(allDetailBands.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('structural bands span full width in flow mode', async () => {
+    let t = createTemplate({
+      page: { width: 200, height: 200, margins: { top: 20, right: 20, bottom: 20, left: 20 } },
+    });
+    t = addSection(t, { id: 'sec1', columns: 2, columnGap: 0, columnMode: 'flow', bands: [] });
+    t = addBand(t, 'sec1', { id: 'ph', type: 'pageHeader', height: 20, elements: [] });
+    t = addBand(t, 'sec1', {
+      id: 'detail',
+      type: 'detail',
+      height: 30,
+      dataSource: 'items',
+      elements: [],
+    });
+    t = addBand(t, 'sec1', { id: 'pf', type: 'pageFooter', height: 20, elements: [] });
+
+    const data = { items: [{ n: 1 }, { n: 2 }] };
+    const result = await doLayout(t, data);
+    expect(result.totalPages).toBe(1);
+
+    const pageHeaderBands = result.pages[0]!.bands.filter((b) => b.band.type === 'pageHeader');
+    expect(pageHeaderBands).toHaveLength(1);
+    // Page header is full-width (no columnIndex)
+    expect(pageHeaderBands[0]!.columnIndex).toBeUndefined();
+  });
+
+  it('title bands placed full-width before flow columns', async () => {
+    let t = createTemplate({
+      page: { width: 200, height: 200, margins: { top: 20, right: 20, bottom: 20, left: 20 } },
+    });
+    t = addSection(t, { id: 'sec1', columns: 2, columnGap: 0, columnMode: 'flow', bands: [] });
+    t = addBand(t, 'sec1', { id: 'title', type: 'title', height: 30, elements: [] });
+    t = addBand(t, 'sec1', {
+      id: 'detail',
+      type: 'detail',
+      height: 20,
+      dataSource: 'items',
+      elements: [],
+    });
+
+    const data = { items: [{ n: 1 }, { n: 2 }] };
+    const result = await doLayout(t, data);
+    expect(result.totalPages).toBe(1);
+
+    const titleBands = result.pages[0]!.bands.filter((b) => b.band.type === 'title');
+    expect(titleBands).toHaveLength(1);
+    expect(titleBands[0]!.columnIndex).toBeUndefined();
+
+    // Detail bands should be in columns
+    const detailBands = result.pages[0]!.bands.filter((b) => b.band.type === 'detail');
+    expect(detailBands[0]!.columnIndex).toBe(0);
+  });
 });

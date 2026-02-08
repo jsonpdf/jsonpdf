@@ -1,5 +1,5 @@
 import { rgb, pushGraphicsState, popGraphicsState, setCharacterSpacing } from 'pdf-lib';
-import { parseColor } from '@jsonpdf/core';
+import { parseColor, isGradient } from '@jsonpdf/core';
 import type { Style, ValidationError } from '@jsonpdf/core';
 import type { Plugin, MeasureContext, RenderContext } from '../types.js';
 import { getFont, getLineHeight } from '../utils.js';
@@ -63,7 +63,7 @@ export const tablePlugin: Plugin<TableProps> = {
         : ctx.elementStyle;
 
       // Header background
-      if (headerStyle.backgroundColor) {
+      if (headerStyle.backgroundColor && !isGradient(headerStyle.backgroundColor)) {
         const bg = parseColor(headerStyle.backgroundColor);
         ctx.page.drawRectangle({
           x: ctx.x,
@@ -115,7 +115,7 @@ export const tablePlugin: Plugin<TableProps> = {
       const rowHeight = m.rowHeights[r];
 
       // Row background
-      if (style.backgroundColor) {
+      if (style.backgroundColor && !isGradient(style.backgroundColor)) {
         const bg = parseColor(style.backgroundColor);
         ctx.page.drawRectangle({
           x: ctx.x,

@@ -193,9 +193,9 @@
           ]
         },
         {
-          "id": "toc",
-          "type": "body",
-          "height": 250,
+          "id": "toc-heading-band",
+          "type": "title",
+          "height": 45,
           "elements": [
             {
               "id": "toc-heading",
@@ -215,110 +215,35 @@
               "width": 502,
               "height": 1,
               "properties": { "color": "#cccccc", "thickness": 0.5 }
-            },
+            }
+          ]
+        },
+        {
+          "id": "toc-entry-band",
+          "type": "detail",
+          "dataSource": "_bookmarks",
+          "height": 22,
+          "condition": "item.level == 1",
+          "elements": [
             {
-              "id": "toc-ch1-label",
+              "id": "toc-item-title",
               "type": "text",
               "x": 20,
-              "y": 50,
-              "width": 400,
+              "y": 2,
+              "width": 380,
               "height": 18,
               "style": "toc-entry",
-              "properties": { "content": [{ "text": "1. Introduction", "link": "#ch1" }] }
+              "properties": { "content": "{{ item.title }}" }
             },
             {
-              "id": "toc-ch1-page",
+              "id": "toc-item-page",
               "type": "text",
               "x": 400,
-              "y": 50,
+              "y": 2,
               "width": 102,
               "height": 18,
               "style": "toc-page",
-              "properties": { "content": [{ "text": "{{ \"ch1\" | ref }}", "link": "#ch1" }] }
-            },
-            {
-              "id": "toc-ch2-label",
-              "type": "text",
-              "x": 20,
-              "y": 72,
-              "width": 400,
-              "height": 18,
-              "style": "toc-entry",
-              "properties": { "content": [{ "text": "2. Methodology", "link": "#ch2" }] }
-            },
-            {
-              "id": "toc-ch2-page",
-              "type": "text",
-              "x": 400,
-              "y": 72,
-              "width": 102,
-              "height": 18,
-              "style": "toc-page",
-              "properties": { "content": [{ "text": "{{ \"ch2\" | ref }}", "link": "#ch2" }] }
-            },
-            {
-              "id": "toc-ch3-label",
-              "type": "text",
-              "x": 20,
-              "y": 94,
-              "width": 400,
-              "height": 18,
-              "style": "toc-entry",
-              "properties": { "content": [{ "text": "3. Results", "link": "#ch3" }] }
-            },
-            {
-              "id": "toc-ch3-page",
-              "type": "text",
-              "x": 400,
-              "y": 94,
-              "width": 102,
-              "height": 18,
-              "style": "toc-page",
-              "properties": { "content": [{ "text": "{{ \"ch3\" | ref }}", "link": "#ch3" }] }
-            },
-            {
-              "id": "toc-ch4-label",
-              "type": "text",
-              "x": 20,
-              "y": 116,
-              "width": 400,
-              "height": 18,
-              "style": "toc-entry",
-              "properties": { "content": [{ "text": "4. Conclusion", "link": "#ch4" }] }
-            },
-            {
-              "id": "toc-ch4-page",
-              "type": "text",
-              "x": 400,
-              "y": 116,
-              "width": 102,
-              "height": 18,
-              "style": "toc-page",
-              "properties": { "content": [{ "text": "{{ \"ch4\" | ref }}", "link": "#ch4" }] }
-            },
-            {
-              "id": "toc-app-label",
-              "type": "text",
-              "x": 20,
-              "y": 138,
-              "width": 400,
-              "height": 18,
-              "style": "toc-entry",
-              "properties": {
-                "content": [{ "text": "Appendix A — Application Inventory", "link": "#appendix" }]
-              }
-            },
-            {
-              "id": "toc-app-page",
-              "type": "text",
-              "x": 400,
-              "y": 138,
-              "width": 102,
-              "height": 18,
-              "style": "toc-page",
-              "properties": {
-                "content": [{ "text": "{{ \"appendix\" | ref }}", "link": "#appendix" }]
-              }
+              "properties": { "content": "{{ item.pageNumber }}" }
             }
           ]
         },
