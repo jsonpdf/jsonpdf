@@ -1,0 +1,41 @@
+.group {
+  margin-bottom: var(--jp-space-md);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--jp-space-xs);
+  cursor: pointer;
+  user-select: none;
+  padding: var(--jp-space-xs) 0;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-family: var(--jp-font-family);
+  font-size: var(--jp-font-size-sm);
+  font-weight: 600;
+  color: var(--jp-color-text-primary);
+}
+
+.header:hover {
+  color: var(--jp-color-accent);
+}
+
+.chevron {
+  font-size: var(--jp-font-size-xs);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+  width: 12px;
+  text-align: center;
+}
+
+.chevronOpen {
+  composes: chevron;
+  transform: rotate(90deg);
+}
+
+.content {
+  padding-top: var(--jp-space-xs);
+}

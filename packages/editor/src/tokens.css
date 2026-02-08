@@ -36,4 +36,11 @@
   /* Layout */
   --jp-toolbar-height: 40px;
   --jp-sidebar-width: 280px;
+
+  /* Form fields */
+  --jp-color-field-bg: #ffffff;
+  --jp-color-field-border: #d0d0d0;
+  --jp-color-field-focus: #2563eb;
+  --jp-field-height: 28px;
+  --jp-field-label-width: 72px;
 }

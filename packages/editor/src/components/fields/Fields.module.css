@@ -1,0 +1,95 @@
+.field {
+  display: flex;
+  align-items: center;
+  gap: var(--jp-space-sm);
+  margin-bottom: var(--jp-space-sm);
+}
+
+.fieldLabel {
+  width: var(--jp-field-label-width);
+  flex-shrink: 0;
+  text-align: right;
+  font-size: var(--jp-font-size-sm);
+  color: var(--jp-color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fieldInput {
+  flex: 1;
+  min-width: 0;
+  height: var(--jp-field-height);
+  font-size: var(--jp-font-size-sm);
+  font-family: var(--jp-font-family);
+  color: var(--jp-color-text-primary);
+  background: var(--jp-color-field-bg);
+  border: 1px solid var(--jp-color-field-border);
+  border-radius: 4px;
+  padding: 0 var(--jp-space-sm);
+  box-sizing: border-box;
+  outline: none;
+}
+
+.fieldInput:focus {
+  border-color: var(--jp-color-field-focus);
+  box-shadow: 0 0 0 1px var(--jp-color-field-focus);
+}
+
+.fieldTextarea {
+  composes: fieldInput;
+  height: auto;
+  min-height: 56px;
+  padding: var(--jp-space-xs) var(--jp-space-sm);
+  resize: vertical;
+}
+
+.fieldSelect {
+  composes: fieldInput;
+  cursor: pointer;
+}
+
+.fieldCheckbox {
+  flex: 1;
+  min-width: 0;
+}
+
+.colorRow {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--jp-space-xs);
+}
+
+.colorSwatch {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--jp-color-field-border);
+  border-radius: 4px;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.colorSwatch::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.colorSwatch::-webkit-color-swatch {
+  border: none;
+  border-radius: 3px;
+}
+
+.colorText {
+  composes: fieldInput;
+  font-family: monospace;
+}
+
+.readOnly {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--jp-font-size-sm);
+  color: var(--jp-color-text-tertiary);
+  font-style: italic;
+}

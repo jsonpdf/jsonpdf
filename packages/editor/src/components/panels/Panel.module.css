@@ -1,0 +1,23 @@
+.panelHeader {
+  font-size: var(--jp-font-size-md);
+  font-weight: 600;
+  color: var(--jp-color-text-primary);
+  margin-bottom: var(--jp-space-md);
+  padding-bottom: var(--jp-space-sm);
+  border-bottom: 1px solid var(--jp-color-border-light);
+}
+
+.panelSubheader {
+  font-size: var(--jp-font-size-xs);
+  color: var(--jp-color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--jp-space-xs);
+}
+
+.readOnlyLabel {
+  font-size: var(--jp-font-size-sm);
+  color: var(--jp-color-text-tertiary);
+  font-style: italic;
+  padding: var(--jp-space-xs) 0;
+}

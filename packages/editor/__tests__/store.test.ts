@@ -142,5 +142,76 @@ describe('useEditorStore', () => {
       useEditorStore.getState().updateBandHeight('band1', 3);
       expect(useEditorStore.getState().template.sections[0].bands[0].height).toBe(10);
     });
+
+    it('updateElementProps updates properties, style, rotation, condition', () => {
+      setupTemplateWithElement();
+      useEditorStore.getState().updateElementProps('el1', {
+        rotation: 45,
+        condition: 'show',
+        style: 'heading',
+        properties: { content: 'updated' },
+      });
+      const el = useEditorStore.getState().template.sections[0].bands[0].elements[0];
+      expect(el.rotation).toBe(45);
+      expect(el.condition).toBe('show');
+      expect(el.style).toBe('heading');
+      expect(el.properties.content).toBe('updated');
+    });
+
+    it('updateElementProps no-ops on nonexistent element', () => {
+      setupTemplateWithElement();
+      const before = useEditorStore.getState().template;
+      useEditorStore.getState().updateElementProps('nonexistent', { rotation: 90 });
+      expect(useEditorStore.getState().template).toBe(before);
+    });
+
+    it('updateBandProps updates autoHeight, condition, dataSource', () => {
+      setupTemplateWithElement();
+      useEditorStore
+        .getState()
+        .updateBandProps('band1', { autoHeight: true, condition: 'visible', dataSource: 'items' });
+      const band = useEditorStore.getState().template.sections[0].bands[0];
+      expect(band.autoHeight).toBe(true);
+      expect(band.condition).toBe('visible');
+      expect(band.dataSource).toBe('items');
+    });
+
+    it('updateBandProps no-ops on nonexistent band', () => {
+      setupTemplateWithElement();
+      const before = useEditorStore.getState().template;
+      useEditorStore.getState().updateBandProps('nonexistent', { autoHeight: true });
+      expect(useEditorStore.getState().template).toBe(before);
+    });
+
+    it('updateSectionProps no-ops on nonexistent section', () => {
+      setupTemplateWithElement();
+      const before = useEditorStore.getState().template;
+      useEditorStore.getState().updateSectionProps('nonexistent', { name: 'test' });
+      expect(useEditorStore.getState().template).toBe(before);
+    });
+
+    it('updateSectionProps updates name, columns, page overrides', () => {
+      setupTemplateWithElement();
+      useEditorStore
+        .getState()
+        .updateSectionProps('sec1', { name: 'Main', columns: 2, page: { width: 800 } });
+      const section = useEditorStore.getState().template.sections[0];
+      expect(section.name).toBe('Main');
+      expect(section.columns).toBe(2);
+      expect(section.page?.width).toBe(800);
+    });
+
+    it('updateTemplateProps updates name, description, page config with margin merge', () => {
+      useEditorStore.getState().updateTemplateProps({
+        name: 'New Name',
+        description: 'A desc',
+        page: { margins: { top: 20, right: 40, bottom: 40, left: 40 } },
+      });
+      const t = useEditorStore.getState().template;
+      expect(t.name).toBe('New Name');
+      expect(t.description).toBe('A desc');
+      expect(t.page.margins.top).toBe(20);
+      expect(t.page.margins.right).toBe(40);
+    });
   });
 });

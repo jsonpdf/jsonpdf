@@ -2,11 +2,6 @@
   width: var(--jp-sidebar-width);
   border-left: 1px solid var(--jp-color-border);
   background: var(--jp-color-surface);
-  padding: var(--jp-space-lg);
+  padding: var(--jp-space-md);
   overflow-y: auto;
-}
-
-.placeholder {
-  font-size: var(--jp-font-size-sm);
-  color: var(--jp-color-text-tertiary);
 }
