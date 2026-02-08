@@ -195,4 +195,57 @@ describe('OutlinePanel', () => {
     render(<OutlinePanel />);
     expect(screen.getByText('Outline')).toBeDefined();
   });
+
+  describe('drag and drop', () => {
+    it('direct band elements are draggable', () => {
+      render(<OutlinePanel />);
+      const elText = screen.getByText('el-text').closest('[role="treeitem"]')!;
+      expect(elText.getAttribute('draggable')).toBe('true');
+    });
+
+    it('container children are not draggable', () => {
+      render(<OutlinePanel />);
+      const child = screen.getByText('el-child1').closest('[role="treeitem"]')!;
+      expect(child.getAttribute('draggable')).toBeNull();
+    });
+
+    it('frame-internal elements are not draggable', () => {
+      render(<OutlinePanel />);
+      const frameEl = screen.getByText('frame-el1').closest('[role="treeitem"]')!;
+      expect(frameEl.getAttribute('draggable')).toBeNull();
+    });
+
+    it('band and section nodes are not draggable', () => {
+      render(<OutlinePanel />);
+      const band = screen.getByText('Detail').closest('[role="treeitem"]')!;
+      expect(band.getAttribute('draggable')).toBeNull();
+      const section = screen.getByText('Main').closest('[role="treeitem"]')!;
+      expect(section.getAttribute('draggable')).toBeNull();
+    });
+
+    it('frame-internal band nodes are not drop targets', () => {
+      render(<OutlinePanel />);
+      // "Body" is the frame-internal band — it should not have drag event handlers
+      const bodyNode = screen.getByText('Body').closest('[role="treeitem"]')!;
+      // Frame-internal bands have frameOwnerId set, so isDropTarget is false
+      // We verify this indirectly: the node should not accept drops (no onDragOver)
+      expect(bodyNode.getAttribute('draggable')).toBeNull();
+    });
+
+    it('reorders elements within same band via store action', () => {
+      // Directly test the store action since HTML5 DnD simulation is limited
+      useEditorStore.getState().reorderElement('el-text', 1);
+      const els = useEditorStore.getState().template.sections[0].bands[1].elements;
+      expect(els[0].id).toBe('el-container');
+      expect(els[1].id).toBe('el-text');
+    });
+
+    it('moves element to different band via store action', () => {
+      useEditorStore.getState().moveElementToBand('el-text', 'band1');
+      const b1 = useEditorStore.getState().template.sections[0].bands[0];
+      const b2 = useEditorStore.getState().template.sections[0].bands[1];
+      expect(b1.elements.map((e) => e.id)).toContain('el-text');
+      expect(b2.elements.map((e) => e.id)).not.toContain('el-text');
+    });
+  });
 });

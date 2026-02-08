@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { createContext, useMemo, useRef, useState } from 'react';
 import type { Template, Band, Element } from '@jsonpdf/core';
 import { useEditorStore } from '../../store';
 import { BAND_TYPE_META } from '../../constants/band-types';
@@ -16,7 +16,38 @@ export interface TreeNode {
   frameOwnerId?: string;
   /** The bandId of the frame element's parent band (for correct store selection). */
   frameOwnerBandId?: string;
+  /** Whether this element can be dragged (direct band children only, not nested/frame-internal). */
+  draggable: boolean;
 }
+
+/* ------------------------------------------------------------------ */
+/*  Drag-and-drop context                                              */
+/* ------------------------------------------------------------------ */
+
+export interface DragSource {
+  elementId: string;
+  sourceBandId: string;
+  sourceIndex: number;
+}
+
+export interface DropIndicatorState {
+  targetId: string;
+  position: 'before' | 'after' | 'inside';
+}
+
+export interface OutlineDragContextValue {
+  dragRef: React.RefObject<DragSource | null>;
+  draggingId: string | null;
+  setDraggingId: (id: string | null) => void;
+  dropIndicator: DropIndicatorState | null;
+  setDropIndicator: (indicator: DropIndicatorState | null) => void;
+}
+
+export const OutlineDragContext = createContext<OutlineDragContextValue | null>(null);
+
+/* ------------------------------------------------------------------ */
+/*  Tree building                                                      */
+/* ------------------------------------------------------------------ */
 
 function buildElementNode(
   element: Element,
@@ -24,13 +55,16 @@ function buildElementNode(
   bandId: string,
   frameOwnerId?: string,
   frameOwnerBandId?: string,
+  isDirectBandChild = false,
 ): TreeNode {
   const children: TreeNode[] = [];
 
-  // Container children
+  // Container children (not direct band children)
   if (element.elements) {
     for (const child of element.elements) {
-      children.push(buildElementNode(child, sectionId, bandId, frameOwnerId, frameOwnerBandId));
+      children.push(
+        buildElementNode(child, sectionId, bandId, frameOwnerId, frameOwnerBandId, false),
+      );
     }
   }
 
@@ -52,6 +86,7 @@ function buildElementNode(
     bandId,
     frameOwnerId,
     frameOwnerBandId,
+    draggable: isDirectBandChild && !frameOwnerId,
   };
 }
 
@@ -63,7 +98,7 @@ function buildBandNode(
 ): TreeNode {
   const meta = BAND_TYPE_META[band.type];
   const children = band.elements.map((el) =>
-    buildElementNode(el, sectionId, band.id, frameOwnerId, frameOwnerBandId),
+    buildElementNode(el, sectionId, band.id, frameOwnerId, frameOwnerBandId, true),
   );
 
   return {
@@ -76,6 +111,7 @@ function buildBandNode(
     bandId: band.id,
     frameOwnerId,
     frameOwnerBandId,
+    draggable: false,
   };
 }
 
@@ -87,18 +123,29 @@ function buildTree(template: Template): TreeNode[] {
     typeLabel: 'Section',
     children: section.bands.map((band) => buildBandNode(band, section.id)),
     sectionId: section.id,
+    draggable: false,
   }));
 }
 
 export function OutlineTree() {
   const template = useEditorStore((s) => s.template);
   const nodes = useMemo(() => buildTree(template), [template]);
+  const dragRef = useRef<DragSource | null>(null);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [dropIndicator, setDropIndicator] = useState<DropIndicatorState | null>(null);
+
+  const contextValue = useMemo<OutlineDragContextValue>(
+    () => ({ dragRef, draggingId, setDraggingId, dropIndicator, setDropIndicator }),
+    [draggingId, dropIndicator],
+  );
 
   return (
-    <div role="tree" aria-label="Template outline">
-      {nodes.map((node) => (
-        <OutlineNode key={node.id} node={node} depth={0} />
-      ))}
-    </div>
+    <OutlineDragContext.Provider value={contextValue}>
+      <div role="tree" aria-label="Template outline">
+        {nodes.map((node, i) => (
+          <OutlineNode key={node.id} node={node} depth={0} index={i} />
+        ))}
+      </div>
+    </OutlineDragContext.Provider>
   );
 }
