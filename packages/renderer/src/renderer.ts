@@ -481,7 +481,13 @@ export async function renderPdf(
 
   // 12. Render pages
   const env: RenderEnv = {
-    engine, registry, fonts, styles: template.styles, doc, imageCache, anchorPageMap,
+    engine,
+    registry,
+    fonts,
+    styles: template.styles,
+    doc,
+    imageCache,
+    anchorPageMap,
   };
   const bookmarkEntries: BookmarkEntry[] = [];
   let lastSectionIndex = -1;

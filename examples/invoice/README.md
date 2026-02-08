@@ -20,31 +20,31 @@ A multi-page invoice with line items, page headers/footers, summary totals, and 
 
 ## Template Structure
 
-| Band | Type | Content |
-|------|------|---------|
-| `page-header` | pageHeader | Company info, invoice number, dates, separator line |
-| `bill-to` | title | "Bill To" label, customer name, address, email hyperlink |
-| `col-header` | columnHeader | Description / Qty / Unit Price / Total column headers |
-| `line-item` | detail | Line item row (description, qty, unit price, total) with separator |
-| `no-items` | noData | "No line items" fallback |
-| `subtotals` | summary | Subtotal, tax, grand total |
-| `page-footer` | pageFooter | Page number |
-| `last-footer` | lastPageFooter | "Thank you" message + page number |
+| Band          | Type           | Content                                                            |
+| ------------- | -------------- | ------------------------------------------------------------------ |
+| `page-header` | pageHeader     | Company info, invoice number, dates, separator line                |
+| `bill-to`     | title          | "Bill To" label, customer name, address, email hyperlink           |
+| `col-header`  | columnHeader   | Description / Qty / Unit Price / Total column headers              |
+| `line-item`   | detail         | Line item row (description, qty, unit price, total) with separator |
+| `no-items`    | noData         | "No line items" fallback                                           |
+| `subtotals`   | summary        | Subtotal, tax, grand total                                         |
+| `page-footer` | pageFooter     | Page number                                                        |
+| `last-footer` | lastPageFooter | "Thank you" message + page number                                  |
 
 ## Data Schema
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `invoiceNumber` | string | Invoice identifier |
-| `date` | string | Invoice date |
-| `dueDate` | string | Payment due date |
-| `company` | object | Company name, address, website |
-| `customer` | object | Customer name, address, email |
-| `items` | array | Line items (description, qty, unitPrice, total) |
-| `subtotal` | number | Sum of all line item totals |
-| `taxRate` | number | Tax rate percentage |
-| `taxAmount` | number | Calculated tax amount |
-| `grandTotal` | number | Final total including tax |
+| Field           | Type   | Description                                     |
+| --------------- | ------ | ----------------------------------------------- |
+| `invoiceNumber` | string | Invoice identifier                              |
+| `date`          | string | Invoice date                                    |
+| `dueDate`       | string | Payment due date                                |
+| `company`       | object | Company name, address, website                  |
+| `customer`      | object | Customer name, address, email                   |
+| `items`         | array  | Line items (description, qty, unitPrice, total) |
+| `subtotal`      | number | Sum of all line item totals                     |
+| `taxRate`       | number | Tax rate percentage                             |
+| `taxAmount`     | number | Calculated tax amount                           |
+| `grandTotal`    | number | Final total including tax                       |
 
 ## Running
 

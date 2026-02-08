@@ -20,49 +20,49 @@ A pay stub naturally has **two independent repeating regions** on the same page:
 
 ## Template Structure
 
-| Band | Type | Content |
-|------|------|---------|
-| `header` | title | Company name, "PAY STUB" title, pay date |
-| `employee-info` | body | Employee name, ID, department, pay period |
-| `earnings-deductions` | body | Horizontal container with two frame elements |
-| `net-pay-band` | body | Net pay highlight box, year-to-date totals |
-| `footer` | pageFooter | Company address, disclaimer |
+| Band                  | Type       | Content                                      |
+| --------------------- | ---------- | -------------------------------------------- |
+| `header`              | title      | Company name, "PAY STUB" title, pay date     |
+| `employee-info`       | body       | Employee name, ID, department, pay period    |
+| `earnings-deductions` | body       | Horizontal container with two frame elements |
+| `net-pay-band`        | body       | Net pay highlight box, year-to-date totals   |
+| `footer`              | pageFooter | Company address, disclaimer                  |
 
 ### Earnings Frame Bands
 
-| Band | Type | Content |
-|------|------|---------|
-| `earn-header` | title | Blue title bar + gray column headers (Description, Hours, Rate, Amount) |
-| `earn-detail` | detail | Each earning row (`dataSource: "earnings"`) |
-| `earn-summary` | summary | Gross Pay total |
+| Band           | Type    | Content                                                                 |
+| -------------- | ------- | ----------------------------------------------------------------------- |
+| `earn-header`  | title   | Blue title bar + gray column headers (Description, Hours, Rate, Amount) |
+| `earn-detail`  | detail  | Each earning row (`dataSource: "earnings"`)                             |
+| `earn-summary` | summary | Gross Pay total                                                         |
 
 ### Deductions Frame Bands
 
-| Band | Type | Content |
-|------|------|---------|
-| `ded-header` | title | Red title bar + gray column headers (Description, Amount) |
-| `ded-detail` | detail | Each deduction row (`dataSource: "deductions"`) |
-| `ded-summary` | summary | Total Deductions |
+| Band          | Type    | Content                                                   |
+| ------------- | ------- | --------------------------------------------------------- |
+| `ded-header`  | title   | Red title bar + gray column headers (Description, Amount) |
+| `ded-detail`  | detail  | Each deduction row (`dataSource: "deductions"`)           |
+| `ded-summary` | summary | Total Deductions                                          |
 
 ## Data Schema
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `companyName` | string | Company name |
-| `companyAddress` | string | Company address |
-| `employeeName` | string | Employee full name |
-| `employeeId` | string | Employee ID |
-| `department` | string | Department name |
-| `payPeriod` | string | Pay period dates |
-| `payDate` | string | Payment date |
-| `earnings` | array | Earning line items (description, hours, rate, amount, type) |
-| `deductions` | array | Deduction line items (description, amount, type) |
-| `grossPay` | number | Total gross pay |
-| `totalDeductions` | number | Total deductions |
-| `netPay` | number | Net pay (gross minus deductions) |
-| `ytdGross` | number | Year-to-date gross |
-| `ytdDeductions` | number | Year-to-date deductions |
-| `ytdNet` | number | Year-to-date net |
+| Field             | Type   | Description                                                 |
+| ----------------- | ------ | ----------------------------------------------------------- |
+| `companyName`     | string | Company name                                                |
+| `companyAddress`  | string | Company address                                             |
+| `employeeName`    | string | Employee full name                                          |
+| `employeeId`      | string | Employee ID                                                 |
+| `department`      | string | Department name                                             |
+| `payPeriod`       | string | Pay period dates                                            |
+| `payDate`         | string | Payment date                                                |
+| `earnings`        | array  | Earning line items (description, hours, rate, amount, type) |
+| `deductions`      | array  | Deduction line items (description, amount, type)            |
+| `grossPay`        | number | Total gross pay                                             |
+| `totalDeductions` | number | Total deductions                                            |
+| `netPay`          | number | Net pay (gross minus deductions)                            |
+| `ytdGross`        | number | Year-to-date gross                                          |
+| `ytdDeductions`   | number | Year-to-date deductions                                     |
+| `ytdNet`          | number | Year-to-date net                                            |
 
 ## Running
 

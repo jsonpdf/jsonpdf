@@ -17,26 +17,26 @@ A quarterly sales report with a Vega-Lite chart, employees grouped by department
 
 ## Template Structure
 
-| Band | Type | Content |
-|------|------|---------|
-| `report-title` | title | Report name, date range, "Revenue by Department" label, Vega-Lite bar chart |
-| `group-hdr` | groupHeader | Department name (white on dark background) with PDF bookmark |
-| `employee` | detail | Employee name, role, deal count, sales amount |
-| `group-ftr` | groupFooter | Separator line between departments |
-| `report-summary` | summary | Grand total, team size, avg deal size |
-| `page-ftr` | pageFooter | Page number |
+| Band             | Type        | Content                                                                     |
+| ---------------- | ----------- | --------------------------------------------------------------------------- |
+| `report-title`   | title       | Report name, date range, "Revenue by Department" label, Vega-Lite bar chart |
+| `group-hdr`      | groupHeader | Department name (white on dark background) with PDF bookmark                |
+| `employee`       | detail      | Employee name, role, deal count, sales amount                               |
+| `group-ftr`      | groupFooter | Separator line between departments                                          |
+| `report-summary` | summary     | Grand total, team size, avg deal size                                       |
+| `page-ftr`       | pageFooter  | Page number                                                                 |
 
 ## Data Schema
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `reportTitle` | string | Report heading |
-| `dateRange` | string | Reporting period |
-| `departmentSummary` | array | Chart data (department, revenue) |
-| `employees` | array | Employee list (name, department, role, sales, deals) |
-| `grandTotal` | number | Total revenue |
-| `employeeCount` | number | Number of employees |
-| `avgDealSize` | number | Average revenue per deal |
+| Field               | Type   | Description                                          |
+| ------------------- | ------ | ---------------------------------------------------- |
+| `reportTitle`       | string | Report heading                                       |
+| `dateRange`         | string | Reporting period                                     |
+| `departmentSummary` | array  | Chart data (department, revenue)                     |
+| `employees`         | array  | Employee list (name, department, role, sales, deals) |
+| `grandTotal`        | number | Total revenue                                        |
+| `employeeCount`     | number | Number of employees                                  |
+| `avgDealSize`       | number | Average revenue per deal                             |
 
 ## Running
 

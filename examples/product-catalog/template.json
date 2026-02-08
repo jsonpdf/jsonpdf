@@ -299,7 +299,9 @@
               "width": 535,
               "height": 12,
               "style": "footer",
-              "properties": { "content": "{{ catalogName }} — Page {{ _pageNumber }} of {{ _totalPages }}" }
+              "properties": {
+                "content": "{{ catalogName }} — Page {{ _pageNumber }} of {{ _totalPages }}"
+              }
             }
           ]
         }

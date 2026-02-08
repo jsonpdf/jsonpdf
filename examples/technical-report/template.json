@@ -304,7 +304,9 @@
               "width": 400,
               "height": 18,
               "style": "toc-entry",
-              "properties": { "content": [{ "text": "Appendix A — Application Inventory", "link": "#appendix" }] }
+              "properties": {
+                "content": [{ "text": "Appendix A — Application Inventory", "link": "#appendix" }]
+              }
             },
             {
               "id": "toc-app-page",
@@ -314,7 +316,9 @@
               "width": 102,
               "height": 18,
               "style": "toc-page",
-              "properties": { "content": [{ "text": "{{ \"appendix\" | ref }}", "link": "#appendix" }] }
+              "properties": {
+                "content": [{ "text": "{{ \"appendix\" | ref }}", "link": "#appendix" }]
+              }
             }
           ]
         },
@@ -392,7 +396,9 @@
               "width": 502,
               "height": 20,
               "style": "body-text",
-              "properties": { "content": "The assessment followed a structured six-step methodology:" }
+              "properties": {
+                "content": "The assessment followed a structured six-step methodology:"
+              }
             },
             {
               "id": "ch2-steps",
@@ -416,7 +422,9 @@
               "width": 502,
               "height": 30,
               "style": "cross-ref",
-              "properties": { "content": "The detailed results of this methodology are presented in Chapter 3 (page {{ \"ch3\" | ref }}). A full application inventory is provided in Appendix A (page {{ \"appendix\" | ref }})." }
+              "properties": {
+                "content": "The detailed results of this methodology are presented in Chapter 3 (page {{ \"ch3\" | ref }}). A full application inventory is provided in Appendix A (page {{ \"appendix\" | ref }})."
+              }
             }
           ]
         },
@@ -477,7 +485,9 @@
               "width": 502,
               "height": 14,
               "style": "figure-caption",
-              "properties": { "content": "Figure 1 — Distribution of applications by migration category" }
+              "properties": {
+                "content": "Figure 1 — Distribution of applications by migration category"
+              }
             },
             {
               "id": "ch3-ref",
@@ -487,7 +497,9 @@
               "width": 502,
               "height": 20,
               "style": "cross-ref",
-              "properties": { "content": "For methodology details, see Chapter 2 (page {{ \"ch2\" | ref }}). Conclusions follow on page {{ \"ch4\" | ref }}." }
+              "properties": {
+                "content": "For methodology details, see Chapter 2 (page {{ \"ch2\" | ref }}). Conclusions follow on page {{ \"ch4\" | ref }}."
+              }
             }
           ]
         },
@@ -604,7 +616,9 @@
               "width": 502,
               "height": 12,
               "style": "footer",
-              "properties": { "content": "{{ reportTitle }} — {{ documentId }} — Page {{ _pageNumber }} of {{ _totalPages }}" }
+              "properties": {
+                "content": "{{ reportTitle }} — {{ documentId }} — Page {{ _pageNumber }} of {{ _totalPages }}"
+              }
             }
           ]
         }

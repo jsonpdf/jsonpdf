@@ -159,9 +159,7 @@
               "style": "link",
               "styleOverrides": { "fontSize": 8 },
               "properties": {
-                "content": [
-                  { "text": "{{ company.website }}", "link": "{{ company.website }}" }
-                ]
+                "content": [{ "text": "{{ company.website }}", "link": "{{ company.website }}" }]
               }
             },
             {

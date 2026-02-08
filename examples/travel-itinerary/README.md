@@ -13,24 +13,24 @@ A travel itinerary showcasing image plugin, container grid layout, bookmarks, an
 
 ## Template Structure
 
-| Band | Type | Content |
-|------|------|---------|
-| `header` | title | Trip name, dates, traveler, separator line |
-| `day1` | body | Day 1 heading + bookmark, image, description, numbered activity list |
-| `day2` | body | Day 2 heading + bookmark, image, description, numbered activity list |
-| `day3` | body | Day 3 heading + bookmark, image, description, numbered activity list |
-| `gallery` | body | "Photo Highlights" + bookmark, 2x2 image grid via container |
-| `page-ftr` | pageFooter | Trip name + page number |
+| Band       | Type       | Content                                                              |
+| ---------- | ---------- | -------------------------------------------------------------------- |
+| `header`   | title      | Trip name, dates, traveler, separator line                           |
+| `day1`     | body       | Day 1 heading + bookmark, image, description, numbered activity list |
+| `day2`     | body       | Day 2 heading + bookmark, image, description, numbered activity list |
+| `day3`     | body       | Day 3 heading + bookmark, image, description, numbered activity list |
+| `gallery`  | body       | "Photo Highlights" + bookmark, 2x2 image grid via container          |
+| `page-ftr` | pageFooter | Trip name + page number                                              |
 
 ## Data Schema
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `tripName` | string | Trip title |
-| `dates` | string | Date range |
-| `traveler` | string | Traveler name |
-| `days` | array | Day entries (label, title, image, description, activities) |
-| `gallery` | array | Gallery image URLs (4 items) |
+| Field      | Type   | Description                                                |
+| ---------- | ------ | ---------------------------------------------------------- |
+| `tripName` | string | Trip title                                                 |
+| `dates`    | string | Date range                                                 |
+| `traveler` | string | Traveler name                                              |
+| `days`     | array  | Day entries (label, title, image, description, activities) |
+| `gallery`  | array  | Gallery image URLs (4 items)                               |
 
 ## Running
 

@@ -18,27 +18,27 @@ A multi-page product catalog with cards, conditional styles, and shape-based ima
 
 ## Template Structure
 
-| Band | Type | Content |
-|------|------|---------|
-| `header` | pageHeader | Catalog name, page number, separator line |
-| `product` | detail | Product card: image placeholder shape, category badge, product name, description, price, original price, SALE badge, out-of-stock label, SKU |
-| `page-ftr` | pageFooter | Page number |
+| Band       | Type       | Content                                                                                                                                      |
+| ---------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `header`   | pageHeader | Catalog name, page number, separator line                                                                                                    |
+| `product`  | detail     | Product card: image placeholder shape, category badge, product name, description, price, original price, SALE badge, out-of-stock label, SKU |
+| `page-ftr` | pageFooter | Page number                                                                                                                                  |
 
 ## Data Schema
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `catalogName` | string | Catalog title |
-| `products` | array | Product list |
-| `products[].name` | string | Product name |
-| `products[].description` | string | Product description |
-| `products[].price` | number | Current price |
-| `products[].originalPrice` | number | Original price (shown when on sale) |
-| `products[].sku` | string | SKU code |
-| `products[].category` | string | Product category (displayed as badge) |
-| `products[].color` | string | Hex color for image placeholder |
-| `products[].inStock` | boolean | Availability (false grays out product name) |
-| `products[].onSale` | boolean | When true, shows SALE badge and strikethrough price |
+| Field                      | Type    | Description                                         |
+| -------------------------- | ------- | --------------------------------------------------- |
+| `catalogName`              | string  | Catalog title                                       |
+| `products`                 | array   | Product list                                        |
+| `products[].name`          | string  | Product name                                        |
+| `products[].description`   | string  | Product description                                 |
+| `products[].price`         | number  | Current price                                       |
+| `products[].originalPrice` | number  | Original price (shown when on sale)                 |
+| `products[].sku`           | string  | SKU code                                            |
+| `products[].category`      | string  | Product category (displayed as badge)               |
+| `products[].color`         | string  | Hex color for image placeholder                     |
+| `products[].inStock`       | boolean | Availability (false grays out product name)         |
+| `products[].onSale`        | boolean | When true, shows SALE badge and strikethrough price |
 
 ## Running
 

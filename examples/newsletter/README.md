@@ -21,25 +21,25 @@ A developer newsletter showcasing multiple custom fonts, two-column layout, bull
 
 ## Template Structure
 
-| Band | Type | Content |
-|------|------|---------|
-| `masthead` | title | Dark background bar, newsletter name (white), issue info |
-| `featured` | body | Featured article: title, byline, body text, separator line |
-| `two-col` | body | Container with two article columns separated by a vertical divider |
-| `highlights` | body | "Quick Highlights" section title, bullet list (5 items) |
-| `footer-band` | pageFooter | Separator line, newsletter/issue/date info |
+| Band          | Type       | Content                                                            |
+| ------------- | ---------- | ------------------------------------------------------------------ |
+| `masthead`    | title      | Dark background bar, newsletter name (white), issue info           |
+| `featured`    | body       | Featured article: title, byline, body text, separator line         |
+| `two-col`     | body       | Container with two article columns separated by a vertical divider |
+| `highlights`  | body       | "Quick Highlights" section title, bullet list (5 items)            |
+| `footer-band` | pageFooter | Separator line, newsletter/issue/date info                         |
 
 ## Data Schema
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `newsletterName` | string | Newsletter title |
-| `issueNumber` | number | Issue number |
-| `issueDate` | string | Publication date |
-| `featured` | object | Featured article (title, author, body) |
-| `leftArticle` | object | Left column article (title, author, body) |
-| `rightArticle` | object | Right column article (title, author, body) |
-| `highlights` | string[] | Array of 5 highlight bullet points |
+| Field            | Type     | Description                                |
+| ---------------- | -------- | ------------------------------------------ |
+| `newsletterName` | string   | Newsletter title                           |
+| `issueNumber`    | number   | Issue number                               |
+| `issueDate`      | string   | Publication date                           |
+| `featured`       | object   | Featured article (title, author, body)     |
+| `leftArticle`    | object   | Left column article (title, author, body)  |
+| `rightArticle`   | object   | Right column article (title, author, body) |
+| `highlights`     | string[] | Array of 5 highlight bullet points         |
 
 ## Running
 
