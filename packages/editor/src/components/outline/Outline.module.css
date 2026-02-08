@@ -85,3 +85,36 @@
   width: 12px;
   flex-shrink: 0;
 }
+
+/* ---- Drag and drop ---- */
+
+.nodeWrapper {
+  position: relative;
+}
+
+.nodeDragging {
+  opacity: 0.4;
+}
+
+.dropLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--jp-color-accent);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.dropLineBefore {
+  top: 0;
+}
+
+.dropLineAfter {
+  bottom: 0;
+}
+
+.dropTargetInside {
+  background: var(--jp-color-accent-light);
+  outline: 1px dashed var(--jp-color-accent);
+}

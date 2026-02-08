@@ -7,6 +7,8 @@ import {
   updateBand,
   updateSection,
   updateTemplate,
+  reorderElement as reorderElementOp,
+  moveElement as moveElementOp,
 } from '@jsonpdf/template';
 
 export interface EditorState {
@@ -38,6 +40,8 @@ export interface EditorState {
       page?: Partial<PageConfig>;
     },
   ) => void;
+  reorderElement: (elementId: string, toIndex: number) => void;
+  moveElementToBand: (elementId: string, toBandId: string, toIndex?: number) => void;
 }
 
 export const useEditorStore = create<EditorState>((set) => ({
@@ -146,6 +150,24 @@ export const useEditorStore = create<EditorState>((set) => ({
     set((state) => {
       try {
         return { template: updateTemplate(state.template, updates) };
+      } catch {
+        return state;
+      }
+    });
+  },
+  reorderElement: (elementId, toIndex) => {
+    set((state) => {
+      try {
+        return { template: reorderElementOp(state.template, elementId, toIndex) };
+      } catch {
+        return state;
+      }
+    });
+  },
+  moveElementToBand: (elementId, toBandId, toIndex) => {
+    set((state) => {
+      try {
+        return { template: moveElementOp(state.template, elementId, toBandId, toIndex) };
       } catch {
         return state;
       }

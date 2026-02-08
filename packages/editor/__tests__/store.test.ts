@@ -214,4 +214,115 @@ describe('useEditorStore', () => {
       expect(t.page.margins.right).toBe(40);
     });
   });
+
+  describe('reorderElement', () => {
+    function setupTwoElements() {
+      let t = createTemplate();
+      t = addSection(t, { id: 'sec1', bands: [] });
+      t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 100, elements: [] });
+      t = addElement(t, 'b1', {
+        id: 'el1',
+        type: 'text',
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 30,
+        properties: { content: 'A' },
+      });
+      t = addElement(t, 'b1', {
+        id: 'el2',
+        type: 'text',
+        x: 0,
+        y: 30,
+        width: 100,
+        height: 30,
+        properties: { content: 'B' },
+      });
+      useEditorStore.setState({ template: t });
+    }
+
+    it('reorders element within band', () => {
+      setupTwoElements();
+      useEditorStore.getState().reorderElement('el1', 1);
+      const els = useEditorStore.getState().template.sections[0].bands[0].elements;
+      expect(els[0].id).toBe('el2');
+      expect(els[1].id).toBe('el1');
+    });
+
+    it('no-ops on nonexistent element', () => {
+      setupTwoElements();
+      const before = useEditorStore.getState().template;
+      useEditorStore.getState().reorderElement('nonexistent', 0);
+      expect(useEditorStore.getState().template).toBe(before);
+    });
+
+    it('reorders el2 to index 0 (move earlier)', () => {
+      setupTwoElements();
+      useEditorStore.getState().reorderElement('el2', 0);
+      const els = useEditorStore.getState().template.sections[0].bands[0].elements;
+      expect(els[0].id).toBe('el2');
+      expect(els[1].id).toBe('el1');
+    });
+
+    it('reorder to same index is a no-op in terms of order', () => {
+      setupTwoElements();
+      useEditorStore.getState().reorderElement('el1', 0);
+      const els = useEditorStore.getState().template.sections[0].bands[0].elements;
+      expect(els[0].id).toBe('el1');
+      expect(els[1].id).toBe('el2');
+    });
+  });
+
+  describe('moveElementToBand', () => {
+    function setupTwoBands() {
+      let t = createTemplate();
+      t = addSection(t, { id: 'sec1', bands: [] });
+      t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 100, elements: [] });
+      t = addBand(t, 'sec1', { id: 'b2', type: 'detail', height: 100, elements: [] });
+      t = addElement(t, 'b1', {
+        id: 'el1',
+        type: 'text',
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 30,
+        properties: { content: 'A' },
+      });
+      t = addElement(t, 'b2', {
+        id: 'el2',
+        type: 'text',
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 30,
+        properties: { content: 'B' },
+      });
+      useEditorStore.setState({ template: t });
+    }
+
+    it('moves element to a different band', () => {
+      setupTwoBands();
+      useEditorStore.getState().moveElementToBand('el1', 'b2');
+      const b1 = useEditorStore.getState().template.sections[0].bands[0];
+      const b2 = useEditorStore.getState().template.sections[0].bands[1];
+      expect(b1.elements).toHaveLength(0);
+      expect(b2.elements).toHaveLength(2);
+      expect(b2.elements[1].id).toBe('el1');
+    });
+
+    it('moves element to specific index', () => {
+      setupTwoBands();
+      useEditorStore.getState().moveElementToBand('el1', 'b2', 0);
+      const b2 = useEditorStore.getState().template.sections[0].bands[1];
+      expect(b2.elements[0].id).toBe('el1');
+      expect(b2.elements[1].id).toBe('el2');
+    });
+
+    it('no-ops on nonexistent element', () => {
+      setupTwoBands();
+      const before = useEditorStore.getState().template;
+      useEditorStore.getState().moveElementToBand('nonexistent', 'b2');
+      expect(useEditorStore.getState().template).toBe(before);
+    });
+  });
 });
