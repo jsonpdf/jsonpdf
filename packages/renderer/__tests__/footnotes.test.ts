@@ -19,12 +19,12 @@ describe('measureFootnoteHeight', () => {
   const baseStyle: Style = { fontFamily: 'Helvetica', fontSize: 12 };
 
   it('returns 0 for empty entries', () => {
-    expect(measureFootnoteHeight([], baseStyle)).toBe(0);
+    expect(measureFootnoteHeight([], baseStyle, fonts, 500)).toBe(0);
   });
 
   it('returns positive height for single footnote', () => {
     const entries: FootnoteEntry[] = [{ number: 1, content: 'A footnote.' }];
-    const height = measureFootnoteHeight(entries, baseStyle);
+    const height = measureFootnoteHeight(entries, baseStyle, fonts, 500);
     expect(height).toBeGreaterThan(0);
   });
 
@@ -34,8 +34,20 @@ describe('measureFootnoteHeight', () => {
       { number: 1, content: 'First.' },
       { number: 2, content: 'Second.' },
     ];
-    expect(measureFootnoteHeight(two, baseStyle)).toBeGreaterThan(
-      measureFootnoteHeight(one, baseStyle),
+    expect(measureFootnoteHeight(two, baseStyle, fonts, 500)).toBeGreaterThan(
+      measureFootnoteHeight(one, baseStyle, fonts, 500),
+    );
+  });
+
+  it('wraps long footnote text and increases height', () => {
+    const shortText = 'Short.';
+    const longText =
+      'This is a very long footnote that should definitely wrap across multiple lines when the available width is narrow enough to force line breaks in the text content.';
+    const shortEntries: FootnoteEntry[] = [{ number: 1, content: shortText }];
+    const longEntries: FootnoteEntry[] = [{ number: 1, content: longText }];
+    const narrowWidth = 100; // Force wrapping
+    expect(measureFootnoteHeight(longEntries, baseStyle, fonts, narrowWidth)).toBeGreaterThan(
+      measureFootnoteHeight(shortEntries, baseStyle, fonts, narrowWidth),
     );
   });
 });
@@ -75,5 +87,18 @@ describe('renderFootnotes', () => {
       { number: 3, content: [{ text: 'Rich ' }, { text: 'footnote.' }] },
     ];
     renderFootnotes(page, entries, 40, 150, 500, baseStyle, localFonts);
+  });
+
+  it('renders wrapped footnote without error', async () => {
+    const doc = await PDFDocument.create();
+    const helvetica = await doc.embedFont(StandardFonts.Helvetica);
+    const localFonts: FontMap = new Map();
+    localFonts.set(fontKey('Helvetica', 'normal', 'normal'), helvetica);
+
+    const page = doc.addPage([612, 792]);
+    const longText =
+      'This is a very long footnote that should wrap across multiple lines. It contains enough text to exceed the available width and demonstrate the wrapping behavior.';
+    const entries: FootnoteEntry[] = [{ number: 1, content: longText }];
+    renderFootnotes(page, entries, 40, 200, 150, baseStyle, localFonts);
   });
 });

@@ -171,14 +171,14 @@ describe('expandBands: noData band', () => {
     expect(ids).not.toContain('nodata');
   });
 
-  it('includes noData when no detail bands exist', async () => {
+  it('excludes noData when no detail bands exist', async () => {
     const section = makeSection([
       makeBand({ id: 'nodata', type: 'noData' }),
       makeBand({ id: 'body1', type: 'body' }),
     ]);
     const result = await expandBands(section, {}, engine, 1);
     const ids = result.contentBands.map((b) => b.band.id);
-    expect(ids).toContain('nodata');
+    expect(ids).not.toContain('nodata');
   });
 });
 
