@@ -1,0 +1,87 @@
+.outlinePanel {
+  width: var(--jp-outline-width);
+  border-right: 1px solid var(--jp-color-border);
+  background: var(--jp-color-surface);
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.outlineHeader {
+  font-weight: 600;
+  font-size: var(--jp-font-size-sm);
+  color: var(--jp-color-text-secondary);
+  padding: var(--jp-space-sm) var(--jp-space-md);
+  border-bottom: 1px solid var(--jp-color-border-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.outlineBody {
+  padding: var(--jp-space-xs) 0;
+}
+
+.node {
+  display: flex;
+  align-items: center;
+  gap: var(--jp-space-xs);
+  padding: 2px var(--jp-space-sm);
+  cursor: pointer;
+  border-radius: 3px;
+  margin: 0 var(--jp-space-xs);
+  user-select: none;
+}
+
+.node:hover {
+  background: var(--jp-color-surface-secondary);
+}
+
+.nodeSelected {
+  background: var(--jp-color-accent-light);
+}
+
+.nodeSelected:hover {
+  background: var(--jp-color-accent-light);
+}
+
+.nodeLabel {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--jp-font-size-sm);
+  color: var(--jp-color-text-primary);
+}
+
+.nodeSelected .nodeLabel {
+  color: var(--jp-color-accent);
+}
+
+.nodeType {
+  font-size: var(--jp-font-size-xs);
+  color: var(--jp-color-text-tertiary);
+  flex-shrink: 0;
+}
+
+.nodeSelected .nodeType {
+  color: var(--jp-color-accent);
+  opacity: 0.7;
+}
+
+.chevron {
+  font-size: var(--jp-font-size-xs);
+  width: 12px;
+  flex-shrink: 0;
+  text-align: center;
+  transition: transform 0.15s ease;
+  color: var(--jp-color-text-tertiary);
+}
+
+.chevronOpen {
+  composes: chevron;
+  transform: rotate(90deg);
+}
+
+.chevronSpacer {
+  width: 12px;
+  flex-shrink: 0;
+}

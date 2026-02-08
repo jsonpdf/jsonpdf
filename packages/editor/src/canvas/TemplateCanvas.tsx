@@ -11,7 +11,11 @@ import { SelectionOverlay } from './SelectionOverlay';
 const PAGE_GAP = 40;
 export const CANVAS_PADDING = 40;
 
-export function TemplateCanvas() {
+interface TemplateCanvasProps {
+  viewportWidth: number;
+}
+
+export function TemplateCanvas({ viewportWidth }: TemplateCanvasProps) {
   const template = useEditorStore((s) => s.template);
   const zoom = useEditorStore((s) => s.zoom);
   const selectedElementId = useEditorStore((s) => s.selectedElementId);
@@ -25,22 +29,33 @@ export function TemplateCanvas() {
     CANVAS_PADDING * 2 - PAGE_GAP,
   );
 
-  const stageWidth = (maxPageWidth + CANVAS_PADDING * 2) * zoom;
+  const contentWidth = maxPageWidth + CANVAS_PADDING * 2;
+  const stageWidth = Math.max(contentWidth * zoom, viewportWidth);
   const stageHeight = Math.max(totalHeight * zoom, 1);
 
+  const stageWidthInPts = stageWidth / zoom;
+
+  // Center each page individually within the stage
+  const pageXOffsets = useMemo(
+    () => pages.map((p) => Math.max(CANVAS_PADDING, (stageWidthInPts - p.pageConfig.width) / 2)),
+    [pages, stageWidthInPts],
+  );
+
   // Compute page Y offsets
-  let currentY = CANVAS_PADDING;
-  const pageOffsets = pages.map((p) => {
-    const y = currentY;
-    currentY += p.pageConfig.height + PAGE_GAP;
-    return y;
-  });
+  const pageYOffsets = useMemo(() => {
+    let currentY = CANVAS_PADDING;
+    return pages.map((p) => {
+      const y = currentY;
+      currentY += p.pageConfig.height + PAGE_GAP;
+      return y;
+    });
+  }, [pages]);
 
   const selectionGeometry = useSelectionGeometry(
     selectedElementId,
     pages,
-    pageOffsets,
-    CANVAS_PADDING,
+    pageXOffsets,
+    pageYOffsets,
   );
 
   const handleStageClick = useCallback((e: KonvaEventObject<MouseEvent | TouchEvent>) => {
@@ -89,8 +104,8 @@ export function TemplateCanvas() {
           <PageRenderer
             key={page.sectionId}
             page={page}
-            x={CANVAS_PADDING}
-            y={pageOffsets[i]}
+            x={pageXOffsets[i]}
+            y={pageYOffsets[i]}
             styles={template.styles}
           />
         ))}
