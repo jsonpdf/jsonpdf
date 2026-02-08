@@ -39,9 +39,21 @@ export interface LayoutPage {
   computedHeight?: number;
 }
 
+/** A bookmark entry collected during layout for TOC generation. */
+export interface BookmarkLayoutEntry {
+  /** Display title. */
+  title: string;
+  /** 1-based page number. */
+  pageNumber: number;
+  /** Nesting level: 0 = section, 1 = band. */
+  level: number;
+}
+
 export interface LayoutResult {
   pages: LayoutPage[];
   totalPages: number;
+  /** Bookmarks collected during layout (for _bookmarks data source). */
+  bookmarks: BookmarkLayoutEntry[];
 }
 
 /** Merge section-level page config overrides with the template-level defaults. */
@@ -260,6 +272,7 @@ interface SectionColumnConfig {
   columns: number;
   columnGap: number;
   columnWidths?: number[];
+  columnMode?: 'tile' | 'flow';
 }
 
 /** Check if a band type should be placed in columns (vs. full-width). */
@@ -291,16 +304,11 @@ export async function layoutTemplate(
     const pageConfig = mergePageConfig(template.page, section.page);
     const expanded = await expandBands(section, data, engine, totalPagesHint);
 
-    if (section.columnMode === 'flow') {
-      throw new Error(
-        `Section "${section.id}": columnMode "flow" is not implemented. Use "tile" or omit columnMode.`,
-      );
-    }
-
     const columnConfig: SectionColumnConfig = {
       columns: section.columns ?? 1,
       columnGap: section.columnGap ?? 0,
       columnWidths: section.columnWidths,
+      columnMode: section.columnMode,
     };
 
     const sectionPages = await layoutSection(
@@ -323,7 +331,40 @@ export async function layoutTemplate(
     globalPageIndex += sectionPages.length;
   }
 
-  return { pages: allPages, totalPages: allPages.length };
+  // Collect bookmarks from laid-out pages for TOC (_bookmarks) support
+  const bookmarks: BookmarkLayoutEntry[] = [];
+  let lastBookmarkSectionIndex = -1;
+
+  for (const page of allPages) {
+    // Section bookmark (only on first page of each section)
+    if (page.sectionIndex !== lastBookmarkSectionIndex) {
+      const section = template.sections[page.sectionIndex];
+      if (section.bookmark) {
+        const scope = page.bands.length > 0 ? page.bands[0].scope : {};
+        const title = await engine.resolve(section.bookmark, scope);
+        bookmarks.push({
+          title,
+          pageNumber: page.pageIndex + 1,
+          level: 0,
+        });
+      }
+    }
+    lastBookmarkSectionIndex = page.sectionIndex;
+
+    // Band bookmarks
+    for (const layoutBand of page.bands) {
+      if (layoutBand.band.bookmark) {
+        const title = await engine.resolve(layoutBand.band.bookmark, layoutBand.scope);
+        bookmarks.push({
+          title,
+          pageNumber: page.pageIndex + 1,
+          level: 1,
+        });
+      }
+    }
+  }
+
+  return { pages: allPages, totalPages: allPages.length, bookmarks };
 }
 
 async function layoutSection(
@@ -526,50 +567,63 @@ async function layoutSection(
       : pageFooterResult.measurements;
     const footerTotalHeight = useLastFooter ? lastPageFooterHeight : pageFooterHeight;
 
-    // Compute footer placement origin
-    const hasFloatColumnFooter = expanded.columnFooterBands.some((b) => b.float === true);
-    let columnFooterStartOffset: number;
+    // Compute per-band column footer offsets
+    // Each band independently decides whether to float (sit after content) or use fixed position.
+    const fixedColumnFooterBottom = pageConfig.height - totalVerticalMargins - footerTotalHeight;
     let footerStartOffset: number;
+
+    function computeColumnFooterOffsets(): number[] {
+      const offsets: number[] = [];
+      let floatCursor = pageHeaderHeight + columnHeaderHeight + cursorY;
+      let fixedCursor = fixedColumnFooterBottom - columnFooterHeight;
+
+      for (let i = 0; i < expanded.columnFooterBands.length; i++) {
+        const band = expanded.columnFooterBands[i];
+        const m = columnFooterResult.measurements[i];
+
+        if (pageConfig.autoHeight) {
+          offsets.push(floatCursor);
+        } else if (band.float === true) {
+          offsets.push(Math.min(floatCursor, fixedCursor));
+        } else {
+          offsets.push(fixedCursor);
+        }
+
+        floatCursor += m.height;
+        fixedCursor += m.height;
+      }
+      return offsets;
+    }
+
+    const columnFooterOffsets = computeColumnFooterOffsets();
+
     if (pageConfig.autoHeight) {
       const contentBottom = pageHeaderHeight + columnHeaderHeight + cursorY;
-      columnFooterStartOffset = contentBottom;
       footerStartOffset = contentBottom + columnFooterHeight;
-    } else if (hasFloatColumnFooter) {
-      const floatPos = pageHeaderHeight + columnHeaderHeight + cursorY;
-      const fixedPos =
-        pageConfig.height - totalVerticalMargins - footerTotalHeight - columnFooterHeight;
-      columnFooterStartOffset = Math.min(floatPos, fixedPos);
-      footerStartOffset = pageConfig.height - totalVerticalMargins - footerTotalHeight;
     } else {
-      columnFooterStartOffset =
-        pageConfig.height - totalVerticalMargins - footerTotalHeight - columnFooterHeight;
-      footerStartOffset = pageConfig.height - totalVerticalMargins - footerTotalHeight;
+      footerStartOffset = fixedColumnFooterBottom;
     }
 
     // Place column footers (multi-column: per column; single-column: once)
     if (colLayout) {
       for (let col = 0; col < numColumns; col++) {
-        let offset = columnFooterStartOffset;
         for (let i = 0; i < expanded.columnFooterBands.length; i++) {
           const band = expanded.columnFooterBands[i];
           const m = columnFooterResult.measurements[i];
           currentBands.push(
-            createLayoutBand(band, offset, m, scope, {
+            createLayoutBand(band, columnFooterOffsets[i], m, scope, {
               columnIndex: col,
               columnOffsetX: colLayout.offsets[col],
               columnWidth: colLayout.widths[col],
             }),
           );
-          offset += m.height;
         }
       }
     } else {
-      let offset = columnFooterStartOffset;
       for (let i = 0; i < expanded.columnFooterBands.length; i++) {
         const band = expanded.columnFooterBands[i];
         const m = columnFooterResult.measurements[i];
-        currentBands.push(createLayoutBand(band, offset, m, scope));
-        offset += m.height;
+        currentBands.push(createLayoutBand(band, columnFooterOffsets[i], m, scope));
       }
     }
 
@@ -633,12 +687,14 @@ async function layoutSection(
         ...instance.band,
         id: instance.band.id + '__fit',
         elements: [fitElement],
+        height: 0,
         autoHeight: true,
       },
       overflowBand: {
         ...instance.band,
         id: instance.band.id + '__overflow',
         elements: [overflowElement],
+        height: 0,
         autoHeight: true,
       },
     };
@@ -726,7 +782,168 @@ async function layoutSection(
 
   let lastUsedInstance = expanded.contentBands[0];
 
-  if (isMultiColumn && colLayout) {
+  const isFlowMode = columnConfig.columnMode === 'flow';
+
+  if (isMultiColumn && colLayout && isFlowMode) {
+    // ─── Multi-column flow mode ───
+    // Content fills column 1, overflows to column 2, then to new page column 1, etc.
+    // Splittable bands can be split mid-column to fill the remaining space.
+    const flowColLayout = colLayout; // narrowed — always defined in this branch
+
+    // Same three-phase split as tile mode
+    let columnRegionStart = 0;
+    let columnRegionEnd = expanded.contentBands.length;
+    while (
+      columnRegionStart < expanded.contentBands.length &&
+      expanded.contentBands[columnRegionStart].band.type === 'title'
+    ) {
+      columnRegionStart++;
+    }
+    while (
+      columnRegionEnd > columnRegionStart &&
+      !isColumnBandType(expanded.contentBands[columnRegionEnd - 1].band.type)
+    ) {
+      columnRegionEnd--;
+    }
+
+    // Phase 1: Pre-column (title bands) — full-width
+    for (let i = 0; i < columnRegionStart; i++) {
+      lastUsedInstance = await placeFullWidthBand(expanded.contentBands[i], lastUsedInstance);
+    }
+
+    // Phase 2: Column region — flow across columns
+    let flowCol = 0;
+    let flowColCursor = 0; // vertical cursor within current column
+    let flowMaxColCursor = 0; // tallest column height on current page
+
+    function flowStartNewPage(prev: BandInstance, next: BandInstance): void {
+      finalizePage(pageScope(prev, globalPageOffset + pages.length), false);
+      startNewPage();
+      const newScope = pageScope(next, globalPageOffset + pages.length);
+      placePageHeaders(newScope);
+      placeColumnHeaders(newScope);
+      flowCol = 0;
+      flowColCursor = 0;
+      flowMaxColCursor = 0;
+    }
+
+    function flowAdvanceColumn(prev: BandInstance, next: BandInstance): void {
+      flowMaxColCursor = Math.max(flowMaxColCursor, flowColCursor);
+      flowCol++;
+      flowColCursor = 0;
+      if (flowCol >= numColumns) {
+        flowStartNewPage(prev, next);
+      }
+    }
+
+    function flowAvailableHeight(): number {
+      return availableContentHeight - cursorY - flowColCursor;
+    }
+
+    // Place a band (possibly split) in flow mode, handling column/page overflow.
+    async function placeFlowBand(instance: BandInstance): Promise<void> {
+      const measured = await measureBand(
+        instance.band,
+        fonts,
+        styles,
+        getPlugin,
+        pdfDoc,
+        imageCache,
+        fCtx,
+      );
+      const bandHeight = measured.height;
+      const scope = pageScope(instance, globalPageOffset + pages.length);
+
+      // Forced page break
+      if (instance.band.pageBreakBefore && (flowColCursor > 0 || flowCol > 0 || cursorY > 0)) {
+        flowStartNewPage(lastUsedInstance, instance);
+      }
+
+      const available = flowAvailableHeight();
+
+      // Band fits in current column
+      if (pageConfig.autoHeight || bandHeight <= available) {
+        const colOffsetY = pageHeaderHeight + columnHeaderHeight + cursorY + flowColCursor;
+        currentBands.push(
+          createLayoutBand(instance.band, colOffsetY, measured, scope, {
+            columnIndex: flowCol,
+            columnOffsetX: flowColLayout.offsets[flowCol],
+            columnWidth: flowColLayout.widths[flowCol],
+          }),
+        );
+        flowColCursor += bandHeight;
+        lastUsedInstance = instance;
+        return;
+      }
+
+      // Band doesn't fit — try to split
+      if (available > 0) {
+        const splitResult = await trySplitBand(instance, available);
+        if (splitResult) {
+          // Place fit portion in current column
+          const fitMeasured = await measureBand(
+            splitResult.fitBand,
+            fonts,
+            styles,
+            getPlugin,
+            pdfDoc,
+            imageCache,
+            fCtx,
+          );
+          const colOffsetY = pageHeaderHeight + columnHeaderHeight + cursorY + flowColCursor;
+          currentBands.push(
+            createLayoutBand(splitResult.fitBand, colOffsetY, fitMeasured, scope, {
+              columnIndex: flowCol,
+              columnOffsetX: flowColLayout.offsets[flowCol],
+              columnWidth: flowColLayout.widths[flowCol],
+            }),
+          );
+          flowColCursor += fitMeasured.height;
+
+          // Advance to next column/page for overflow
+          const overflowInstance: BandInstance = {
+            band: splitResult.overflowBand,
+            scope: instance.scope,
+          };
+          flowAdvanceColumn(lastUsedInstance, overflowInstance);
+          lastUsedInstance = instance;
+
+          // Recursively place overflow
+          await placeFlowBand(overflowInstance);
+          return;
+        }
+      }
+
+      // Can't split or nothing fits — advance to next column/page
+      if (flowColCursor > 0 || flowCol > 0) {
+        flowAdvanceColumn(lastUsedInstance, instance);
+      }
+
+      // Band still doesn't fit — it's just too tall for any column — place it anyway
+      const colOffsetY = pageHeaderHeight + columnHeaderHeight + cursorY + flowColCursor;
+      currentBands.push(
+        createLayoutBand(instance.band, colOffsetY, measured, scope, {
+          columnIndex: flowCol,
+          columnOffsetX: flowColLayout.offsets[flowCol],
+          columnWidth: flowColLayout.widths[flowCol],
+        }),
+      );
+      flowColCursor += measured.height;
+      lastUsedInstance = instance;
+    }
+
+    for (let i = columnRegionStart; i < columnRegionEnd; i++) {
+      await placeFlowBand(expanded.contentBands[i]);
+    }
+
+    // Resume full-width cursor after flow columns — use tallest column height
+    cursorY += Math.max(flowMaxColCursor, flowColCursor);
+
+    // Phase 3: Post-column (body/summary/noData bands) — full-width
+    for (let i = columnRegionEnd; i < expanded.contentBands.length; i++) {
+      lastUsedInstance = await placeFullWidthBand(expanded.contentBands[i], lastUsedInstance);
+    }
+  } else if (isMultiColumn && colLayout) {
     // ─── Multi-column tile mode ───
     // Split content bands into three phases:
     //   Pre-column (full-width): title bands

@@ -1,0 +1,9 @@
+{
+  "article": [{}],
+  "sampleItems": [
+    { "name": "Garamond", "year": 1530, "origin": "France" },
+    { "name": "Caslon", "year": 1722, "origin": "England" },
+    { "name": "Bodoni", "year": 1798, "origin": "Italy" },
+    { "name": "Helvetica", "year": 1957, "origin": "Switzerland" }
+  ]
+}

@@ -12,6 +12,11 @@ export type {
   ConditionalStyle,
   RichContent,
   StyledRun,
+  GradientStop,
+  LinearGradient,
+  RadialGradient,
+  Gradient,
+  BackgroundColor,
   BorderSide,
   PaddingValue,
   Style,
@@ -25,6 +30,6 @@ export { templateSchema } from './schema.js';
 export { validateTemplateSchema, validateWithSchema } from './validation.js';
 
 // Utilities
-export { parseColor, toHex, type RGB } from './utils/colors.js';
+export { parseColor, toHex, isGradient, type RGB } from './utils/colors.js';
 export { mmToPoints, inchesToPoints, pointsToMm, pointsToInches } from './utils/units.js';
 export { generateId } from './utils/ids.js';

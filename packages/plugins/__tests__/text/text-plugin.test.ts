@@ -504,3 +504,103 @@ describe('textPlugin: hyperlinks', () => {
     }
   });
 });
+
+describe('textPlugin.split (widow/orphan)', () => {
+  const lh = 12 * 1.2; // lineHeight = 14.4
+
+  it('canSplit is true', () => {
+    expect(textPlugin.canSplit).toBe(true);
+  });
+
+  it('returns null for empty text', async () => {
+    const result = await textPlugin.split!({ content: '' }, makeMeasureCtx(), 100);
+    expect(result).toBeNull();
+  });
+
+  it('returns null when entire text fits in one line', async () => {
+    const result = await textPlugin.split!({ content: 'Short text' }, makeMeasureCtx(), 100);
+    expect(result).toBeNull();
+  });
+
+  it('returns null for rich text content', async () => {
+    const result = await textPlugin.split!(
+      { content: [{ text: 'Hello' }, { text: 'World' }] },
+      makeMeasureCtx(),
+      100,
+    );
+    expect(result).toBeNull();
+  });
+
+  it('returns null when no lines fit (availableHeight < lineHeight)', async () => {
+    const longText = 'Line one of the text. Line two of the text. Line three of the text.';
+    const result = await textPlugin.split!(
+      { content: longText },
+      makeMeasureCtx({ availableWidth: 100 }),
+      lh * 0.5, // less than one line
+    );
+    expect(result).toBeNull();
+  });
+
+  it('splits multi-line text at line boundary', async () => {
+    // Use narrow width to force wrapping
+    const text = 'Word1 Word2 Word3 Word4 Word5 Word6 Word7 Word8 Word9 Word10';
+    const ctx = makeMeasureCtx({ availableWidth: 60 });
+    const result = await textPlugin.split!({ content: text }, ctx, lh * 2); // 2 lines fit
+    expect(result).not.toBeNull();
+    expect(result!.fit).toHaveProperty('content');
+    expect(result!.overflow).toHaveProperty('content');
+    expect(typeof result!.fit.content).toBe('string');
+    expect(typeof result!.overflow.content).toBe('string');
+    expect((result!.fit.content as string).length).toBeGreaterThan(0);
+    expect((result!.overflow.content as string).length).toBeGreaterThan(0);
+  });
+
+  it('respects orphans constraint', async () => {
+    const text = 'Word1 Word2 Word3 Word4 Word5 Word6 Word7 Word8';
+    const orphanStyle: Style = { ...defaultStyle, orphans: 3 };
+    const ctx = makeMeasureCtx({ availableWidth: 60, elementStyle: orphanStyle });
+
+    // With orphans: 3, allowing only 1 line should fail
+    const result = await textPlugin.split!({ content: text }, ctx, lh * 1);
+    expect(result).toBeNull();
+  });
+
+  it('respects widows constraint', async () => {
+    const text = 'Word1 Word2 Word3 Word4 Word5 Word6 Word7 Word8';
+    const widowStyle: Style = { ...defaultStyle, widows: 3 };
+    const ctx = makeMeasureCtx({ availableWidth: 60, elementStyle: widowStyle });
+
+    // Measure to know total lines
+    const measured = await textPlugin.measure({ content: text }, ctx);
+    const totalLines = Math.round(measured.height / lh);
+
+    // Allow all but 1 line — widows: 3 means overflow must have >= 3 lines
+    const result = await textPlugin.split!({ content: text }, ctx, lh * (totalLines - 1));
+    if (totalLines > 3) {
+      expect(result).not.toBeNull();
+      // The overflow text should produce at least 3 lines
+    } else {
+      // If total lines <=3, can't satisfy widows and still split
+      expect(result).toBeNull();
+    }
+  });
+
+  it('returns null when orphans + widows exceed total lines', async () => {
+    const text = 'Word1 Word2 Word3 Word4';
+    // With narrow width, maybe 2-3 lines
+    const strictStyle: Style = { ...defaultStyle, orphans: 3, widows: 3 };
+    const ctx = makeMeasureCtx({ availableWidth: 60, elementStyle: strictStyle });
+    const result = await textPlugin.split!({ content: text }, ctx, lh * 2);
+    // With only ~2-3 lines, orphans:3 + widows:3 can't both be satisfied
+    expect(result).toBeNull();
+  });
+
+  it('preserves paragraph breaks across split', async () => {
+    const text = 'First paragraph line one.\nSecond paragraph line one.';
+    const ctx = makeMeasureCtx({ availableWidth: 200 });
+    const result = await textPlugin.split!({ content: text }, ctx, lh * 1); // fit 1 line
+    expect(result).not.toBeNull();
+    expect(result!.fit.content).toBe('First paragraph line one.');
+    expect(result!.overflow.content).toBe('Second paragraph line one.');
+  });
+});

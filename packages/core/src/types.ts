@@ -90,7 +90,7 @@ export interface Band {
   pageBreakBefore?: boolean;
   bookmark?: string;
   anchor?: string;
-  backgroundColor?: string;
+  backgroundColor?: BackgroundColor;
   elements: Element[];
 }
 
@@ -132,6 +132,36 @@ export interface StyledRun {
   footnote?: RichContent;
 }
 
+// ---- Gradient ----
+
+export interface GradientStop {
+  color: string;
+  position: number;
+}
+
+export interface LinearGradient {
+  type: 'linear';
+  /** Angle in degrees. 0 = left-to-right, 90 = top-to-bottom. */
+  angle: number;
+  stops: GradientStop[];
+}
+
+export interface RadialGradient {
+  type: 'radial';
+  /** Center X as fraction (0–1, default 0.5). */
+  cx?: number;
+  /** Center Y as fraction (0–1, default 0.5). */
+  cy?: number;
+  /** Radius as fraction of the shorter dimension (0–1, default 0.5). */
+  radius?: number;
+  stops: GradientStop[];
+}
+
+export type Gradient = LinearGradient | RadialGradient;
+
+/** A background color can be a hex string or a gradient object. */
+export type BackgroundColor = string | Gradient;
+
 // ---- Style ----
 
 export interface BorderSide {
@@ -148,7 +178,7 @@ export interface Style {
   fontStyle?: 'normal' | 'italic';
   textDecoration?: 'none' | 'underline' | 'line-through' | 'underline line-through';
   color?: string;
-  backgroundColor?: string;
+  backgroundColor?: BackgroundColor;
   textAlign?: 'left' | 'center' | 'right' | 'justify';
   lineHeight?: number;
   letterSpacing?: number;

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseColor, toHex } from '../../src/utils/colors.js';
+import { parseColor, toHex, isGradient } from '../../src/utils/colors.js';
 
 describe('parseColor', () => {
   it('parses #RRGGBB format', () => {
@@ -69,5 +69,52 @@ describe('toHex', () => {
 
   it('converts white correctly', () => {
     expect(toHex({ r: 1, g: 1, b: 1 })).toBe('#ffffff');
+  });
+});
+
+describe('isGradient', () => {
+  it('returns true for linear gradient', () => {
+    expect(
+      isGradient({
+        type: 'linear',
+        angle: 90,
+        stops: [
+          { color: '#000000', position: 0 },
+          { color: '#ffffff', position: 1 },
+        ],
+      }),
+    ).toBe(true);
+  });
+
+  it('returns true for radial gradient', () => {
+    expect(
+      isGradient({
+        type: 'radial',
+        stops: [
+          { color: '#ff0000', position: 0 },
+          { color: '#0000ff', position: 1 },
+        ],
+      }),
+    ).toBe(true);
+  });
+
+  it('returns false for hex color string', () => {
+    expect(isGradient('#ff0000')).toBe(false);
+  });
+
+  it('returns false for null', () => {
+    expect(isGradient(null)).toBe(false);
+  });
+
+  it('returns false for undefined', () => {
+    expect(isGradient(undefined)).toBe(false);
+  });
+
+  it('returns false for object without type', () => {
+    expect(isGradient({ stops: [] })).toBe(false);
+  });
+
+  it('returns false for object with invalid type', () => {
+    expect(isGradient({ type: 'conic' })).toBe(false);
   });
 });

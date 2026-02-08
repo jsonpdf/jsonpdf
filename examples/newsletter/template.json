@@ -127,19 +127,16 @@
           "id": "masthead",
           "type": "title",
           "height": 55,
+          "backgroundColor": {
+            "type": "linear",
+            "angle": 0,
+            "stops": [
+              { "color": "#1a1a2e", "position": 0 },
+              { "color": "#16213e", "position": 0.5 },
+              { "color": "#0f3460", "position": 1 }
+            ]
+          },
           "elements": [
-            {
-              "id": "masthead-bg",
-              "type": "shape",
-              "x": 0,
-              "y": 0,
-              "width": 535,
-              "height": 50,
-              "properties": {
-                "shapeType": "rect",
-                "fill": "#1a1a2e"
-              }
-            },
             {
               "id": "masthead-title",
               "type": "text",

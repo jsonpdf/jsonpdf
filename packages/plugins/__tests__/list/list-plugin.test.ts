@@ -226,6 +226,50 @@ describe('listPlugin.render', () => {
   });
 });
 
+describe('listPlugin.render: text alignment', () => {
+  it('renders justified list items', async () => {
+    const justifyStyle: Style = { ...defaultStyle, textAlign: 'justify' };
+    await expect(
+      listPlugin.render(
+        { items: ['This is a longer item that may wrap to multiple lines in the list'] },
+        makeRenderCtx({ elementStyle: justifyStyle, availableWidth: 150, width: 150 }),
+      ),
+    ).resolves.toBeUndefined();
+  });
+
+  it('renders center-aligned list items', async () => {
+    const centerStyle: Style = { ...defaultStyle, textAlign: 'center' };
+    await expect(
+      listPlugin.render(
+        { items: ['Centered item', 'Another centered'] },
+        makeRenderCtx({ elementStyle: centerStyle }),
+      ),
+    ).resolves.toBeUndefined();
+  });
+
+  it('renders right-aligned list items', async () => {
+    const rightStyle: Style = { ...defaultStyle, textAlign: 'right' };
+    await expect(
+      listPlugin.render(
+        { items: ['Right-aligned item', 'Another right'] },
+        makeRenderCtx({ elementStyle: rightStyle }),
+      ),
+    ).resolves.toBeUndefined();
+  });
+
+  it('justified list with wrapping text renders without error', async () => {
+    const justifyStyle: Style = { ...defaultStyle, textAlign: 'justify' };
+    const longText =
+      'This is a very long list item that should wrap to multiple lines and be justified';
+    await expect(
+      listPlugin.render(
+        { items: [longText, 'Short'] },
+        makeRenderCtx({ elementStyle: justifyStyle, availableWidth: 120, width: 120 }),
+      ),
+    ).resolves.toBeUndefined();
+  });
+});
+
 describe('listPlugin.validate', () => {
   it('returns no errors for valid props', () => {
     expect(listPlugin.validate({ items: ['a'] })).toEqual([]);
