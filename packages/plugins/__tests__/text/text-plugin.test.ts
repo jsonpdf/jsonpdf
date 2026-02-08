@@ -333,4 +333,69 @@ describe('textPlugin: hyperlinks', () => {
     const header = new TextDecoder().decode(new Uint8Array(bytes).slice(0, 5));
     expect(header).toBe('%PDF-');
   });
+
+  it('creates GoTo annotation for #anchor internal links', async () => {
+    const testDoc = await PDFDocument.create();
+    const testFont = await testDoc.embedFont(StandardFonts.Helvetica);
+    const sourcePage = testDoc.addPage([612, 792]);
+    const targetPage = testDoc.addPage([612, 792]);
+    const testFonts: FontMap = new Map();
+    testFonts.set(fontKey('Helvetica', 'normal', 'normal'), testFont);
+
+    const anchorPageMap = new Map<string, typeof targetPage>();
+    anchorPageMap.set('chapter1', targetPage);
+
+    await textPlugin.render(
+      {
+        content: [{ text: 'Go to chapter', link: '#chapter1' }],
+      },
+      makeRenderCtx({
+        page: sourcePage,
+        fonts: testFonts,
+        pdfDoc: testDoc,
+        anchorPageMap,
+      }),
+    );
+
+    // Should have annotations (3 words: "Go", "to", "chapter")
+    const annots = sourcePage.node.get(PDFName.of('Annots'));
+    expect(annots).toBeInstanceOf(PDFArray);
+    expect((annots as PDFArray).size()).toBe(3);
+
+    // Verify PDF is valid
+    const bytes = await testDoc.save();
+    const header = new TextDecoder().decode(new Uint8Array(bytes).slice(0, 5));
+    expect(header).toBe('%PDF-');
+  });
+
+  it('skips annotation when #anchor not found in map', async () => {
+    const testDoc = await PDFDocument.create();
+    const testFont = await testDoc.embedFont(StandardFonts.Helvetica);
+    const testPage = testDoc.addPage([612, 792]);
+    const testFonts: FontMap = new Map();
+    testFonts.set(fontKey('Helvetica', 'normal', 'normal'), testFont);
+
+    const anchorPageMap = new Map<string, typeof testPage>();
+    // Don't add 'missing-anchor' to the map
+
+    await textPlugin.render(
+      {
+        content: [{ text: 'Dead link', link: '#missing-anchor' }],
+      },
+      makeRenderCtx({
+        page: testPage,
+        fonts: testFonts,
+        pdfDoc: testDoc,
+        anchorPageMap,
+      }),
+    );
+
+    // No annotations should be added since anchor doesn't exist
+    const annots = testPage.node.get(PDFName.of('Annots'));
+    if (annots instanceof PDFArray) {
+      expect(annots.size()).toBe(0);
+    } else {
+      expect(annots).toBeUndefined();
+    }
+  });
 });

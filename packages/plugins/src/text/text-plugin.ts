@@ -183,7 +183,9 @@ function measureRichText(
   return { width: ctx.availableWidth, height: totalHeight };
 }
 
-/** Add a URI link annotation covering a rectangular area on the page. */
+/** Add a link annotation covering a rectangular area on the page.
+ *  Links starting with "#" are internal GoTo links targeting an anchor's page.
+ *  All other links are external URI actions. */
 function addLinkAnnotation(
   ctx: RenderContext,
   x: number,
@@ -194,10 +196,21 @@ function addLinkAnnotation(
 ): void {
   const context = ctx.pdfDoc.context;
 
-  const actionDict = context.obj({
-    S: 'URI',
-    URI: PDFString.of(uri),
-  });
+  let actionDict;
+  if (uri.startsWith('#') && ctx.anchorPageMap) {
+    const anchorId = uri.slice(1);
+    const targetPage = ctx.anchorPageMap.get(anchorId);
+    if (!targetPage) return; // anchor not found, skip link
+    actionDict = context.obj({
+      S: 'GoTo',
+      D: [targetPage.ref, PDFName.of('Fit')],
+    });
+  } else {
+    actionDict = context.obj({
+      S: 'URI',
+      URI: PDFString.of(uri),
+    });
+  }
 
   const annotDict = context.obj({
     Type: 'Annot',
