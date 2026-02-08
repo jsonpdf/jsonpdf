@@ -476,8 +476,7 @@ export async function renderPdf(
   // 11b. Build anchor-to-PDFPage map for internal links
   const anchorPageMap = new Map<string, PDFPage>();
   for (const [anchorId, pageNum] of anchorMap) {
-    const target = pdfPages[pageNum - 1]; // 1-based → 0-based
-    if (target) anchorPageMap.set(anchorId, target.page);
+    anchorPageMap.set(anchorId, pdfPages[pageNum - 1].page); // 1-based → 0-based
   }
 
   // 12. Render pages
