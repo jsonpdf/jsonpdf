@@ -24,7 +24,7 @@ export function collectAnchors(
           anchors.set(layoutBand.band.anchor, pageNumber);
         } else if (warn) {
           console.warn(
-            `Duplicate anchor "${layoutBand.band.anchor}" on page ${pageNumber}; first occurrence on page ${anchors.get(layoutBand.band.anchor)} used`,
+            `Duplicate anchor "${layoutBand.band.anchor}" on page ${String(pageNumber)}; first occurrence on page ${String(anchors.get(layoutBand.band.anchor))} used`,
           );
         }
       }
@@ -35,7 +35,7 @@ export function collectAnchors(
             anchors.set(element.anchor, pageNumber);
           } else if (warn) {
             console.warn(
-              `Duplicate anchor "${element.anchor}" on page ${pageNumber}; first occurrence on page ${anchors.get(element.anchor)} used`,
+              `Duplicate anchor "${element.anchor}" on page ${String(pageNumber)}; first occurrence on page ${String(anchors.get(element.anchor))} used`,
             );
           }
         }
