@@ -22,6 +22,7 @@ function makePage(overrides: Partial<DesignPage>): DesignPage {
     },
     bands: [],
     totalHeight: 0,
+    designHeight: 80,
     ...overrides,
   };
 }
