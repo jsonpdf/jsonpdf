@@ -1,0 +1,353 @@
+{
+  "version": "1.0",
+  "name": "Quarterly Sales Report",
+  "description": "A sales report with Vega-Lite chart, grouped employees by department, bookmarks, and summary.",
+  "page": {
+    "width": 612,
+    "height": 792,
+    "margins": { "top": 40, "right": 40, "bottom": 40, "left": 40 }
+  },
+  "dataSchema": {
+    "type": "object",
+    "properties": {
+      "reportTitle": { "type": "string" },
+      "dateRange": { "type": "string" },
+      "departmentSummary": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "department": { "type": "string" },
+            "revenue": { "type": "number" }
+          }
+        }
+      },
+      "employees": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "department": { "type": "string" },
+            "role": { "type": "string" },
+            "sales": { "type": "number" },
+            "deals": { "type": "number" }
+          }
+        }
+      },
+      "grandTotal": { "type": "number" },
+      "employeeCount": { "type": "number" },
+      "avgDealSize": { "type": "number" }
+    }
+  },
+  "styles": {
+    "title": {
+      "fontSize": 22,
+      "fontWeight": "bold",
+      "color": "#1a1a2e"
+    },
+    "subtitle": {
+      "fontSize": 11,
+      "color": "#888888"
+    },
+    "section-label": {
+      "fontSize": 10,
+      "fontWeight": "bold",
+      "color": "#555555"
+    },
+    "group-heading": {
+      "fontSize": 12,
+      "fontWeight": "bold",
+      "color": "#ffffff"
+    },
+    "emp-name": {
+      "fontSize": 10,
+      "fontWeight": "bold",
+      "color": "#333333"
+    },
+    "emp-detail": {
+      "fontSize": 9,
+      "color": "#666666"
+    },
+    "emp-sales": {
+      "fontSize": 10,
+      "fontWeight": "bold",
+      "color": "#16a34a",
+      "textAlign": "right"
+    },
+    "emp-deals": {
+      "fontSize": 9,
+      "color": "#888888",
+      "textAlign": "right"
+    },
+    "summary-label": {
+      "fontSize": 11,
+      "color": "#555555"
+    },
+    "summary-value": {
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "color": "#1a1a2e"
+    },
+    "footer": {
+      "fontSize": 8,
+      "color": "#999999",
+      "textAlign": "center"
+    }
+  },
+  "fonts": [],
+  "sections": [
+    {
+      "id": "report",
+      "bookmark": "Sales Report",
+      "bands": [
+        {
+          "id": "report-title",
+          "type": "title",
+          "height": 240,
+          "elements": [
+            {
+              "id": "title-text",
+              "type": "text",
+              "x": 0,
+              "y": 5,
+              "width": 350,
+              "height": 30,
+              "style": "title",
+              "properties": { "content": "{{ reportTitle }}" }
+            },
+            {
+              "id": "date-range",
+              "type": "text",
+              "x": 0,
+              "y": 38,
+              "width": 350,
+              "height": 16,
+              "style": "subtitle",
+              "properties": { "content": "{{ dateRange }}" }
+            },
+            {
+              "id": "chart-label",
+              "type": "text",
+              "x": 0,
+              "y": 65,
+              "width": 532,
+              "height": 14,
+              "style": "section-label",
+              "properties": { "content": "Revenue by Department" }
+            },
+            {
+              "id": "revenue-chart",
+              "type": "chart",
+              "x": 0,
+              "y": 82,
+              "width": 532,
+              "height": 150,
+              "properties": {
+                "spec": {
+                  "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+                  "width": 440,
+                  "height": 120,
+                  "mark": { "type": "bar", "cornerRadiusEnd": 4 },
+                  "encoding": {
+                    "x": { "field": "department", "type": "nominal", "axis": { "labelAngle": 0, "title": null } },
+                    "y": { "field": "revenue", "type": "quantitative", "axis": { "title": "Revenue ($)", "format": "$,.0f" } },
+                    "color": { "value": "#3b82f6" }
+                  }
+                },
+                "dataSource": "{{ departmentSummary }}",
+                "scale": 2
+              }
+            }
+          ]
+        },
+        {
+          "id": "group-hdr",
+          "type": "groupHeader",
+          "height": 28,
+          "backgroundColor": "#1a1a2e",
+          "bookmark": "{{ _groupKey }}",
+          "elements": [
+            {
+              "id": "dept-name",
+              "type": "text",
+              "x": 10,
+              "y": 6,
+              "width": 512,
+              "height": 16,
+              "style": "group-heading",
+              "properties": { "content": "{{ _groupKey }}" }
+            }
+          ]
+        },
+        {
+          "id": "employee",
+          "type": "detail",
+          "height": 24,
+          "dataSource": "employees",
+          "groupBy": "department",
+          "elements": [
+            {
+              "id": "emp-name",
+              "type": "text",
+              "x": 15,
+              "y": 4,
+              "width": 180,
+              "height": 14,
+              "style": "emp-name",
+              "properties": { "content": "{{ item.name }}" }
+            },
+            {
+              "id": "emp-role",
+              "type": "text",
+              "x": 200,
+              "y": 5,
+              "width": 150,
+              "height": 13,
+              "style": "emp-detail",
+              "properties": { "content": "{{ item.role }}" }
+            },
+            {
+              "id": "emp-deals",
+              "type": "text",
+              "x": 355,
+              "y": 5,
+              "width": 60,
+              "height": 13,
+              "style": "emp-deals",
+              "properties": { "content": "{{ item.deals }} deals" }
+            },
+            {
+              "id": "emp-sales",
+              "type": "text",
+              "x": 425,
+              "y": 4,
+              "width": 97,
+              "height": 14,
+              "style": "emp-sales",
+              "properties": { "content": "{{ item.sales | money }}" }
+            },
+            {
+              "id": "emp-line",
+              "type": "line",
+              "x": 15,
+              "y": 22,
+              "width": 507,
+              "height": 1,
+              "properties": { "color": "#f0f0f0", "thickness": 0.5 }
+            }
+          ]
+        },
+        {
+          "id": "group-ftr",
+          "type": "groupFooter",
+          "height": 10,
+          "elements": [
+            {
+              "id": "group-line",
+              "type": "line",
+              "x": 0,
+              "y": 5,
+              "width": 532,
+              "height": 1,
+              "properties": { "color": "#e0e0e0", "thickness": 1 }
+            }
+          ]
+        },
+        {
+          "id": "report-summary",
+          "type": "summary",
+          "height": 65,
+          "elements": [
+            {
+              "id": "summary-line",
+              "type": "line",
+              "x": 0,
+              "y": 5,
+              "width": 532,
+              "height": 1,
+              "properties": { "color": "#1a1a2e", "thickness": 2 }
+            },
+            {
+              "id": "total-label",
+              "type": "text",
+              "x": 0,
+              "y": 15,
+              "width": 130,
+              "height": 14,
+              "style": "summary-label",
+              "properties": { "content": "Grand Total:" }
+            },
+            {
+              "id": "total-value",
+              "type": "text",
+              "x": 130,
+              "y": 12,
+              "width": 120,
+              "height": 20,
+              "style": "summary-value",
+              "properties": { "content": "{{ grandTotal | money }}" }
+            },
+            {
+              "id": "emp-count-label",
+              "type": "text",
+              "x": 270,
+              "y": 15,
+              "width": 100,
+              "height": 14,
+              "style": "summary-label",
+              "properties": { "content": "Team Size:" }
+            },
+            {
+              "id": "emp-count-value",
+              "type": "text",
+              "x": 370,
+              "y": 12,
+              "width": 60,
+              "height": 20,
+              "style": "summary-value",
+              "properties": { "content": "{{ employeeCount }}" }
+            },
+            {
+              "id": "avg-label",
+              "type": "text",
+              "x": 0,
+              "y": 40,
+              "width": 130,
+              "height": 14,
+              "style": "summary-label",
+              "properties": { "content": "Avg Deal Size:" }
+            },
+            {
+              "id": "avg-value",
+              "type": "text",
+              "x": 130,
+              "y": 37,
+              "width": 120,
+              "height": 20,
+              "style": "summary-value",
+              "properties": { "content": "{{ avgDealSize | money }}" }
+            }
+          ]
+        },
+        {
+          "id": "page-ftr",
+          "type": "pageFooter",
+          "height": 20,
+          "elements": [
+            {
+              "id": "footer-text",
+              "type": "text",
+              "x": 0,
+              "y": 5,
+              "width": 532,
+              "height": 12,
+              "style": "footer",
+              "properties": { "content": "{{ reportTitle }} — Page {{ _pageNumber }} of {{ _totalPages }}" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

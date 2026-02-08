@@ -1,0 +1,388 @@
+{
+  "version": "1.0",
+  "name": "Event Ticket",
+  "description": "A compact event ticket with QR code, dashed tear line, and conditional VIP badge.",
+  "page": {
+    "width": 288,
+    "height": 576,
+    "margins": { "top": 15, "right": 15, "bottom": 15, "left": 15 }
+  },
+  "dataSchema": {
+    "type": "object",
+    "properties": {
+      "eventName": { "type": "string" },
+      "venue": { "type": "string" },
+      "address": { "type": "string" },
+      "date": { "type": "string" },
+      "time": { "type": "string" },
+      "gate": { "type": "string" },
+      "seat": { "type": "string" },
+      "row": { "type": "string" },
+      "attendeeName": { "type": "string" },
+      "ticketId": { "type": "string" },
+      "ticketUrl": { "type": "string" },
+      "vip": { "type": "boolean" }
+    }
+  },
+  "styles": {
+    "event-name": {
+      "fontFamily": "Oswald",
+      "fontSize": 20,
+      "fontWeight": "bold",
+      "color": "#1a1a2e",
+      "textAlign": "center"
+    },
+    "venue": {
+      "fontSize": 11,
+      "color": "#333333",
+      "textAlign": "center"
+    },
+    "address": {
+      "fontSize": 9,
+      "color": "#666666",
+      "textAlign": "center"
+    },
+    "detail-label": {
+      "fontSize": 7,
+      "fontWeight": "bold",
+      "color": "#999999"
+    },
+    "detail-value": {
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "color": "#1a1a2e"
+    },
+    "attendee": {
+      "fontSize": 12,
+      "fontWeight": "bold",
+      "textAlign": "center"
+    },
+    "ticket-id": {
+      "fontSize": 7,
+      "color": "#999999",
+      "textAlign": "center"
+    },
+    "tear-label": {
+      "fontSize": 7,
+      "fontStyle": "italic",
+      "color": "#bbbbbb",
+      "textAlign": "center"
+    },
+    "vip-badge": {
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "color": "#d4af37",
+      "textAlign": "center"
+    },
+    "stub-text": {
+      "fontFamily": "Oswald",
+      "fontSize": 10,
+      "fontWeight": "bold",
+      "color": "#cccccc",
+      "textAlign": "center"
+    }
+  },
+  "fonts": [
+    {
+      "family": "Oswald",
+      "weight": 700,
+      "src": "./node_modules/@fontsource/oswald/files/oswald-latin-700-normal.woff"
+    }
+  ],
+  "sections": [
+    {
+      "id": "ticket",
+      "bands": [
+        {
+          "id": "ticket-body",
+          "type": "body",
+          "height": 546,
+          "elements": [
+            {
+              "id": "ticket-border",
+              "type": "shape",
+              "x": 0,
+              "y": 0,
+              "width": 258,
+              "height": 546,
+              "properties": {
+                "shapeType": "rect",
+                "stroke": "#dddddd",
+                "strokeWidth": 1,
+                "borderRadius": 8
+              }
+            },
+            {
+              "id": "header-bar",
+              "type": "shape",
+              "x": 1,
+              "y": 1,
+              "width": 256,
+              "height": 6,
+              "properties": {
+                "shapeType": "rect",
+                "fill": "#1a1a2e"
+              }
+            },
+            {
+              "id": "event-title",
+              "type": "text",
+              "x": 10,
+              "y": 20,
+              "width": 238,
+              "height": 50,
+              "style": "event-name",
+              "properties": { "content": "{{ eventName }}" }
+            },
+            {
+              "id": "venue-name",
+              "type": "text",
+              "x": 10,
+              "y": 75,
+              "width": 238,
+              "height": 16,
+              "style": "venue",
+              "properties": { "content": "{{ venue }}" }
+            },
+            {
+              "id": "venue-address",
+              "type": "text",
+              "x": 10,
+              "y": 93,
+              "width": 238,
+              "height": 14,
+              "style": "address",
+              "properties": { "content": "{{ address }}" }
+            },
+            {
+              "id": "sep-1",
+              "type": "line",
+              "x": 20,
+              "y": 115,
+              "width": 218,
+              "height": 1,
+              "properties": { "color": "#eeeeee", "thickness": 1 }
+            },
+            {
+              "id": "date-label",
+              "type": "text",
+              "x": 15,
+              "y": 125,
+              "width": 60,
+              "height": 10,
+              "style": "detail-label",
+              "properties": { "content": "DATE" }
+            },
+            {
+              "id": "date-value",
+              "type": "text",
+              "x": 15,
+              "y": 136,
+              "width": 100,
+              "height": 18,
+              "style": "detail-value",
+              "properties": { "content": "{{ date }}" }
+            },
+            {
+              "id": "time-label",
+              "type": "text",
+              "x": 140,
+              "y": 125,
+              "width": 60,
+              "height": 10,
+              "style": "detail-label",
+              "properties": { "content": "TIME" }
+            },
+            {
+              "id": "time-value",
+              "type": "text",
+              "x": 140,
+              "y": 136,
+              "width": 100,
+              "height": 18,
+              "style": "detail-value",
+              "properties": { "content": "{{ time }}" }
+            },
+            {
+              "id": "gate-label",
+              "type": "text",
+              "x": 15,
+              "y": 165,
+              "width": 60,
+              "height": 10,
+              "style": "detail-label",
+              "properties": { "content": "GATE" }
+            },
+            {
+              "id": "gate-value",
+              "type": "text",
+              "x": 15,
+              "y": 176,
+              "width": 60,
+              "height": 18,
+              "style": "detail-value",
+              "properties": { "content": "{{ gate }}" }
+            },
+            {
+              "id": "row-label",
+              "type": "text",
+              "x": 95,
+              "y": 165,
+              "width": 60,
+              "height": 10,
+              "style": "detail-label",
+              "properties": { "content": "ROW" }
+            },
+            {
+              "id": "row-value",
+              "type": "text",
+              "x": 95,
+              "y": 176,
+              "width": 60,
+              "height": 18,
+              "style": "detail-value",
+              "properties": { "content": "{{ row }}" }
+            },
+            {
+              "id": "seat-label",
+              "type": "text",
+              "x": 175,
+              "y": 165,
+              "width": 60,
+              "height": 10,
+              "style": "detail-label",
+              "properties": { "content": "SEAT" }
+            },
+            {
+              "id": "seat-value",
+              "type": "text",
+              "x": 175,
+              "y": 176,
+              "width": 60,
+              "height": 18,
+              "style": "detail-value",
+              "properties": { "content": "{{ seat }}" }
+            },
+            {
+              "id": "sep-2",
+              "type": "line",
+              "x": 20,
+              "y": 205,
+              "width": 218,
+              "height": 1,
+              "properties": { "color": "#eeeeee", "thickness": 1 }
+            },
+            {
+              "id": "attendee-label",
+              "type": "text",
+              "x": 10,
+              "y": 215,
+              "width": 238,
+              "height": 10,
+              "style": "detail-label",
+              "styleOverrides": { "textAlign": "center" },
+              "properties": { "content": "ATTENDEE" }
+            },
+            {
+              "id": "attendee-name",
+              "type": "text",
+              "x": 10,
+              "y": 228,
+              "width": 238,
+              "height": 18,
+              "style": "attendee",
+              "properties": { "content": "{{ attendeeName }}" }
+            },
+            {
+              "id": "vip-circle",
+              "type": "shape",
+              "x": 104,
+              "y": 252,
+              "width": 50,
+              "height": 50,
+              "condition": "vip",
+              "properties": {
+                "shapeType": "circle",
+                "stroke": "#d4af37",
+                "strokeWidth": 2
+              }
+            },
+            {
+              "id": "vip-text",
+              "type": "text",
+              "x": 104,
+              "y": 265,
+              "width": 50,
+              "height": 20,
+              "style": "vip-badge",
+              "condition": "vip",
+              "properties": { "content": "VIP" }
+            },
+            {
+              "id": "tear-text",
+              "type": "text",
+              "x": 10,
+              "y": 310,
+              "width": 238,
+              "height": 12,
+              "style": "tear-label",
+              "properties": { "content": "- - - - - TEAR HERE - - - - -" }
+            },
+            {
+              "id": "tear-line",
+              "type": "line",
+              "x": 0,
+              "y": 325,
+              "width": 258,
+              "height": 1,
+              "properties": { "dashPattern": [6, 4], "color": "#cccccc", "thickness": 1 }
+            },
+            {
+              "id": "qr-code",
+              "type": "barcode",
+              "x": 64,
+              "y": 345,
+              "width": 130,
+              "height": 130,
+              "properties": {
+                "value": "{{ ticketUrl }}",
+                "format": "qrcode"
+              }
+            },
+            {
+              "id": "scan-text",
+              "type": "text",
+              "x": 10,
+              "y": 480,
+              "width": 238,
+              "height": 12,
+              "style": "ticket-id",
+              "properties": { "content": "Scan for entry" }
+            },
+            {
+              "id": "ticket-id",
+              "type": "text",
+              "x": 10,
+              "y": 495,
+              "width": 238,
+              "height": 12,
+              "style": "ticket-id",
+              "properties": { "content": "{{ ticketId }}" }
+            },
+            {
+              "id": "stub-event",
+              "type": "text",
+              "x": 230,
+              "y": 150,
+              "width": 200,
+              "height": 14,
+              "rotation": 90,
+              "style": "stub-text",
+              "properties": { "content": "{{ eventName }}" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

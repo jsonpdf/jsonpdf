@@ -1,0 +1,27 @@
+{
+  "newsletterName": "The Developer Weekly",
+  "issueNumber": 47,
+  "issueDate": "January 20, 2025",
+  "featured": {
+    "title": "The Rise of Edge Computing in Modern Web Architecture",
+    "author": "Elena Vasquez",
+    "body": "Edge computing has fundamentally changed how we think about web application architecture. By moving computation closer to the end user, developers can achieve latency reductions of 50-80% for data-intensive operations. Major cloud providers have expanded their edge networks significantly over the past year, with new points of presence appearing across Southeast Asia and Latin America. This shift enables real-time applications that were previously impractical, from collaborative editing tools to multiplayer gaming experiences. The key challenge remains state management — keeping data consistent across distributed nodes while maintaining the performance benefits that made edge computing attractive in the first place. New frameworks like EdgeDB and Turso are tackling this problem head-on, offering SQLite-based solutions that replicate seamlessly across edge locations."
+  },
+  "leftArticle": {
+    "title": "TypeScript 6.0: What to Expect",
+    "author": "Marcus Chen",
+    "body": "The TypeScript team has outlined their vision for the next major release. Key features include pattern matching expressions, improved type inference for higher-order functions, and a new module resolution strategy designed for edge runtimes. The controversial decorators proposal has been finalized, bringing TypeScript in line with the TC39 Stage 3 specification. Performance improvements are also a major focus, with the compiler achieving 40% faster type-checking through incremental graph analysis. Early benchmarks show build times dropping from minutes to seconds for large codebases."
+  },
+  "rightArticle": {
+    "title": "Sustainable Software Engineering",
+    "author": "Priya Sharma",
+    "body": "As data centers account for an increasing share of global energy consumption, the software industry is rethinking efficiency. Green coding practices — from optimizing algorithms to reducing unnecessary network calls — can cut energy usage by up to 30%. Companies like Stripe and Shopify have begun measuring the carbon footprint of individual API endpoints. New tools like CodeCarbon and Green Algorithms help developers understand the environmental impact of their code choices. The movement goes beyond optimization: it is about building a culture where resource efficiency is a first-class engineering concern."
+  },
+  "highlights": [
+    "React Server Components are now stable in Next.js 15, enabling zero-bundle-size components",
+    "The WebAssembly Garbage Collection proposal reached Stage 4, unlocking managed languages in the browser",
+    "GitHub Copilot now supports multi-file editing with contextual awareness across entire repositories",
+    "Bun 2.0 launched with native Windows support and a built-in SQL database driver",
+    "The Node.js project announced official support for the Permission Model API in LTS releases"
+  ]
+}

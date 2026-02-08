@@ -1,0 +1,425 @@
+{
+  "version": "1.0",
+  "name": "Newsletter",
+  "description": "A newsletter showcasing multiple custom fonts, containers, lists, and rich text.",
+  "page": {
+    "width": 595,
+    "height": 842,
+    "margins": { "top": 30, "right": 30, "bottom": 30, "left": 30 }
+  },
+  "dataSchema": {
+    "type": "object",
+    "properties": {
+      "newsletterName": { "type": "string" },
+      "issueNumber": { "type": "number" },
+      "issueDate": { "type": "string" },
+      "featured": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "author": { "type": "string" },
+          "body": { "type": "string" }
+        }
+      },
+      "leftArticle": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "author": { "type": "string" },
+          "body": { "type": "string" }
+        }
+      },
+      "rightArticle": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "author": { "type": "string" },
+          "body": { "type": "string" }
+        }
+      },
+      "highlights": {
+        "type": "array",
+        "items": { "type": "string" }
+      }
+    }
+  },
+  "styles": {
+    "masthead": {
+      "fontSize": 28,
+      "fontWeight": "bold",
+      "color": "#ffffff"
+    },
+    "issue-info": {
+      "fontSize": 9,
+      "color": "#cccccc",
+      "textAlign": "right"
+    },
+    "section-title": {
+      "fontFamily": "Oswald",
+      "fontSize": 16,
+      "fontWeight": "bold",
+      "color": "#1a1a2e"
+    },
+    "article-title": {
+      "fontFamily": "Oswald",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "color": "#1a1a2e"
+    },
+    "article-body": {
+      "fontFamily": "Merriweather",
+      "fontSize": 9,
+      "lineHeight": 1.5,
+      "color": "#333333"
+    },
+    "byline": {
+      "fontFamily": "Merriweather",
+      "fontSize": 8,
+      "fontStyle": "italic",
+      "color": "#888888"
+    },
+    "highlight-title": {
+      "fontFamily": "Oswald",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "color": "#1a1a2e"
+    },
+    "highlight-item": {
+      "fontFamily": "Merriweather",
+      "fontSize": 9,
+      "lineHeight": 1.4,
+      "color": "#444444"
+    },
+    "footer": {
+      "fontSize": 8,
+      "color": "#999999",
+      "textAlign": "center"
+    }
+  },
+  "fonts": [
+    {
+      "family": "Oswald",
+      "weight": 700,
+      "src": "./node_modules/@fontsource/oswald/files/oswald-latin-700-normal.woff"
+    },
+    {
+      "family": "Merriweather",
+      "weight": 400,
+      "src": "./node_modules/@fontsource/merriweather/files/merriweather-latin-400-normal.woff"
+    },
+    {
+      "family": "Merriweather",
+      "weight": 700,
+      "src": "./node_modules/@fontsource/merriweather/files/merriweather-latin-700-normal.woff"
+    },
+    {
+      "family": "Merriweather",
+      "weight": 400,
+      "style": "italic",
+      "src": "./node_modules/@fontsource/merriweather/files/merriweather-latin-400-italic.woff"
+    }
+  ],
+  "sections": [
+    {
+      "id": "newsletter",
+      "bands": [
+        {
+          "id": "masthead",
+          "type": "title",
+          "height": 55,
+          "elements": [
+            {
+              "id": "masthead-bg",
+              "type": "shape",
+              "x": 0,
+              "y": 0,
+              "width": 535,
+              "height": 50,
+              "properties": {
+                "shapeType": "rect",
+                "fill": "#1a1a2e"
+              }
+            },
+            {
+              "id": "masthead-title",
+              "type": "text",
+              "x": 15,
+              "y": 10,
+              "width": 300,
+              "height": 35,
+              "style": "masthead",
+              "properties": { "content": "{{ newsletterName }}" }
+            },
+            {
+              "id": "masthead-issue",
+              "type": "text",
+              "x": 330,
+              "y": 18,
+              "width": 190,
+              "height": 14,
+              "style": "issue-info",
+              "properties": { "content": "Issue #{{ issueNumber }} — {{ issueDate }}" }
+            }
+          ]
+        },
+        {
+          "id": "featured",
+          "type": "body",
+          "height": 220,
+          "elements": [
+            {
+              "id": "featured-label",
+              "type": "text",
+              "x": 0,
+              "y": 15,
+              "width": 535,
+              "height": 22,
+              "style": "section-title",
+              "properties": { "content": "FEATURED STORY" }
+            },
+            {
+              "id": "featured-line",
+              "type": "line",
+              "x": 0,
+              "y": 38,
+              "width": 60,
+              "height": 1,
+              "properties": { "color": "#1a1a2e", "thickness": 3 }
+            },
+            {
+              "id": "featured-title",
+              "type": "text",
+              "x": 0,
+              "y": 50,
+              "width": 535,
+              "height": 22,
+              "style": "article-title",
+              "styleOverrides": { "fontSize": 18 },
+              "properties": { "content": "{{ featured.title }}" }
+            },
+            {
+              "id": "featured-byline",
+              "type": "text",
+              "x": 0,
+              "y": 75,
+              "width": 535,
+              "height": 14,
+              "style": "byline",
+              "properties": { "content": "By {{ featured.author }}" }
+            },
+            {
+              "id": "featured-body",
+              "type": "text",
+              "x": 0,
+              "y": 95,
+              "width": 535,
+              "height": 115,
+              "style": "article-body",
+              "properties": { "content": "{{ featured.body }}" }
+            },
+            {
+              "id": "featured-sep",
+              "type": "line",
+              "x": 0,
+              "y": 215,
+              "width": 535,
+              "height": 1,
+              "properties": { "color": "#dddddd", "thickness": 1 }
+            }
+          ]
+        },
+        {
+          "id": "two-col",
+          "type": "body",
+          "height": 280,
+          "elements": [
+            {
+              "id": "columns",
+              "type": "container",
+              "x": 0,
+              "y": 10,
+              "width": 535,
+              "height": 260,
+              "properties": { "layout": "horizontal", "gap": 25 },
+              "elements": [
+                {
+                  "id": "left-col",
+                  "type": "container",
+                  "x": 0,
+                  "y": 0,
+                  "width": 242,
+                  "height": 260,
+                  "properties": { "layout": "absolute" },
+                  "elements": [
+                    {
+                      "id": "left-title",
+                      "type": "text",
+                      "x": 0,
+                      "y": 0,
+                      "width": 242,
+                      "height": 20,
+                      "style": "article-title",
+                      "properties": { "content": "{{ leftArticle.title }}" }
+                    },
+                    {
+                      "id": "left-byline",
+                      "type": "text",
+                      "x": 0,
+                      "y": 25,
+                      "width": 242,
+                      "height": 12,
+                      "style": "byline",
+                      "properties": { "content": "By {{ leftArticle.author }}" }
+                    },
+                    {
+                      "id": "left-body",
+                      "type": "text",
+                      "x": 0,
+                      "y": 42,
+                      "width": 242,
+                      "height": 218,
+                      "style": "article-body",
+                      "properties": { "content": "{{ leftArticle.body }}" }
+                    }
+                  ]
+                },
+                {
+                  "id": "col-divider",
+                  "type": "line",
+                  "x": 0,
+                  "y": 0,
+                  "width": 1,
+                  "height": 250,
+                  "properties": { "direction": "vertical", "color": "#eeeeee", "thickness": 1 }
+                },
+                {
+                  "id": "right-col",
+                  "type": "container",
+                  "x": 0,
+                  "y": 0,
+                  "width": 242,
+                  "height": 260,
+                  "properties": { "layout": "absolute" },
+                  "elements": [
+                    {
+                      "id": "right-title",
+                      "type": "text",
+                      "x": 0,
+                      "y": 0,
+                      "width": 242,
+                      "height": 20,
+                      "style": "article-title",
+                      "properties": { "content": "{{ rightArticle.title }}" }
+                    },
+                    {
+                      "id": "right-byline",
+                      "type": "text",
+                      "x": 0,
+                      "y": 25,
+                      "width": 242,
+                      "height": 12,
+                      "style": "byline",
+                      "properties": { "content": "By {{ rightArticle.author }}" }
+                    },
+                    {
+                      "id": "right-body",
+                      "type": "text",
+                      "x": 0,
+                      "y": 42,
+                      "width": 242,
+                      "height": 218,
+                      "style": "article-body",
+                      "properties": { "content": "{{ rightArticle.body }}" }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "highlights",
+          "type": "body",
+          "height": 180,
+          "elements": [
+            {
+              "id": "highlights-sep",
+              "type": "line",
+              "x": 0,
+              "y": 0,
+              "width": 535,
+              "height": 1,
+              "properties": { "color": "#dddddd", "thickness": 1 }
+            },
+            {
+              "id": "highlights-title",
+              "type": "text",
+              "x": 0,
+              "y": 12,
+              "width": 535,
+              "height": 22,
+              "style": "highlight-title",
+              "properties": { "content": "QUICK HIGHLIGHTS" }
+            },
+            {
+              "id": "highlights-accent",
+              "type": "line",
+              "x": 0,
+              "y": 35,
+              "width": 60,
+              "height": 1,
+              "properties": { "color": "#1a1a2e", "thickness": 3 }
+            },
+            {
+              "id": "highlights-list",
+              "type": "list",
+              "x": 10,
+              "y": 48,
+              "width": 515,
+              "height": 120,
+              "style": "highlight-item",
+              "properties": {
+                "listType": "bullet",
+                "bulletStyle": "\u25cf",
+                "itemSpacing": 6,
+                "items": [
+                  "{{ highlights[0] }}",
+                  "{{ highlights[1] }}",
+                  "{{ highlights[2] }}",
+                  "{{ highlights[3] }}",
+                  "{{ highlights[4] }}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "footer-band",
+          "type": "pageFooter",
+          "height": 25,
+          "elements": [
+            {
+              "id": "footer-line",
+              "type": "line",
+              "x": 0,
+              "y": 0,
+              "width": 535,
+              "height": 1,
+              "properties": { "color": "#dddddd", "thickness": 1 }
+            },
+            {
+              "id": "footer-text",
+              "type": "text",
+              "x": 0,
+              "y": 8,
+              "width": 535,
+              "height": 14,
+              "style": "footer",
+              "properties": { "content": "{{ newsletterName }} — Issue #{{ issueNumber }} — {{ issueDate }}" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

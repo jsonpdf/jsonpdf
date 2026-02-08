@@ -1,0 +1,239 @@
+{
+  "version": "1.0",
+  "name": "Financial Statement",
+  "description": "An annual financial statement with income statement and balance sheet tables, pageBreakBefore, and pad filter.",
+  "page": {
+    "width": 612,
+    "height": 792,
+    "margins": { "top": 40, "right": 40, "bottom": 40, "left": 40 }
+  },
+  "dataSchema": {
+    "type": "object",
+    "properties": {
+      "company": { "type": "string" },
+      "period": { "type": "string" },
+      "documentId": { "type": "number" },
+      "incomeRows": {
+        "type": "array",
+        "items": { "type": "object" }
+      },
+      "balanceRows": {
+        "type": "array",
+        "items": { "type": "object" }
+      }
+    }
+  },
+  "styles": {
+    "title": {
+      "fontSize": 20,
+      "fontWeight": "bold",
+      "color": "#1a1a2e"
+    },
+    "subtitle": {
+      "fontSize": 11,
+      "color": "#666666"
+    },
+    "section-heading": {
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "color": "#1a1a2e"
+    },
+    "table-header": {
+      "fontSize": 9,
+      "fontWeight": "bold",
+      "color": "#ffffff",
+      "backgroundColor": "#1a1a2e"
+    },
+    "table-row": {
+      "fontSize": 9,
+      "color": "#333333"
+    },
+    "table-row-alt": {
+      "fontSize": 9,
+      "color": "#333333",
+      "backgroundColor": "#f5f5f5"
+    },
+    "footer": {
+      "fontSize": 8,
+      "color": "#999999",
+      "textAlign": "center"
+    },
+    "footer-left": {
+      "fontSize": 8,
+      "color": "#999999"
+    }
+  },
+  "fonts": [],
+  "sections": [
+    {
+      "id": "financial-stmt",
+      "bands": [
+        {
+          "id": "header",
+          "type": "title",
+          "height": 85,
+          "elements": [
+            {
+              "id": "company-name",
+              "type": "text",
+              "x": 0,
+              "y": 5,
+              "width": 532,
+              "height": 28,
+              "style": "title",
+              "properties": { "content": "{{ company }}" }
+            },
+            {
+              "id": "report-title",
+              "type": "text",
+              "x": 0,
+              "y": 35,
+              "width": 532,
+              "height": 18,
+              "style": "section-heading",
+              "properties": { "content": "Annual Financial Statement" }
+            },
+            {
+              "id": "period-text",
+              "type": "text",
+              "x": 0,
+              "y": 55,
+              "width": 532,
+              "height": 14,
+              "style": "subtitle",
+              "properties": { "content": "{{ period }}" }
+            },
+            {
+              "id": "title-line",
+              "type": "line",
+              "x": 0,
+              "y": 78,
+              "width": 532,
+              "height": 1,
+              "properties": { "color": "#1a1a2e", "thickness": 2 }
+            }
+          ]
+        },
+        {
+          "id": "income-stmt",
+          "type": "body",
+          "height": 370,
+          "elements": [
+            {
+              "id": "income-heading",
+              "type": "text",
+              "x": 0,
+              "y": 10,
+              "width": 532,
+              "height": 20,
+              "style": "section-heading",
+              "properties": { "content": "INCOME STATEMENT" }
+            },
+            {
+              "id": "income-table",
+              "type": "table",
+              "x": 0,
+              "y": 38,
+              "width": 532,
+              "height": 320,
+              "properties": {
+                "columns": [
+                  { "key": "code", "header": "Code", "width": 55, "align": "left" },
+                  { "key": "account", "header": "Account", "flex": 1, "align": "left" },
+                  { "key": "fy2024", "header": "FY 2024", "width": 110, "align": "right" },
+                  { "key": "fy2023", "header": "FY 2023", "width": 110, "align": "right" }
+                ],
+                "rows": "{{ incomeRows }}",
+                "showHeader": true,
+                "headerStyle": "table-header",
+                "rowStyle": "table-row",
+                "alternateRowStyle": "table-row-alt",
+                "borderWidth": 0.5,
+                "borderColor": "#cccccc",
+                "cellPadding": 5
+              }
+            }
+          ]
+        },
+        {
+          "id": "balance-sheet",
+          "type": "body",
+          "height": 600,
+          "pageBreakBefore": true,
+          "elements": [
+            {
+              "id": "balance-heading",
+              "type": "text",
+              "x": 0,
+              "y": 10,
+              "width": 532,
+              "height": 20,
+              "style": "section-heading",
+              "properties": { "content": "BALANCE SHEET" }
+            },
+            {
+              "id": "balance-subtitle",
+              "type": "text",
+              "x": 0,
+              "y": 30,
+              "width": 532,
+              "height": 14,
+              "style": "subtitle",
+              "properties": { "content": "As of December 31, 2024" }
+            },
+            {
+              "id": "balance-table",
+              "type": "table",
+              "x": 0,
+              "y": 52,
+              "width": 532,
+              "height": 540,
+              "properties": {
+                "columns": [
+                  { "key": "code", "header": "Code", "width": 55, "align": "left" },
+                  { "key": "account", "header": "Account", "flex": 1, "align": "left" },
+                  { "key": "amount", "header": "Amount", "width": 130, "align": "right" }
+                ],
+                "rows": "{{ balanceRows }}",
+                "showHeader": true,
+                "headerStyle": "table-header",
+                "rowStyle": "table-row",
+                "alternateRowStyle": "table-row-alt",
+                "borderWidth": 0.5,
+                "borderColor": "#cccccc",
+                "cellPadding": 5
+              }
+            }
+          ]
+        },
+        {
+          "id": "page-ftr",
+          "type": "pageFooter",
+          "height": 25,
+          "elements": [
+            {
+              "id": "doc-number",
+              "type": "text",
+              "x": 0,
+              "y": 8,
+              "width": 200,
+              "height": 12,
+              "style": "footer-left",
+              "properties": { "content": "Document: FS-{{ documentId | pad: 6, \"0\" }}" }
+            },
+            {
+              "id": "page-number",
+              "type": "text",
+              "x": 0,
+              "y": 8,
+              "width": 532,
+              "height": 12,
+              "style": "footer",
+              "properties": { "content": "Page {{ _pageNumber }} of {{ _totalPages }}" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

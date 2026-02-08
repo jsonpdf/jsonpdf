@@ -1,0 +1,14 @@
+{
+  "eventName": "Summer Music Festival 2025",
+  "venue": "Riverside Amphitheater",
+  "address": "500 Waterfront Drive, Austin, TX 78701",
+  "date": "JUN 21",
+  "time": "7:00 PM",
+  "gate": "B",
+  "row": "12",
+  "seat": "34",
+  "attendeeName": "James Wilson",
+  "ticketId": "TKT-2025-SMF-004521",
+  "ticketUrl": "https://tickets.example.com/verify/TKT-2025-SMF-004521",
+  "vip": true
+}

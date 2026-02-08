@@ -1,0 +1,30 @@
+{
+  "companyName": "Meridian Technologies Inc.",
+  "companyAddress": "1200 Innovation Drive, Suite 400, San Jose, CA 95110",
+  "employeeName": "Sarah J. Mitchell",
+  "employeeId": "EMP-20847",
+  "department": "Software Engineering",
+  "payPeriod": "January 1 – January 15, 2025",
+  "payDate": "January 20, 2025",
+  "earnings": [
+    { "description": "Regular Pay", "hours": 80, "rate": 62.50, "amount": 5000.00, "type": "regular" },
+    { "description": "Overtime (1.5x)", "hours": 12, "rate": 93.75, "amount": 1125.00, "type": "overtime" },
+    { "description": "Shift Differential", "hours": 16, "rate": 5.00, "amount": 80.00, "type": "regular" },
+    { "description": "Holiday Pay", "hours": 8, "rate": 62.50, "amount": 500.00, "type": "regular" },
+    { "description": "Performance Bonus", "hours": 0, "rate": 0, "amount": 750.00, "type": "bonus" }
+  ],
+  "deductions": [
+    { "description": "Federal Income Tax", "amount": 1118.25, "type": "tax" },
+    { "description": "State Income Tax (CA)", "amount": 521.85, "type": "tax" },
+    { "description": "Social Security (6.2%)", "amount": 462.21, "type": "tax" },
+    { "description": "Medicare (1.45%)", "amount": 108.16, "type": "tax" },
+    { "description": "Health Insurance (PPO)", "amount": 287.50, "type": "benefit" },
+    { "description": "401(k) Contribution (8%)", "amount": 596.40, "type": "retirement" }
+  ],
+  "grossPay": 7455.00,
+  "totalDeductions": 3094.37,
+  "netPay": 4360.63,
+  "ytdGross": 14910.00,
+  "ytdDeductions": 6188.74,
+  "ytdNet": 8721.26
+}

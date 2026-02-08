@@ -1,0 +1,463 @@
+{
+  "version": "1.0",
+  "name": "Resume",
+  "description": "A professional resume showcasing numbered lists, lettered lists with nesting, rich text, and multiple body bands.",
+  "page": {
+    "width": 612,
+    "height": 792,
+    "margins": { "top": 30, "right": 45, "bottom": 30, "left": 45 }
+  },
+  "dataSchema": {
+    "type": "object",
+    "properties": {
+      "name": { "type": "string" },
+      "email": { "type": "string" },
+      "phone": { "type": "string" },
+      "location": { "type": "string" },
+      "website": { "type": "string" },
+      "summary": { "type": "string" },
+      "jobs": { "type": "array" },
+      "skills": { "type": "array" },
+      "achievements": { "type": "array" },
+      "education": { "type": "array" }
+    }
+  },
+  "styles": {
+    "name": {
+      "fontSize": 22,
+      "fontWeight": "bold",
+      "color": "#1a1a2e",
+      "textAlign": "center"
+    },
+    "contact": {
+      "fontSize": 9,
+      "color": "#555555",
+      "textAlign": "center"
+    },
+    "section-title": {
+      "fontSize": 12,
+      "fontWeight": "bold",
+      "color": "#1a1a2e"
+    },
+    "body-text": {
+      "fontSize": 9.5,
+      "lineHeight": 1.4,
+      "color": "#333333"
+    },
+    "job-title": {
+      "fontSize": 10,
+      "fontWeight": "bold",
+      "color": "#222222"
+    },
+    "job-detail": {
+      "fontSize": 9,
+      "fontStyle": "italic",
+      "color": "#666666"
+    },
+    "responsibility": {
+      "fontSize": 9,
+      "lineHeight": 1.3,
+      "color": "#444444"
+    },
+    "skill-text": {
+      "fontSize": 9,
+      "lineHeight": 1.3,
+      "color": "#333333"
+    },
+    "achievement-text": {
+      "fontSize": 9,
+      "lineHeight": 1.3,
+      "color": "#333333"
+    },
+    "edu-degree": {
+      "fontSize": 10,
+      "fontWeight": "bold",
+      "color": "#222222"
+    },
+    "edu-detail": {
+      "fontSize": 9,
+      "color": "#666666"
+    },
+    "footer": {
+      "fontSize": 7,
+      "color": "#bbbbbb",
+      "textAlign": "center"
+    }
+  },
+  "fonts": [],
+  "sections": [
+    {
+      "id": "resume",
+      "bands": [
+        {
+          "id": "header",
+          "type": "title",
+          "height": 72,
+          "elements": [
+            {
+              "id": "full-name",
+              "type": "text",
+              "x": 0,
+              "y": 5,
+              "width": 522,
+              "height": 30,
+              "style": "name",
+              "properties": { "content": "{{ name }}" }
+            },
+            {
+              "id": "contact-line",
+              "type": "text",
+              "x": 0,
+              "y": 33,
+              "width": 522,
+              "height": 14,
+              "style": "contact",
+              "properties": {
+                "content": [
+                  { "text": "{{ email }}", "link": "mailto:{{ email }}" },
+                  { "text": "  |  {{ phone }}  |  {{ location }}  |  " },
+                  { "text": "{{ website }}", "link": "{{ website }}" }
+                ]
+              }
+            },
+            {
+              "id": "header-line",
+              "type": "line",
+              "x": 0,
+              "y": 58,
+              "width": 522,
+              "height": 1,
+              "properties": { "color": "#1a1a2e", "thickness": 1.5 }
+            }
+          ]
+        },
+        {
+          "id": "summary-section",
+          "type": "body",
+          "height": 72,
+          "elements": [
+            {
+              "id": "summary-title",
+              "type": "text",
+              "x": 0,
+              "y": 3,
+              "width": 522,
+              "height": 16,
+              "style": "section-title",
+              "properties": { "content": "PROFESSIONAL SUMMARY" }
+            },
+            {
+              "id": "summary-line",
+              "type": "line",
+              "x": 0,
+              "y": 17,
+              "width": 522,
+              "height": 1,
+              "properties": { "color": "#cccccc", "thickness": 0.5 }
+            },
+            {
+              "id": "summary-text",
+              "type": "text",
+              "x": 0,
+              "y": 22,
+              "width": 522,
+              "height": 48,
+              "style": "body-text",
+              "properties": { "content": "{{ summary }}" }
+            }
+          ]
+        },
+        {
+          "id": "experience-section",
+          "type": "body",
+          "height": 240,
+          "elements": [
+            {
+              "id": "exp-title",
+              "type": "text",
+              "x": 0,
+              "y": 0,
+              "width": 522,
+              "height": 16,
+              "style": "section-title",
+              "properties": { "content": "EXPERIENCE" }
+            },
+            {
+              "id": "exp-line",
+              "type": "line",
+              "x": 0,
+              "y": 14,
+              "width": 522,
+              "height": 1,
+              "properties": { "color": "#cccccc", "thickness": 0.5 }
+            },
+            {
+              "id": "job1-title",
+              "type": "text",
+              "x": 0,
+              "y": 20,
+              "width": 350,
+              "height": 14,
+              "style": "job-title",
+              "properties": { "content": "{{ jobs[0].title }}" }
+            },
+            {
+              "id": "job1-dates",
+              "type": "text",
+              "x": 300,
+              "y": 21,
+              "width": 222,
+              "height": 12,
+              "style": "job-detail",
+              "styleOverrides": { "textAlign": "right" },
+              "properties": { "content": "{{ jobs[0].dates }}" }
+            },
+            {
+              "id": "job1-company",
+              "type": "text",
+              "x": 0,
+              "y": 35,
+              "width": 522,
+              "height": 12,
+              "style": "job-detail",
+              "properties": { "content": "{{ jobs[0].company }} — {{ jobs[0].location }}" }
+            },
+            {
+              "id": "job1-duties",
+              "type": "list",
+              "x": 8,
+              "y": 50,
+              "width": 510,
+              "height": 80,
+              "style": "responsibility",
+              "properties": {
+                "listType": "bullet",
+                "bulletStyle": "\u2022",
+                "itemSpacing": 3,
+                "items": [
+                  "{{ jobs[0].responsibilities[0] }}",
+                  "{{ jobs[0].responsibilities[1] }}",
+                  "{{ jobs[0].responsibilities[2] }}"
+                ]
+              }
+            },
+            {
+              "id": "job2-title",
+              "type": "text",
+              "x": 0,
+              "y": 138,
+              "width": 350,
+              "height": 14,
+              "style": "job-title",
+              "properties": { "content": "{{ jobs[1].title }}" }
+            },
+            {
+              "id": "job2-dates",
+              "type": "text",
+              "x": 300,
+              "y": 139,
+              "width": 222,
+              "height": 12,
+              "style": "job-detail",
+              "styleOverrides": { "textAlign": "right" },
+              "properties": { "content": "{{ jobs[1].dates }}" }
+            },
+            {
+              "id": "job2-company",
+              "type": "text",
+              "x": 0,
+              "y": 153,
+              "width": 522,
+              "height": 12,
+              "style": "job-detail",
+              "properties": { "content": "{{ jobs[1].company }} — {{ jobs[1].location }}" }
+            },
+            {
+              "id": "job2-duties",
+              "type": "list",
+              "x": 8,
+              "y": 168,
+              "width": 510,
+              "height": 70,
+              "style": "responsibility",
+              "properties": {
+                "listType": "bullet",
+                "bulletStyle": "\u2022",
+                "itemSpacing": 3,
+                "items": [
+                  "{{ jobs[1].responsibilities[0] }}",
+                  "{{ jobs[1].responsibilities[1] }}",
+                  "{{ jobs[1].responsibilities[2] }}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "skills-section",
+          "type": "body",
+          "height": 148,
+          "elements": [
+            {
+              "id": "skills-title",
+              "type": "text",
+              "x": 0,
+              "y": 0,
+              "width": 522,
+              "height": 16,
+              "style": "section-title",
+              "properties": { "content": "TECHNICAL SKILLS" }
+            },
+            {
+              "id": "skills-line",
+              "type": "line",
+              "x": 0,
+              "y": 14,
+              "width": 522,
+              "height": 1,
+              "properties": { "color": "#cccccc", "thickness": 0.5 }
+            },
+            {
+              "id": "skills-list",
+              "type": "list",
+              "x": 8,
+              "y": 22,
+              "width": 510,
+              "height": 124,
+              "style": "skill-text",
+              "properties": {
+                "listType": "lettered",
+                "indent": 18,
+                "itemSpacing": 4,
+                "items": "{{ skills }}"
+              }
+            }
+          ]
+        },
+        {
+          "id": "achievements-section",
+          "type": "body",
+          "height": 108,
+          "elements": [
+            {
+              "id": "ach-title",
+              "type": "text",
+              "x": 0,
+              "y": 0,
+              "width": 522,
+              "height": 16,
+              "style": "section-title",
+              "properties": { "content": "KEY ACHIEVEMENTS" }
+            },
+            {
+              "id": "ach-line",
+              "type": "line",
+              "x": 0,
+              "y": 14,
+              "width": 522,
+              "height": 1,
+              "properties": { "color": "#cccccc", "thickness": 0.5 }
+            },
+            {
+              "id": "ach-list",
+              "type": "list",
+              "x": 8,
+              "y": 22,
+              "width": 510,
+              "height": 84,
+              "style": "achievement-text",
+              "properties": {
+                "listType": "numbered",
+                "itemSpacing": 4,
+                "items": "{{ achievements }}"
+              }
+            }
+          ]
+        },
+        {
+          "id": "education-section",
+          "type": "body",
+          "height": 74,
+          "elements": [
+            {
+              "id": "edu-title",
+              "type": "text",
+              "x": 0,
+              "y": 0,
+              "width": 522,
+              "height": 16,
+              "style": "section-title",
+              "properties": { "content": "EDUCATION" }
+            },
+            {
+              "id": "edu-line",
+              "type": "line",
+              "x": 0,
+              "y": 14,
+              "width": 522,
+              "height": 1,
+              "properties": { "color": "#cccccc", "thickness": 0.5 }
+            },
+            {
+              "id": "edu1-degree",
+              "type": "text",
+              "x": 0,
+              "y": 22,
+              "width": 400,
+              "height": 14,
+              "style": "edu-degree",
+              "properties": { "content": "{{ education[0].degree }}" }
+            },
+            {
+              "id": "edu1-school",
+              "type": "text",
+              "x": 0,
+              "y": 36,
+              "width": 300,
+              "height": 12,
+              "style": "edu-detail",
+              "properties": { "content": "{{ education[0].school }}, {{ education[0].year }}" }
+            },
+            {
+              "id": "edu2-degree",
+              "type": "text",
+              "x": 0,
+              "y": 52,
+              "width": 400,
+              "height": 14,
+              "style": "edu-degree",
+              "properties": { "content": "{{ education[1].degree }}" }
+            },
+            {
+              "id": "edu2-school",
+              "type": "text",
+              "x": 0,
+              "y": 66,
+              "width": 300,
+              "height": 12,
+              "style": "edu-detail",
+              "properties": { "content": "{{ education[1].school }}, {{ education[1].year }}" }
+            }
+          ]
+        },
+        {
+          "id": "page-ftr",
+          "type": "pageFooter",
+          "height": 16,
+          "elements": [
+            {
+              "id": "footer-text",
+              "type": "text",
+              "x": 0,
+              "y": 4,
+              "width": 522,
+              "height": 10,
+              "style": "footer",
+              "properties": { "content": "{{ name }} — Resume" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
