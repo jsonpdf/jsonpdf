@@ -7,18 +7,34 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    }
+    },
+    "./styles.css": "./dist/index.css"
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsc --build",
+    "dev": "vite serve dev",
+    "build": "vite build",
     "typecheck": "tsc --build --noEmit"
   },
   "dependencies": {
     "@jsonpdf/core": "workspace:*",
     "@jsonpdf/template": "workspace:*",
-    "@jsonpdf/renderer": "workspace:*"
+    "konva": "^9.3.0",
+    "react-konva": "^19.2.0",
+    "zustand": "^5.0.0"
+  },
+  "peerDependencies": {
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "vite": "^6.0.0"
   }
 }

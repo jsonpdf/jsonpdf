@@ -1,0 +1,14 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-family: var(--jp-font-family);
+  color: var(--jp-color-text-primary);
+  background: var(--jp-color-surface);
+}
+
+.main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}

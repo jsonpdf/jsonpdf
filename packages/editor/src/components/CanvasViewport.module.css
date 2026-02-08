@@ -1,0 +1,5 @@
+.viewport {
+  flex: 1;
+  overflow: auto;
+  background: var(--jp-color-canvas-bg);
+}

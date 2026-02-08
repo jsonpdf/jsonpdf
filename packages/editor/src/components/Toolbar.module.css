@@ -1,0 +1,50 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  height: var(--jp-toolbar-height);
+  padding: 0 var(--jp-space-md);
+  border-bottom: 1px solid var(--jp-color-border);
+  background: var(--jp-color-surface);
+  gap: var(--jp-space-md);
+}
+
+.name {
+  font-size: var(--jp-font-size-md);
+  font-weight: 600;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.zoomControls {
+  display: flex;
+  align-items: center;
+  gap: var(--jp-space-xs);
+}
+
+.zoomBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--jp-color-border);
+  border-radius: 4px;
+  background: var(--jp-color-surface);
+  color: var(--jp-color-text-primary);
+  cursor: pointer;
+  font-size: var(--jp-font-size-md);
+  line-height: 1;
+}
+
+.zoomBtn:hover {
+  background: var(--jp-color-surface-secondary);
+}
+
+.zoomLabel {
+  font-size: var(--jp-font-size-sm);
+  color: var(--jp-color-text-secondary);
+  min-width: 40px;
+  text-align: center;
+}
