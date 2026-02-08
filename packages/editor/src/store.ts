@@ -1,6 +1,13 @@
 import { create } from 'zustand';
-import type { Template } from '@jsonpdf/core';
-import { createTemplate, updateElement, removeElement, updateBand } from '@jsonpdf/template';
+import type { Template, Element, Band, Section, PageConfig } from '@jsonpdf/core';
+import {
+  createTemplate,
+  updateElement,
+  removeElement,
+  updateBand,
+  updateSection,
+  updateTemplate,
+} from '@jsonpdf/template';
 
 export interface EditorState {
   template: Template;
@@ -23,6 +30,14 @@ export interface EditorState {
   updateElementBounds: (elementId: string, x: number, y: number, w: number, h: number) => void;
   deleteSelectedElement: () => void;
   updateBandHeight: (bandId: string, height: number) => void;
+  updateElementProps: (elementId: string, updates: Partial<Omit<Element, 'id'>>) => void;
+  updateBandProps: (bandId: string, updates: Partial<Omit<Band, 'id' | 'elements'>>) => void;
+  updateSectionProps: (sectionId: string, updates: Partial<Omit<Section, 'id' | 'bands'>>) => void;
+  updateTemplateProps: (
+    updates: Omit<Partial<Template>, 'version' | 'sections' | 'page'> & {
+      page?: Partial<PageConfig>;
+    },
+  ) => void;
 }
 
 export const useEditorStore = create<EditorState>((set) => ({
@@ -95,6 +110,42 @@ export const useEditorStore = create<EditorState>((set) => ({
     set((state) => {
       try {
         return { template: updateBand(state.template, bandId, { height: clamped }) };
+      } catch {
+        return state;
+      }
+    });
+  },
+  updateElementProps: (elementId, updates) => {
+    set((state) => {
+      try {
+        return { template: updateElement(state.template, elementId, updates) };
+      } catch {
+        return state;
+      }
+    });
+  },
+  updateBandProps: (bandId, updates) => {
+    set((state) => {
+      try {
+        return { template: updateBand(state.template, bandId, updates) };
+      } catch {
+        return state;
+      }
+    });
+  },
+  updateSectionProps: (sectionId, updates) => {
+    set((state) => {
+      try {
+        return { template: updateSection(state.template, sectionId, updates) };
+      } catch {
+        return state;
+      }
+    });
+  },
+  updateTemplateProps: (updates) => {
+    set((state) => {
+      try {
+        return { template: updateTemplate(state.template, updates) };
       } catch {
         return state;
       }
