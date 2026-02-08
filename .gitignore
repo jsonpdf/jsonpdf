@@ -25,3 +25,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Generated example PDFs
+examples/*/output.pdf
