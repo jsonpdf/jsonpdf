@@ -53,8 +53,27 @@ export function createExpressionEngine(): ExpressionEngine {
     return result;
   }
 
+  // Matches a pure Liquid expression: exactly {{ expr }} with nothing else
+  const PURE_EXPR_RE = /^\{\{\s*(.+?)\s*\}\}$/;
+
   async function resolveValue(value: unknown, scope: Record<string, unknown>): Promise<unknown> {
     if (typeof value === 'string') {
+      // For pure expressions like "{{ departmentSummary }}", return the raw
+      // scope value when it resolves to a non-primitive (array/object).
+      // This allows properties like chart.dataSource to receive actual arrays
+      // instead of their stringified representation.
+      const match = value.match(PURE_EXPR_RE);
+      if (match) {
+        try {
+          const raw: unknown = await liquid.evalValue(match[1], scope);
+          if (raw !== null && raw !== undefined && typeof raw === 'object') {
+            return raw;
+          }
+        } catch {
+          // evalValue can't handle all Liquid syntax (e.g. filters with |).
+          // Fall through to normal string resolution.
+        }
+      }
       return resolve(value, scope);
     }
     if (Array.isArray(value)) {
