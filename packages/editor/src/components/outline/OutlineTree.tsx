@@ -25,6 +25,7 @@ export interface TreeNode {
 /* ------------------------------------------------------------------ */
 
 export interface DragSource {
+  kind: 'element' | 'section';
   elementId: string;
   sourceBandId: string;
   sourceIndex: number;
@@ -123,7 +124,7 @@ function buildTree(template: Template): TreeNode[] {
     typeLabel: 'Section',
     children: section.bands.map((band) => buildBandNode(band, section.id)),
     sectionId: section.id,
-    draggable: false,
+    draggable: true,
   }));
 }
 

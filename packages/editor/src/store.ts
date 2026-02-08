@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { Template, Element, Band, Section, PageConfig } from '@jsonpdf/core';
+import { generateId } from '@jsonpdf/core';
 import {
   createTemplate,
   updateElement,
@@ -7,8 +8,11 @@ import {
   updateBand,
   updateSection,
   updateTemplate,
+  addSection as addSectionOp,
+  removeSection as removeSectionOp,
   reorderElement as reorderElementOp,
   moveElement as moveElementOp,
+  moveSection as moveSectionOp,
 } from '@jsonpdf/template';
 
 export interface EditorState {
@@ -42,6 +46,9 @@ export interface EditorState {
   ) => void;
   reorderElement: (elementId: string, toIndex: number) => void;
   moveElementToBand: (elementId: string, toBandId: string, toIndex?: number) => void;
+  addSection: () => void;
+  removeSection: (sectionId: string) => void;
+  moveSection: (sectionId: string, toIndex: number) => void;
 }
 
 export const useEditorStore = create<EditorState>((set) => ({
@@ -168,6 +175,42 @@ export const useEditorStore = create<EditorState>((set) => ({
     set((state) => {
       try {
         return { template: moveElementOp(state.template, elementId, toBandId, toIndex) };
+      } catch {
+        return state;
+      }
+    });
+  },
+  addSection: () => {
+    set((state) => {
+      const sectionId = generateId('sec');
+      const name = `Section ${String(state.template.sections.length + 1)}`;
+      const section: Section = { id: sectionId, name, bands: [] };
+      return {
+        template: addSectionOp(state.template, section),
+        selectedElementId: null,
+        selectedBandId: null,
+        selectedSectionId: sectionId,
+      };
+    });
+  },
+  removeSection: (sectionId) => {
+    set((state) => {
+      try {
+        return {
+          template: removeSectionOp(state.template, sectionId),
+          selectedElementId: null,
+          selectedBandId: null,
+          selectedSectionId: null,
+        };
+      } catch {
+        return state;
+      }
+    });
+  },
+  moveSection: (sectionId, toIndex) => {
+    set((state) => {
+      try {
+        return { template: moveSectionOp(state.template, sectionId, toIndex) };
       } catch {
         return state;
       }

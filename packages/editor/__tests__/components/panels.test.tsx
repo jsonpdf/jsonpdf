@@ -114,6 +114,30 @@ describe('TemplatePanel', () => {
   });
 });
 
+describe('SectionPanel', () => {
+  beforeEach(() => {
+    useEditorStore.setState({
+      template: buildTestTemplate(),
+      selectedElementId: null,
+      selectedBandId: null,
+      selectedSectionId: 'sec1',
+    });
+  });
+
+  it('shows delete section button', () => {
+    render(<Sidebar />);
+    expect(screen.getByRole('button', { name: 'Delete section' })).toBeTruthy();
+  });
+
+  it('removes section on delete click', () => {
+    render(<Sidebar />);
+    fireEvent.click(screen.getByRole('button', { name: 'Delete section' }));
+    const state = useEditorStore.getState();
+    expect(state.template.sections).toHaveLength(0);
+    expect(state.selectedSectionId).toBeNull();
+  });
+});
+
 describe('BandPanel', () => {
   beforeEach(() => {
     useEditorStore.setState({

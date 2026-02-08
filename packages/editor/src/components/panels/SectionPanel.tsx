@@ -16,6 +16,7 @@ interface SectionPanelProps {
 export function SectionPanel({ section }: SectionPanelProps) {
   const page = useEditorStore((s) => s.template.page);
   const updateSectionProps = useEditorStore((s) => s.updateSectionProps);
+  const removeSectionAction = useEditorStore((s) => s.removeSection);
 
   const update = useCallback(
     (updates: Partial<Omit<Section, 'id' | 'bands'>>) => {
@@ -150,6 +151,16 @@ export function SectionPanel({ section }: SectionPanelProps) {
           placeholder={String(page.margins.left)}
         />
       </PropertyGroup>
+
+      <button
+        className={styles.deleteBtn}
+        onClick={() => {
+          removeSectionAction(section.id);
+        }}
+        aria-label="Delete section"
+      >
+        Delete Section
+      </button>
     </div>
   );
 }

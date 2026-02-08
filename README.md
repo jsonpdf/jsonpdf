@@ -198,7 +198,9 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 - [x] Keyboard shortcuts (Delete, Escape, Arrow nudge 1pt / Shift+Arrow 10pt)
 - [x] Property panel (context-sensitive panels for template, section, band, element properties + style overrides)
 - [x] Outline panel (hierarchical tree of sections, bands, elements with click-to-select)
-- [ ] Band/section management (add, remove, reorder)
+- [x] Element drag-and-drop reordering in outline panel (within band, across bands)
+- [x] Section management: add, delete, drag-and-drop reorder (kind-isolated from element drags)
+- [ ] Band management: add/remove bands
 - [ ] Template import/export (JSON)
 - [ ] Live PDF preview
 

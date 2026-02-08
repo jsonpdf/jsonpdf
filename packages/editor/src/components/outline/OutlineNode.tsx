@@ -14,7 +14,7 @@ interface OutlineNodeProps {
 export function computeDropPosition(
   clientY: number,
   rect: { top: number; height: number },
-  targetKind: 'band' | 'element',
+  targetKind: 'band' | 'element' | 'section',
 ): 'before' | 'after' | 'inside' {
   const ratio = (clientY - rect.top) / rect.height;
   if (targetKind === 'band') return 'inside';
@@ -65,6 +65,7 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
       if (!dragCtx || !node.draggable) return;
       e.stopPropagation();
       dragCtx.dragRef.current = {
+        kind: node.kind === 'section' ? 'section' : 'element',
         elementId: node.id,
         sourceBandId: node.bandId ?? '',
         sourceIndex: index ?? 0,
@@ -73,7 +74,7 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/plain', node.id);
     },
-    [dragCtx, node.id, node.bandId, node.draggable, index],
+    [dragCtx, node.id, node.bandId, node.kind, node.draggable, index],
   );
 
   const handleDragEnd = useCallback(() => {
@@ -87,9 +88,13 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
 
   const handleDragOver = useCallback(
     (e: React.DragEvent) => {
-      if (!dragCtx || node.kind === 'section') return;
+      if (!dragCtx) return;
       const source = dragCtx.dragRef.current;
       if (!source || source.elementId === node.id) return;
+
+      // Kind-matching: sections can only drop on sections, elements can't drop on sections
+      if (source.kind === 'section' && node.kind !== 'section') return;
+      if (source.kind === 'element' && node.kind === 'section') return;
 
       e.preventDefault();
       e.stopPropagation();
@@ -135,6 +140,22 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
 
       const store = useEditorStore.getState();
 
+      // Section reorder
+      if (source.kind === 'section' && node.kind === 'section') {
+        const S = source.sourceIndex;
+        const T = index ?? 0;
+        let toIndex: number;
+        if (currentIndicator.position === 'before') {
+          toIndex = S < T ? T - 1 : T;
+        } else {
+          toIndex = S < T ? T : T + 1;
+        }
+        if (toIndex !== S) {
+          store.moveSection(source.elementId, toIndex);
+        }
+        return;
+      }
+
       if (currentIndicator.position === 'inside' && node.kind === 'band') {
         // Drop on band header → append to that band (skip if already in this band)
         if (source.sourceBandId === node.id) return;
@@ -179,7 +200,10 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
     .join(' ');
 
   const isDropTarget =
-    !node.frameOwnerId && (node.kind === 'band' || (node.kind === 'element' && node.draggable));
+    !node.frameOwnerId &&
+    (node.kind === 'band' ||
+      (node.kind === 'element' && node.draggable) ||
+      (node.kind === 'section' && dragCtx?.dragRef.current?.kind === 'section'));
 
   return (
     <div>
