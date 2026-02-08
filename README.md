@@ -193,7 +193,9 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 - [x] `@jsonpdf/template` — Full manipulation API (update, remove, move, clone, queries)
 - [x] Editor scaffolding (React + Konva + Zustand + CSS Modules, Vite library build)
 - [x] Canvas rendering (pages with margin guides, bands with type labels, 11 element type renderers)
-- [ ] Element selection, drag, resize
+- [x] Element click-to-select, drag-to-move, resize handles (8-point), selection overlay on separate Layer
+- [x] Band click selection with highlight, band height resize via drag handle
+- [x] Keyboard shortcuts (Delete, Escape, Arrow nudge 1pt / Shift+Arrow 10pt)
 - [ ] Property panel (auto-generated from propsSchema)
 - [ ] Band/section management
 - [ ] Template import/export (JSON)

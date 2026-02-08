@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { Template } from '@jsonpdf/core';
-import { createTemplate } from '@jsonpdf/template';
+import { createTemplate, updateElement, removeElement, updateBand } from '@jsonpdf/template';
 
 export interface EditorState {
   template: Template;
@@ -19,6 +19,10 @@ export interface EditorState {
     bandId?: string | null,
     sectionId?: string | null,
   ) => void;
+  updateElementPosition: (elementId: string, x: number, y: number) => void;
+  updateElementBounds: (elementId: string, x: number, y: number, w: number, h: number) => void;
+  deleteSelectedElement: () => void;
+  updateBandHeight: (bandId: string, height: number) => void;
 }
 
 export const useEditorStore = create<EditorState>((set) => ({
@@ -44,6 +48,56 @@ export const useEditorStore = create<EditorState>((set) => ({
       selectedElementId: elementId,
       selectedBandId: bandId ?? null,
       selectedSectionId: sectionId ?? null,
+    });
+  },
+  updateElementPosition: (elementId, x, y) => {
+    set((state) => {
+      try {
+        return { template: updateElement(state.template, elementId, { x, y }) };
+      } catch {
+        return state;
+      }
+    });
+  },
+  updateElementBounds: (elementId, x, y, w, h) => {
+    set((state) => {
+      try {
+        return {
+          template: updateElement(state.template, elementId, {
+            x,
+            y,
+            width: w,
+            height: h,
+          }),
+        };
+      } catch {
+        return state;
+      }
+    });
+  },
+  deleteSelectedElement: () => {
+    set((state) => {
+      if (!state.selectedElementId) return state;
+      try {
+        return {
+          template: removeElement(state.template, state.selectedElementId),
+          selectedElementId: null,
+          selectedBandId: null,
+          selectedSectionId: null,
+        };
+      } catch {
+        return state;
+      }
+    });
+  },
+  updateBandHeight: (bandId, height) => {
+    const clamped = Math.max(10, height);
+    set((state) => {
+      try {
+        return { template: updateBand(state.template, bandId, { height: clamped }) };
+      } catch {
+        return state;
+      }
     });
   },
 }));
