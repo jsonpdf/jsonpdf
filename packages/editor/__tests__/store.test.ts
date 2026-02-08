@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useEditorStore } from '../src/store';
-import { createTemplate } from '@jsonpdf/template';
+import { createTemplate, addSection, addBand, addElement } from '@jsonpdf/template';
 
 describe('useEditorStore', () => {
   beforeEach(() => {
@@ -77,5 +77,70 @@ describe('useEditorStore', () => {
     expect(state.selectedElementId).toBe('el1');
     expect(state.selectedBandId).toBeNull();
     expect(state.selectedSectionId).toBeNull();
+  });
+
+  describe('mutation actions', () => {
+    function setupTemplateWithElement() {
+      let t = createTemplate();
+      t = addSection(t, { id: 'sec1', bands: [] });
+      t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+      t = addElement(t, 'band1', {
+        id: 'el1',
+        type: 'text',
+        x: 10,
+        y: 20,
+        width: 100,
+        height: 50,
+        properties: { content: 'test' },
+      });
+      useEditorStore.getState().setTemplate(t);
+    }
+
+    it('updateElementPosition updates element x/y', () => {
+      setupTemplateWithElement();
+      useEditorStore.getState().updateElementPosition('el1', 55, 77);
+      const el = useEditorStore.getState().template.sections[0].bands[0].elements[0];
+      expect(el.x).toBe(55);
+      expect(el.y).toBe(77);
+    });
+
+    it('updateElementBounds updates element x/y/width/height', () => {
+      setupTemplateWithElement();
+      useEditorStore.getState().updateElementBounds('el1', 5, 10, 200, 80);
+      const el = useEditorStore.getState().template.sections[0].bands[0].elements[0];
+      expect(el.x).toBe(5);
+      expect(el.y).toBe(10);
+      expect(el.width).toBe(200);
+      expect(el.height).toBe(80);
+    });
+
+    it('deleteSelectedElement removes element and clears selection', () => {
+      setupTemplateWithElement();
+      useEditorStore.getState().setSelection('el1', 'band1', 'sec1');
+      useEditorStore.getState().deleteSelectedElement();
+      const state = useEditorStore.getState();
+      expect(state.template.sections[0].bands[0].elements).toHaveLength(0);
+      expect(state.selectedElementId).toBeNull();
+      expect(state.selectedBandId).toBeNull();
+      expect(state.selectedSectionId).toBeNull();
+    });
+
+    it('deleteSelectedElement is a no-op when nothing selected', () => {
+      setupTemplateWithElement();
+      useEditorStore.getState().deleteSelectedElement();
+      expect(useEditorStore.getState().template.sections[0].bands[0].elements).toHaveLength(1);
+    });
+
+    it('updateBandHeight updates band height', () => {
+      setupTemplateWithElement();
+      useEditorStore.getState().updateBandHeight('band1', 200);
+      expect(useEditorStore.getState().template.sections[0].bands[0].height).toBe(200);
+    });
+
+    it('updateBandHeight clamps to minimum 10', () => {
+      setupTemplateWithElement();
+      useEditorStore.getState().updateBandHeight('band1', 3);
+      expect(useEditorStore.getState().template.sections[0].bands[0].height).toBe(10);
+    });
   });
 });

@@ -41,7 +41,7 @@ export function buildSampleTemplate(): Template {
     height: 30,
     elements: [],
   });
-  t = addElement(t, 'sec1', 'ph1', {
+  t = addElement(t, 'ph1', {
     id: 'ph1-line',
     type: 'line',
     x: 0,
@@ -58,7 +58,7 @@ export function buildSampleTemplate(): Template {
     height: 60,
     elements: [],
   });
-  t = addElement(t, 'sec1', 'title1', {
+  t = addElement(t, 'title1', {
     id: 'title-text',
     type: 'text',
     x: 0,
@@ -76,7 +76,7 @@ export function buildSampleTemplate(): Template {
     height: 120,
     elements: [],
   });
-  t = addElement(t, 'sec1', 'detail1', {
+  t = addElement(t, 'detail1', {
     id: 'detail-subheading',
     type: 'text',
     x: 0,
@@ -86,7 +86,7 @@ export function buildSampleTemplate(): Template {
     style: 'subheading',
     properties: { content: 'Section Overview' },
   });
-  t = addElement(t, 'sec1', 'detail1', {
+  t = addElement(t, 'detail1', {
     id: 'detail-body',
     type: 'text',
     x: 0,
@@ -107,7 +107,7 @@ export function buildSampleTemplate(): Template {
     height: 200,
     elements: [],
   });
-  t = addElement(t, 'sec1', 'body1', {
+  t = addElement(t, 'body1', {
     id: 'shape-rect',
     type: 'shape',
     x: 0,
@@ -122,7 +122,7 @@ export function buildSampleTemplate(): Template {
       borderRadius: 8,
     },
   });
-  t = addElement(t, 'sec1', 'body1', {
+  t = addElement(t, 'body1', {
     id: 'shape-circle',
     type: 'shape',
     x: 140,
@@ -136,7 +136,7 @@ export function buildSampleTemplate(): Template {
       strokeWidth: 1,
     },
   });
-  t = addElement(t, 'sec1', 'body1', {
+  t = addElement(t, 'body1', {
     id: 'image-placeholder',
     type: 'image',
     x: 240,
@@ -145,7 +145,7 @@ export function buildSampleTemplate(): Template {
     height: 80,
     properties: { src: 'logo.png' },
   });
-  t = addElement(t, 'sec1', 'body1', {
+  t = addElement(t, 'body1', {
     id: 'line-horizontal',
     type: 'line',
     x: 0,
@@ -156,7 +156,7 @@ export function buildSampleTemplate(): Template {
   });
 
   // Container with children
-  t = addElement(t, 'sec1', 'body1', {
+  t = addElement(t, 'body1', {
     id: 'container1',
     type: 'container',
     x: 0,
@@ -195,7 +195,7 @@ export function buildSampleTemplate(): Template {
     height: 25,
     elements: [],
   });
-  t = addElement(t, 'sec1', 'pf1', {
+  t = addElement(t, 'pf1', {
     id: 'footer-text',
     type: 'text',
     x: 0,
@@ -219,7 +219,7 @@ export function buildSampleTemplate(): Template {
     height: 50,
     elements: [],
   });
-  t = addElement(t, 'sec2', 'title2', {
+  t = addElement(t, 'title2', {
     id: 'title2-text',
     type: 'text',
     x: 0,
@@ -236,7 +236,7 @@ export function buildSampleTemplate(): Template {
     height: 150,
     elements: [],
   });
-  t = addElement(t, 'sec2', 'body2', {
+  t = addElement(t, 'body2', {
     id: 'chart-placeholder',
     type: 'chart',
     x: 0,
@@ -245,7 +245,7 @@ export function buildSampleTemplate(): Template {
     height: 130,
     properties: { spec: {} },
   });
-  t = addElement(t, 'sec2', 'body2', {
+  t = addElement(t, 'body2', {
     id: 'barcode-placeholder',
     type: 'barcode',
     x: 380,

@@ -65,6 +65,7 @@ export function PageRenderer({ page, x, y, styles }: PageRendererProps) {
             designBand={db}
             contentWidth={contentWidth}
             styles={styles}
+            sectionId={page.sectionId}
           />
         ))}
       </Group>

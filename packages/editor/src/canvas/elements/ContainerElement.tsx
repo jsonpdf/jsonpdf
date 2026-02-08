@@ -5,7 +5,12 @@ import { ElementRenderer } from '../ElementRenderer';
 const DASH = [3, 3];
 const STROKE_COLOR = '#aaaaaa';
 
-export function ContainerElement({ element, styles }: ElementRendererChildProps) {
+export function ContainerElement({
+  element,
+  styles,
+  bandId,
+  sectionId,
+}: ElementRendererChildProps) {
   return (
     <Group>
       <Rect
@@ -18,7 +23,13 @@ export function ContainerElement({ element, styles }: ElementRendererChildProps)
         dash={DASH}
       />
       {(element.elements ?? []).map((child) => (
-        <ElementRenderer key={child.id} element={child} styles={styles} />
+        <ElementRenderer
+          key={child.id}
+          element={child}
+          styles={styles}
+          bandId={bandId}
+          sectionId={sectionId}
+        />
       ))}
     </Group>
   );

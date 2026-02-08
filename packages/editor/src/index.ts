@@ -8,7 +8,7 @@ export { useEditorStore } from './store';
 export type { EditorState } from './store';
 
 // Canvas (advanced usage)
-export { TemplateCanvas } from './canvas/TemplateCanvas';
+export { TemplateCanvas, CANVAS_PADDING } from './canvas/TemplateCanvas';
 
 // Layout utilities
 export { computeDesignLayout } from './layout';
