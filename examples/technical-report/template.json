@@ -233,7 +233,9 @@
               "width": 380,
               "height": 18,
               "style": "toc-entry",
-              "properties": { "content": "{{ item.title }}" }
+              "properties": {
+                "content": [{ "text": "{{ item.title }}", "link": "#{{ item.anchorId }}" }]
+              }
             },
             {
               "id": "toc-item-page",
@@ -243,7 +245,9 @@
               "width": 102,
               "height": 18,
               "style": "toc-page",
-              "properties": { "content": "{{ item.pageNumber }}" }
+              "properties": {
+                "content": [{ "text": "{{ item.pageNumber }}", "link": "#{{ item.anchorId }}" }]
+              }
             }
           ]
         },

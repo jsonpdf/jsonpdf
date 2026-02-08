@@ -606,6 +606,12 @@ export async function renderPdf(
 
   // 9b. Collect cross-reference anchors and register ref filter
   const anchorMap = collectAnchors(measureLayout);
+  // Merge bookmark-derived anchor IDs so internal links (#anchorId) in TOC entries resolve
+  for (const bk of measureLayout.bookmarks) {
+    if (!anchorMap.has(bk.anchorId)) {
+      anchorMap.set(bk.anchorId, bk.pageNumber);
+    }
+  }
   engine.registerFilter('ref', (anchorId: unknown) => {
     return anchorMap.get(String(anchorId)) ?? '??';
   });
