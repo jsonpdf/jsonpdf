@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { collectAnchors } from '../src/anchors.js';
 import type { LayoutResult } from '../src/layout.js';
 import type { Band, Element } from '@jsonpdf/core';
@@ -179,6 +179,114 @@ describe('collectAnchors', () => {
 
     const anchors = collectAnchors(layout);
     expect(anchors.get('dup')).toBe(1);
+  });
+
+  it('warns on duplicate band anchor IDs', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const layout = makeLayout([
+      {
+        sectionIndex: 0,
+        pageIndex: 0,
+        bands: [
+          {
+            band: makeBand({ anchor: 'dup' }),
+            offsetY: 0,
+            measuredHeight: 50,
+            elementHeights: new Map(),
+            scope: {},
+          },
+        ],
+      },
+      {
+        sectionIndex: 0,
+        pageIndex: 1,
+        bands: [
+          {
+            band: makeBand({ anchor: 'dup' }),
+            offsetY: 0,
+            measuredHeight: 50,
+            elementHeights: new Map(),
+            scope: {},
+          },
+        ],
+      },
+    ]);
+
+    collectAnchors(layout, { warnOnDuplicates: true });
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Duplicate anchor "dup"'));
+    warnSpy.mockRestore();
+  });
+
+  it('does not warn on duplicates when warnOnDuplicates is false', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const layout = makeLayout([
+      {
+        sectionIndex: 0,
+        pageIndex: 0,
+        bands: [
+          {
+            band: makeBand({ anchor: 'dup' }),
+            offsetY: 0,
+            measuredHeight: 50,
+            elementHeights: new Map(),
+            scope: {},
+          },
+        ],
+      },
+      {
+        sectionIndex: 0,
+        pageIndex: 1,
+        bands: [
+          {
+            band: makeBand({ anchor: 'dup' }),
+            offsetY: 0,
+            measuredHeight: 50,
+            elementHeights: new Map(),
+            scope: {},
+          },
+        ],
+      },
+    ]);
+
+    collectAnchors(layout);
+    expect(warnSpy).not.toHaveBeenCalled();
+    warnSpy.mockRestore();
+  });
+
+  it('warns on duplicate element anchor IDs', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const layout = makeLayout([
+      {
+        sectionIndex: 0,
+        pageIndex: 0,
+        bands: [
+          {
+            band: makeBand({ elements: [makeElement({ anchor: 'el-dup' })] }),
+            offsetY: 0,
+            measuredHeight: 50,
+            elementHeights: new Map(),
+            scope: {},
+          },
+        ],
+      },
+      {
+        sectionIndex: 0,
+        pageIndex: 1,
+        bands: [
+          {
+            band: makeBand({ elements: [makeElement({ anchor: 'el-dup' })] }),
+            offsetY: 0,
+            measuredHeight: 50,
+            elementHeights: new Map(),
+            scope: {},
+          },
+        ],
+      },
+    ]);
+
+    collectAnchors(layout, { warnOnDuplicates: true });
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Duplicate anchor "el-dup"'));
+    warnSpy.mockRestore();
   });
 
   it('collects both band and element anchors from same page', () => {

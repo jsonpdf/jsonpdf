@@ -3,7 +3,7 @@ import { rgb } from 'pdf-lib';
 import type { RichContent, Style } from '@jsonpdf/core';
 import { parseColor } from '@jsonpdf/core';
 import type { FontMap } from '@jsonpdf/plugins';
-import { getFont, getLineHeight } from '@jsonpdf/plugins';
+import { getFont, getLineHeight, wrapText } from '@jsonpdf/plugins';
 
 /** A single footnote entry collected during rendering. */
 export interface FootnoteEntry {
@@ -29,18 +29,31 @@ const FOOTNOTE_FONT_SIZE_RATIO = 0.8; // footnote text is 80% of base font size
  * Measure the total height of a set of footnotes.
  * Includes separator line height + gap + content lines.
  */
-export function measureFootnoteHeight(entries: FootnoteEntry[], baseStyle: Style): number {
+export function measureFootnoteHeight(
+  entries: FootnoteEntry[],
+  baseStyle: Style,
+  fonts: FontMap,
+  width: number,
+): number {
   if (entries.length === 0) return 0;
 
   const fontSize = (baseStyle.fontSize ?? 12) * FOOTNOTE_FONT_SIZE_RATIO;
+  const superFontSize = fontSize * 0.65;
   const style: Style = { ...baseStyle, fontSize };
+  const font = getFont(fonts, style);
   const lh = getLineHeight(style);
 
   // Separator line + gaps
   let height = SEPARATOR_GAP + SEPARATOR_THICKNESS + SEPARATOR_GAP;
 
-  // Each footnote is one line of text (simplified — no wrapping for now)
-  height += entries.length * lh;
+  // Each footnote wrapped to available width
+  for (const entry of entries) {
+    const text = getFootnoteText(entry);
+    const numWidth = font.widthOfTextAtSize(String(entry.number), superFontSize);
+    const indent = numWidth + 3;
+    const wrapped = wrapText(text, font, fontSize, width - indent, lh);
+    height += wrapped.lines.length * lh;
+  }
 
   return height;
 }
@@ -74,6 +87,8 @@ export function renderFootnotes(
   const colorStr = style.color ?? '#000000';
   const color = parseColor(colorStr);
 
+  const superFontSize = fontSize * 0.65;
+
   let cursorY = y;
 
   // Draw separator line (1/3 of page width)
@@ -91,14 +106,14 @@ export function renderFootnotes(
   for (const entry of entries) {
     const text = getFootnoteText(entry);
     const ascent = font.heightAtSize(fontSize, { descender: false });
-    const drawY = cursorY - ascent;
 
     // Draw superscript number
-    const superFontSize = fontSize * 0.65;
     const superAscent = font.heightAtSize(superFontSize, { descender: false });
     const superRaise = ascent * 0.35;
     const numText = String(entry.number);
     const numWidth = font.widthOfTextAtSize(numText, superFontSize);
+
+    const drawY = cursorY - ascent;
 
     page.drawText(numText, {
       x,
@@ -108,17 +123,21 @@ export function renderFootnotes(
       color: rgb(color.r, color.g, color.b),
     });
 
-    // Draw footnote content text (with indent for the number)
+    // Draw footnote content text with wrapping
     const indent = numWidth + 3;
-    page.drawText(text, {
-      x: x + indent,
-      y: drawY,
-      font,
-      size: fontSize,
-      color: rgb(color.r, color.g, color.b),
-    });
+    const wrapped = wrapText(text, font, fontSize, width - indent, lh);
 
-    cursorY -= lh;
+    for (const line of wrapped.lines) {
+      const lineDrawY = cursorY - ascent;
+      page.drawText(line, {
+        x: x + indent,
+        y: lineDrawY,
+        font,
+        size: fontSize,
+        color: rgb(color.r, color.g, color.b),
+      });
+      cursorY -= lh;
+    }
   }
 }
 

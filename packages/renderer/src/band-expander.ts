@@ -23,7 +23,7 @@ export interface ExpandedSection {
  * Expand a section's bands into structural roles and ordered content instances.
  *
  * Content band ordering: title → [groupHeader → detail items → groupFooter] → body → summary
- * NoData bands are included only when there are no detail items (or no detail bands at all).
+ * NoData bands are included only when detail bands exist but produce no items.
  */
 export async function expandBands(
   section: Section,
@@ -171,7 +171,7 @@ export async function expandBands(
   }
 
   // NoData bands (only when no detail items were produced)
-  if (!hasDetailItems && noDataBands.length > 0) {
+  if (!hasDetailItems && detailBands.length > 0 && noDataBands.length > 0) {
     for (const band of noDataBands) {
       if (await shouldInclude(band, baseScope, engine)) {
         result.contentBands.push({ band, scope: baseScope });

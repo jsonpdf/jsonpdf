@@ -647,7 +647,7 @@ export async function renderPdf(
   // 11b. Build anchor-to-PDFPage map for internal links
   // Uses pass 2 layout so page positions reflect expanded _bookmarks detail bands.
   // Bookmark-derived anchors (from section/band ids) are merged for TOC links.
-  const linkAnchorMap = collectAnchors(layout);
+  const linkAnchorMap = collectAnchors(layout, { warnOnDuplicates: true });
   for (const bk of layout.bookmarks) {
     if (!linkAnchorMap.has(bk.anchorId)) {
       linkAnchorMap.set(bk.anchorId, bk.pageNumber);
@@ -787,10 +787,10 @@ export async function renderPdf(
         fontFamily: 'Helvetica',
         fontSize: 12,
       };
-      const fnHeight = measureFootnoteHeight(pageFootnotes, defaultStyle);
-      const fnY = footerTopY + fnHeight;
       const marginLeft = pageConfig.margins.left;
       const contentWidth = pageConfig.width - pageConfig.margins.left - pageConfig.margins.right;
+      const fnHeight = measureFootnoteHeight(pageFootnotes, defaultStyle, env.fonts, contentWidth);
+      const fnY = footerTopY + fnHeight;
 
       renderFootnotes(page, pageFootnotes, marginLeft, fnY, contentWidth, defaultStyle, env.fonts);
     }
