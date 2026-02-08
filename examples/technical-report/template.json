@@ -1,0 +1,614 @@
+{
+  "version": "1.0",
+  "name": "Technical Report",
+  "description": "A multi-page technical report showcasing cross-references, table of contents, pageBreakBefore, images, numbered lists, and noData band.",
+  "page": {
+    "width": 612,
+    "height": 792,
+    "margins": { "top": 50, "right": 55, "bottom": 50, "left": 55 }
+  },
+  "dataSchema": {
+    "type": "object",
+    "properties": {
+      "reportTitle": { "type": "string" },
+      "subtitle": { "type": "string" },
+      "author": { "type": "string" },
+      "department": { "type": "string" },
+      "date": { "type": "string" },
+      "documentId": { "type": "string" },
+      "introText": { "type": "string" },
+      "methodologySteps": { "type": "array" },
+      "resultsText": { "type": "string" },
+      "conclusionText": { "type": "string" },
+      "appendixItems": { "type": "array" }
+    }
+  },
+  "styles": {
+    "report-title": {
+      "fontSize": 26,
+      "fontWeight": "bold",
+      "color": "#1a1a2e",
+      "textAlign": "center"
+    },
+    "report-subtitle": {
+      "fontSize": 13,
+      "color": "#555555",
+      "textAlign": "center",
+      "lineHeight": 1.4
+    },
+    "report-meta": {
+      "fontSize": 10,
+      "color": "#777777",
+      "textAlign": "center"
+    },
+    "toc-title": {
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "color": "#1a1a2e"
+    },
+    "toc-entry": {
+      "fontSize": 11,
+      "color": "#333333",
+      "lineHeight": 1.8
+    },
+    "toc-page": {
+      "fontSize": 11,
+      "color": "#333333",
+      "textAlign": "right",
+      "lineHeight": 1.8
+    },
+    "chapter-title": {
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "color": "#1a1a2e"
+    },
+    "body-text": {
+      "fontSize": 10,
+      "lineHeight": 1.5,
+      "color": "#333333"
+    },
+    "step-text": {
+      "fontSize": 10,
+      "lineHeight": 1.4,
+      "color": "#333333"
+    },
+    "figure-caption": {
+      "fontSize": 9,
+      "color": "#666666",
+      "textAlign": "center",
+      "fontStyle": "italic"
+    },
+    "cross-ref": {
+      "fontSize": 10,
+      "color": "#555555",
+      "fontStyle": "italic",
+      "lineHeight": 1.5
+    },
+    "detail-text": {
+      "fontSize": 9,
+      "color": "#333333"
+    },
+    "detail-header": {
+      "fontSize": 9,
+      "fontWeight": "bold",
+      "color": "#ffffff",
+      "backgroundColor": "#1a1a2e"
+    },
+    "detail-alt": {
+      "fontSize": 9,
+      "color": "#333333",
+      "backgroundColor": "#f5f5f5"
+    },
+    "no-data": {
+      "fontSize": 11,
+      "color": "#999999",
+      "textAlign": "center",
+      "fontStyle": "italic"
+    },
+    "footer": {
+      "fontSize": 8,
+      "color": "#999999",
+      "textAlign": "center"
+    }
+  },
+  "fonts": [],
+  "sections": [
+    {
+      "id": "report",
+      "bookmark": "Cloud Migration Assessment",
+      "bands": [
+        {
+          "id": "title-page",
+          "type": "title",
+          "height": 300,
+          "elements": [
+            {
+              "id": "title-line-top",
+              "type": "line",
+              "x": 150,
+              "y": 80,
+              "width": 202,
+              "height": 1,
+              "properties": { "color": "#1a1a2e", "thickness": 2 }
+            },
+            {
+              "id": "report-name",
+              "type": "text",
+              "x": 0,
+              "y": 95,
+              "width": 502,
+              "height": 70,
+              "style": "report-title",
+              "properties": { "content": "{{ reportTitle }}" }
+            },
+            {
+              "id": "report-sub",
+              "type": "text",
+              "x": 50,
+              "y": 165,
+              "width": 402,
+              "height": 25,
+              "style": "report-subtitle",
+              "properties": { "content": "{{ subtitle }}" }
+            },
+            {
+              "id": "title-line-bottom",
+              "type": "line",
+              "x": 150,
+              "y": 200,
+              "width": 202,
+              "height": 1,
+              "properties": { "color": "#1a1a2e", "thickness": 2 }
+            },
+            {
+              "id": "author-name",
+              "type": "text",
+              "x": 0,
+              "y": 220,
+              "width": 502,
+              "height": 14,
+              "style": "report-meta",
+              "properties": { "content": "{{ author }} — {{ department }}" }
+            },
+            {
+              "id": "report-date",
+              "type": "text",
+              "x": 0,
+              "y": 238,
+              "width": 502,
+              "height": 14,
+              "style": "report-meta",
+              "properties": { "content": "{{ date }}" }
+            },
+            {
+              "id": "doc-id",
+              "type": "text",
+              "x": 0,
+              "y": 258,
+              "width": 502,
+              "height": 14,
+              "style": "report-meta",
+              "properties": { "content": "Document: {{ documentId }}" }
+            }
+          ]
+        },
+        {
+          "id": "toc",
+          "type": "body",
+          "height": 250,
+          "elements": [
+            {
+              "id": "toc-heading",
+              "type": "text",
+              "x": 0,
+              "y": 10,
+              "width": 502,
+              "height": 24,
+              "style": "toc-title",
+              "properties": { "content": "Table of Contents" }
+            },
+            {
+              "id": "toc-line",
+              "type": "line",
+              "x": 0,
+              "y": 35,
+              "width": 502,
+              "height": 1,
+              "properties": { "color": "#cccccc", "thickness": 0.5 }
+            },
+            {
+              "id": "toc-ch1-label",
+              "type": "text",
+              "x": 20,
+              "y": 50,
+              "width": 400,
+              "height": 18,
+              "style": "toc-entry",
+              "properties": { "content": [{ "text": "1. Introduction", "link": "#ch1" }] }
+            },
+            {
+              "id": "toc-ch1-page",
+              "type": "text",
+              "x": 400,
+              "y": 50,
+              "width": 102,
+              "height": 18,
+              "style": "toc-page",
+              "properties": { "content": [{ "text": "{{ \"ch1\" | ref }}", "link": "#ch1" }] }
+            },
+            {
+              "id": "toc-ch2-label",
+              "type": "text",
+              "x": 20,
+              "y": 72,
+              "width": 400,
+              "height": 18,
+              "style": "toc-entry",
+              "properties": { "content": [{ "text": "2. Methodology", "link": "#ch2" }] }
+            },
+            {
+              "id": "toc-ch2-page",
+              "type": "text",
+              "x": 400,
+              "y": 72,
+              "width": 102,
+              "height": 18,
+              "style": "toc-page",
+              "properties": { "content": [{ "text": "{{ \"ch2\" | ref }}", "link": "#ch2" }] }
+            },
+            {
+              "id": "toc-ch3-label",
+              "type": "text",
+              "x": 20,
+              "y": 94,
+              "width": 400,
+              "height": 18,
+              "style": "toc-entry",
+              "properties": { "content": [{ "text": "3. Results", "link": "#ch3" }] }
+            },
+            {
+              "id": "toc-ch3-page",
+              "type": "text",
+              "x": 400,
+              "y": 94,
+              "width": 102,
+              "height": 18,
+              "style": "toc-page",
+              "properties": { "content": [{ "text": "{{ \"ch3\" | ref }}", "link": "#ch3" }] }
+            },
+            {
+              "id": "toc-ch4-label",
+              "type": "text",
+              "x": 20,
+              "y": 116,
+              "width": 400,
+              "height": 18,
+              "style": "toc-entry",
+              "properties": { "content": [{ "text": "4. Conclusion", "link": "#ch4" }] }
+            },
+            {
+              "id": "toc-ch4-page",
+              "type": "text",
+              "x": 400,
+              "y": 116,
+              "width": 102,
+              "height": 18,
+              "style": "toc-page",
+              "properties": { "content": [{ "text": "{{ \"ch4\" | ref }}", "link": "#ch4" }] }
+            },
+            {
+              "id": "toc-app-label",
+              "type": "text",
+              "x": 20,
+              "y": 138,
+              "width": 400,
+              "height": 18,
+              "style": "toc-entry",
+              "properties": { "content": [{ "text": "Appendix A — Application Inventory", "link": "#appendix" }] }
+            },
+            {
+              "id": "toc-app-page",
+              "type": "text",
+              "x": 400,
+              "y": 138,
+              "width": 102,
+              "height": 18,
+              "style": "toc-page",
+              "properties": { "content": [{ "text": "{{ \"appendix\" | ref }}", "link": "#appendix" }] }
+            }
+          ]
+        },
+        {
+          "id": "ch1-band",
+          "type": "body",
+          "height": 180,
+          "pageBreakBefore": true,
+          "anchor": "ch1",
+          "bookmark": "1. Introduction",
+          "elements": [
+            {
+              "id": "ch1-title",
+              "type": "text",
+              "x": 0,
+              "y": 5,
+              "width": 502,
+              "height": 24,
+              "style": "chapter-title",
+              "properties": { "content": "1. Introduction" }
+            },
+            {
+              "id": "ch1-line",
+              "type": "line",
+              "x": 0,
+              "y": 30,
+              "width": 502,
+              "height": 1,
+              "properties": { "color": "#1a1a2e", "thickness": 1 }
+            },
+            {
+              "id": "ch1-body",
+              "type": "text",
+              "x": 0,
+              "y": 42,
+              "width": 502,
+              "height": 120,
+              "style": "body-text",
+              "properties": { "content": "{{ introText }}" }
+            }
+          ]
+        },
+        {
+          "id": "ch2-band",
+          "type": "body",
+          "height": 310,
+          "pageBreakBefore": true,
+          "anchor": "ch2",
+          "bookmark": "2. Methodology",
+          "elements": [
+            {
+              "id": "ch2-title",
+              "type": "text",
+              "x": 0,
+              "y": 5,
+              "width": 502,
+              "height": 24,
+              "style": "chapter-title",
+              "properties": { "content": "2. Methodology" }
+            },
+            {
+              "id": "ch2-line",
+              "type": "line",
+              "x": 0,
+              "y": 30,
+              "width": 502,
+              "height": 1,
+              "properties": { "color": "#1a1a2e", "thickness": 1 }
+            },
+            {
+              "id": "ch2-intro",
+              "type": "text",
+              "x": 0,
+              "y": 42,
+              "width": 502,
+              "height": 20,
+              "style": "body-text",
+              "properties": { "content": "The assessment followed a structured six-step methodology:" }
+            },
+            {
+              "id": "ch2-steps",
+              "type": "list",
+              "x": 15,
+              "y": 68,
+              "width": 480,
+              "height": 160,
+              "style": "step-text",
+              "properties": {
+                "listType": "numbered",
+                "itemSpacing": 6,
+                "items": "{{ methodologySteps }}"
+              }
+            },
+            {
+              "id": "ch2-ref",
+              "type": "text",
+              "x": 0,
+              "y": 260,
+              "width": 502,
+              "height": 30,
+              "style": "cross-ref",
+              "properties": { "content": "The detailed results of this methodology are presented in Chapter 3 (page {{ \"ch3\" | ref }}). A full application inventory is provided in Appendix A (page {{ \"appendix\" | ref }})." }
+            }
+          ]
+        },
+        {
+          "id": "ch3-band",
+          "type": "body",
+          "height": 360,
+          "pageBreakBefore": true,
+          "anchor": "ch3",
+          "bookmark": "3. Results",
+          "elements": [
+            {
+              "id": "ch3-title",
+              "type": "text",
+              "x": 0,
+              "y": 5,
+              "width": 502,
+              "height": 24,
+              "style": "chapter-title",
+              "properties": { "content": "3. Results" }
+            },
+            {
+              "id": "ch3-line",
+              "type": "line",
+              "x": 0,
+              "y": 30,
+              "width": 502,
+              "height": 1,
+              "properties": { "color": "#1a1a2e", "thickness": 1 }
+            },
+            {
+              "id": "ch3-body",
+              "type": "text",
+              "x": 0,
+              "y": 42,
+              "width": 502,
+              "height": 90,
+              "style": "body-text",
+              "properties": { "content": "{{ resultsText }}" }
+            },
+            {
+              "id": "ch3-figure",
+              "type": "image",
+              "x": 51,
+              "y": 140,
+              "width": 400,
+              "height": 160,
+              "properties": {
+                "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='200'%3E%3Crect fill='%23f8f9fa' width='500' height='200' rx='4'/%3E%3Crect fill='%233B82F6' x='40' y='40' width='60' height='120' rx='2'/%3E%3Crect fill='%2310B981' x='120' y='70' width='60' height='90' rx='2'/%3E%3Crect fill='%23F59E0B' x='200' y='90' width='60' height='70' rx='2'/%3E%3Crect fill='%23EF4444' x='280' y='120' width='60' height='40' rx='2'/%3E%3Crect fill='%238B5CF6' x='360' y='130' width='60' height='30' rx='2'/%3E%3Ctext x='70' y='175' text-anchor='middle' font-size='10' fill='%23666'%3ERehost%3C/text%3E%3Ctext x='150' y='175' text-anchor='middle' font-size='10' fill='%23666'%3EReplatform%3C/text%3E%3Ctext x='230' y='175' text-anchor='middle' font-size='10' fill='%23666'%3ERefactor%3C/text%3E%3Ctext x='310' y='175' text-anchor='middle' font-size='10' fill='%23666'%3ERepurchase%3C/text%3E%3Ctext x='390' y='175' text-anchor='middle' font-size='10' fill='%23666'%3ERetire%3C/text%3E%3Ctext x='250' y='25' text-anchor='middle' font-size='13' font-weight='bold' fill='%23333'%3EApplication Migration Categories%3C/text%3E%3C/svg%3E",
+                "fit": "contain"
+              }
+            },
+            {
+              "id": "ch3-caption",
+              "type": "text",
+              "x": 0,
+              "y": 308,
+              "width": 502,
+              "height": 14,
+              "style": "figure-caption",
+              "properties": { "content": "Figure 1 — Distribution of applications by migration category" }
+            },
+            {
+              "id": "ch3-ref",
+              "type": "text",
+              "x": 0,
+              "y": 330,
+              "width": 502,
+              "height": 20,
+              "style": "cross-ref",
+              "properties": { "content": "For methodology details, see Chapter 2 (page {{ \"ch2\" | ref }}). Conclusions follow on page {{ \"ch4\" | ref }}." }
+            }
+          ]
+        },
+        {
+          "id": "ch4-band",
+          "type": "body",
+          "height": 180,
+          "pageBreakBefore": true,
+          "anchor": "ch4",
+          "bookmark": "4. Conclusion",
+          "elements": [
+            {
+              "id": "ch4-title",
+              "type": "text",
+              "x": 0,
+              "y": 5,
+              "width": 502,
+              "height": 24,
+              "style": "chapter-title",
+              "properties": { "content": "4. Conclusion" }
+            },
+            {
+              "id": "ch4-line",
+              "type": "line",
+              "x": 0,
+              "y": 30,
+              "width": 502,
+              "height": 1,
+              "properties": { "color": "#1a1a2e", "thickness": 1 }
+            },
+            {
+              "id": "ch4-body",
+              "type": "text",
+              "x": 0,
+              "y": 42,
+              "width": 502,
+              "height": 120,
+              "style": "body-text",
+              "properties": { "content": "{{ conclusionText }}" }
+            }
+          ]
+        },
+        {
+          "id": "appendix-header",
+          "type": "body",
+          "height": 50,
+          "pageBreakBefore": true,
+          "anchor": "appendix",
+          "bookmark": "Appendix A",
+          "elements": [
+            {
+              "id": "app-title",
+              "type": "text",
+              "x": 0,
+              "y": 5,
+              "width": 502,
+              "height": 24,
+              "style": "chapter-title",
+              "properties": { "content": "Appendix A — Application Inventory" }
+            },
+            {
+              "id": "app-line",
+              "type": "line",
+              "x": 0,
+              "y": 30,
+              "width": 502,
+              "height": 1,
+              "properties": { "color": "#1a1a2e", "thickness": 1 }
+            }
+          ]
+        },
+        {
+          "id": "app-table",
+          "type": "body",
+          "height": 250,
+          "elements": [
+            {
+              "id": "inventory-table",
+              "type": "table",
+              "x": 0,
+              "y": 5,
+              "width": 502,
+              "height": 240,
+              "style": "detail-text",
+              "properties": {
+                "columns": [
+                  { "key": "id", "header": "ID", "width": 40 },
+                  { "key": "application", "header": "Application", "flex": 1 },
+                  { "key": "category", "header": "Category", "width": 85 },
+                  { "key": "complexity", "header": "Complexity", "width": 75 },
+                  { "key": "savings", "header": "Annual Savings", "width": 90, "align": "right" }
+                ],
+                "rows": "{{ appendixItems }}",
+                "showHeader": true,
+                "headerStyle": "detail-header",
+                "alternateRowStyle": "detail-alt",
+                "borderWidth": 0.5,
+                "borderColor": "#cccccc",
+                "cellPadding": 5
+              }
+            }
+          ]
+        },
+        {
+          "id": "page-ftr",
+          "type": "pageFooter",
+          "height": 20,
+          "elements": [
+            {
+              "id": "ftr-text",
+              "type": "text",
+              "x": 0,
+              "y": 5,
+              "width": 502,
+              "height": 12,
+              "style": "footer",
+              "properties": { "content": "{{ reportTitle }} — {{ documentId }} — Page {{ _pageNumber }} of {{ _totalPages }}" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

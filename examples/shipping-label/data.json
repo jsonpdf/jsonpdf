@@ -1,0 +1,21 @@
+{
+  "sender": {
+    "name": "TechCorp Fulfillment",
+    "address": "1200 Industrial Blvd, Suite 400",
+    "city": "San Jose",
+    "state": "CA",
+    "zip": "95112"
+  },
+  "recipient": {
+    "name": "Maria Rodriguez",
+    "address": "742 Evergreen Terrace, Apt 3B",
+    "city": "Portland",
+    "state": "OR",
+    "zip": "97201"
+  },
+  "trackingNumber": "1Z999AA10123456784",
+  "trackingUrl": "https://track.example.com/1Z999AA10123456784",
+  "serviceType": "EXPRESS 2-DAY",
+  "weight": "2.4 lbs",
+  "fragile": true
+}

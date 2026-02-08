@@ -1,0 +1,76 @@
+{
+  "name": "Alexandra Chen",
+  "email": "alexandra.chen@example.com",
+  "phone": "(415) 555-0192",
+  "location": "San Francisco, CA",
+  "website": "https://alexchen.dev",
+  "summary": "Senior software engineer with 8+ years of experience building scalable distributed systems and leading cross-functional teams. Proven track record of delivering high-impact projects from architecture through production deployment. Passionate about developer experience, system reliability, and mentoring the next generation of engineers.",
+  "jobs": [
+    {
+      "title": "Senior Software Engineer",
+      "company": "TechCorp Solutions",
+      "location": "San Francisco, CA",
+      "dates": "January 2022 — Present",
+      "responsibilities": [
+        "Architected and led migration from monolithic Rails application to event-driven microservices, reducing deployment time by 75% and enabling independent team scaling",
+        "Designed real-time analytics pipeline using Kafka and ClickHouse processing 2M+ events/day with sub-second query latency",
+        "Mentored 5 junior engineers through structured 1:1s and code review, with 3 promoted to mid-level within 18 months"
+      ]
+    },
+    {
+      "title": "Software Engineer",
+      "company": "DataFlow Inc.",
+      "location": "Oakland, CA",
+      "dates": "March 2019 — December 2021",
+      "responsibilities": [
+        "Built customer-facing REST and GraphQL APIs serving 50K+ requests/minute with 99.9% uptime SLA",
+        "Implemented CI/CD pipelines using GitHub Actions and Terraform, reducing release cycles from weekly to daily",
+        "Led database optimization initiative, reducing average query time by 60% across 12 high-traffic endpoints"
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "content": "Programming Languages",
+      "children": [
+        { "content": "Python, TypeScript, Go, SQL, Rust" }
+      ]
+    },
+    {
+      "content": "Frameworks & Libraries",
+      "children": [
+        { "content": "React, Next.js, Node.js, FastAPI, Django" }
+      ]
+    },
+    {
+      "content": "Cloud & Infrastructure",
+      "children": [
+        { "content": "AWS (EC2, S3, Lambda, RDS), Docker, Kubernetes, Terraform" }
+      ]
+    },
+    {
+      "content": "Data & Messaging",
+      "children": [
+        { "content": "PostgreSQL, Redis, Kafka, ClickHouse, Elasticsearch" }
+      ]
+    }
+  ],
+  "achievements": [
+    "Reduced infrastructure costs by 40% ($180K annual savings) through auto-scaling optimization and reserved instance strategy",
+    "Open-source contributor to Apache Kafka client library — 3 merged PRs improving consumer group rebalancing",
+    "Speaker at SF Python Meetup 2023 on \"Building Resilient Event-Driven Architectures\"",
+    "Received company-wide Engineering Excellence Award (2023) for analytics pipeline project"
+  ],
+  "education": [
+    {
+      "degree": "M.S. Computer Science",
+      "school": "Stanford University",
+      "year": "2017"
+    },
+    {
+      "degree": "B.S. Computer Science, Magna Cum Laude",
+      "school": "UC Berkeley",
+      "year": "2015"
+    }
+  ]
+}

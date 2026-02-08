@@ -1,0 +1,11 @@
+{
+  "name": "@jsonpdf/example-certificate",
+  "private": true,
+  "scripts": {
+    "render": "jsonpdf render -t template.json -d data.json -o output.pdf"
+  },
+  "dependencies": {
+    "@jsonpdf/cli": "workspace:*",
+    "@fontsource/playfair-display": "^5.0.0"
+  }
+}

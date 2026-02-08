@@ -1,0 +1,49 @@
+{
+  "tripName": "Tokyo Adventure",
+  "dates": "March 15 — 20, 2025",
+  "traveler": "Sarah Mitchell",
+  "days": [
+    {
+      "label": "Day 1",
+      "title": "Asakusa & Senso-ji",
+      "image": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='340' height='260'%3E%3Crect fill='%233B82F6' width='340' height='260' rx='8'/%3E%3Ctext x='170' y='120' text-anchor='middle' fill='white' font-size='22' font-family='sans-serif' font-weight='bold'%3ESenso-ji%3C/text%3E%3Ctext x='170' y='150' text-anchor='middle' fill='%23DBEAFE' font-size='14' font-family='sans-serif'%3ETemple%3C/text%3E%3C/svg%3E",
+      "description": "Explore Tokyo's oldest and most significant Buddhist temple, then stroll through Nakamise-dori shopping street.",
+      "activities": [
+        "Morning: Visit Senso-ji Temple and Asakusa Shrine",
+        "Midday: Lunch at Nakamise-dori street food stalls",
+        "Afternoon: Tokyo Skytree observation deck",
+        "Evening: Sumida River cruise at sunset"
+      ]
+    },
+    {
+      "label": "Day 2",
+      "title": "Shibuya & Harajuku",
+      "image": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='340' height='260'%3E%3Crect fill='%23EC4899' width='340' height='260' rx='8'/%3E%3Ctext x='170' y='120' text-anchor='middle' fill='white' font-size='22' font-family='sans-serif' font-weight='bold'%3EShibuya%3C/text%3E%3Ctext x='170' y='150' text-anchor='middle' fill='%23FBCFE8' font-size='14' font-family='sans-serif'%3ECrossing%3C/text%3E%3C/svg%3E",
+      "description": "Experience the energy of Shibuya Crossing, then explore Harajuku's vibrant Takeshita Street fashion scene.",
+      "activities": [
+        "Morning: Meiji Shrine and Yoyogi Park stroll",
+        "Midday: Harajuku's Takeshita Street and Cat Street",
+        "Afternoon: Shibuya Crossing and Hachiko statue",
+        "Evening: Dinner in Shibuya Center-gai"
+      ]
+    },
+    {
+      "label": "Day 3",
+      "title": "Akihabara & Ueno",
+      "image": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='340' height='260'%3E%3Crect fill='%2310B981' width='340' height='260' rx='8'/%3E%3Ctext x='170' y='120' text-anchor='middle' fill='white' font-size='22' font-family='sans-serif' font-weight='bold'%3EUeno%3C/text%3E%3Ctext x='170' y='150' text-anchor='middle' fill='%23D1FAE5' font-size='14' font-family='sans-serif'%3EPark%3C/text%3E%3C/svg%3E",
+      "description": "Discover Akihabara's electronics district and anime culture, then relax in Ueno Park and its world-class museums.",
+      "activities": [
+        "Morning: Akihabara electronics and anime shops",
+        "Midday: Ramen lunch in Akihabara",
+        "Afternoon: Ueno Park, Tokyo National Museum",
+        "Evening: Ameyoko market street for souvenirs"
+      ]
+    }
+  ],
+  "gallery": [
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='150'%3E%3Crect fill='%23F59E0B' width='260' height='150' rx='6'/%3E%3Ctext x='130' y='80' text-anchor='middle' fill='white' font-size='16' font-family='sans-serif'%3ETsukiji Market%3C/text%3E%3C/svg%3E",
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='150'%3E%3Crect fill='%23EF4444' width='260' height='150' rx='6'/%3E%3Ctext x='130' y='80' text-anchor='middle' fill='white' font-size='16' font-family='sans-serif'%3ETokyo Tower%3C/text%3E%3C/svg%3E",
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='150'%3E%3Crect fill='%238B5CF6' width='260' height='150' rx='6'/%3E%3Ctext x='130' y='80' text-anchor='middle' fill='white' font-size='16' font-family='sans-serif'%3EMeiji Shrine%3C/text%3E%3C/svg%3E",
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='150'%3E%3Crect fill='%2306B6D4' width='260' height='150' rx='6'/%3E%3Ctext x='130' y='80' text-anchor='middle' fill='white' font-size='16' font-family='sans-serif'%3EShinjuku%3C/text%3E%3C/svg%3E"
+  ]
+}

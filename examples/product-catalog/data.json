@@ -1,0 +1,93 @@
+{
+  "catalogName": "TechGear Spring Collection 2025",
+  "products": [
+    {
+      "name": "UltraSound Pro Headphones",
+      "description": "Premium noise-canceling wireless headphones with 40-hour battery life, adaptive EQ, and spatial audio support. Features memory foam ear cushions and a lightweight titanium frame.",
+      "price": 249.99,
+      "originalPrice": 349.99,
+      "sku": "TG-HP-001",
+      "category": "Audio",
+      "color": "#3b82f6",
+      "inStock": true,
+      "onSale": true
+    },
+    {
+      "name": "SmartDock 4K Hub",
+      "description": "Universal USB-C docking station with dual 4K HDMI output, 100W passthrough charging, Gigabit Ethernet, and 4 USB-A ports. Compatible with all major laptop brands.",
+      "price": 179.99,
+      "originalPrice": 179.99,
+      "sku": "TG-DK-012",
+      "category": "Accessories",
+      "color": "#6366f1",
+      "inStock": true,
+      "onSale": false
+    },
+    {
+      "name": "ErgoRise Standing Desk Mat",
+      "description": "Anti-fatigue mat designed for standing desks with 3/4 inch cushion, beveled edges, and a built-in massage ridge. Made from sustainable recycled materials.",
+      "price": 64.99,
+      "originalPrice": 64.99,
+      "sku": "TG-DF-034",
+      "category": "Furniture",
+      "color": "#22c55e",
+      "inStock": true,
+      "onSale": false
+    },
+    {
+      "name": "PixelPerfect 27\" Monitor",
+      "description": "27-inch 4K IPS display with 99% sRGB coverage, USB-C input with 65W charging, built-in KVM switch, and adjustable ergonomic stand with height, tilt, and swivel.",
+      "price": 449.99,
+      "originalPrice": 549.99,
+      "sku": "TG-MN-007",
+      "category": "Displays",
+      "color": "#0ea5e9",
+      "inStock": true,
+      "onSale": true
+    },
+    {
+      "name": "MechType Elite Keyboard",
+      "description": "Compact 75% mechanical keyboard with hot-swappable switches, per-key RGB, wireless tri-mode connectivity, and a 4000mAh battery. CNC aluminum case with sound-dampening foam.",
+      "price": 159.99,
+      "originalPrice": 159.99,
+      "sku": "TG-KB-019",
+      "category": "Input",
+      "color": "#f59e0b",
+      "inStock": false,
+      "onSale": false
+    },
+    {
+      "name": "AirCharge Pad Duo",
+      "description": "Dual wireless charging pad supporting up to 15W fast charge per device. Charges phone and earbuds simultaneously with intelligent power distribution.",
+      "price": 39.99,
+      "originalPrice": 39.99,
+      "sku": "TG-CG-045",
+      "category": "Accessories",
+      "color": "#8b5cf6",
+      "inStock": true,
+      "onSale": false
+    },
+    {
+      "name": "StreamCam Ultra",
+      "description": "4K webcam with auto-framing, dual noise-canceling microphones, and a built-in ring light with adjustable color temperature. Includes magnetic privacy shutter.",
+      "price": 129.99,
+      "originalPrice": 129.99,
+      "sku": "TG-WC-023",
+      "category": "Video",
+      "color": "#ec4899",
+      "inStock": true,
+      "onSale": false
+    },
+    {
+      "name": "PowerVault 20K Portable Battery",
+      "description": "20,000mAh portable battery pack with 100W USB-C PD output, dual USB-A ports, and a built-in LED display showing remaining charge. Airline-approved capacity.",
+      "price": 59.99,
+      "originalPrice": 59.99,
+      "sku": "TG-PW-056",
+      "category": "Accessories",
+      "color": "#14b8a6",
+      "inStock": true,
+      "onSale": false
+    }
+  ]
+}

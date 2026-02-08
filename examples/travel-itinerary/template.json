@@ -1,0 +1,395 @@
+{
+  "version": "1.0",
+  "name": "Travel Itinerary",
+  "description": "A travel itinerary showcasing image plugin, container grid layout, bookmarks, and ordered lists.",
+  "page": {
+    "width": 612,
+    "height": 792,
+    "margins": { "top": 35, "right": 35, "bottom": 35, "left": 35 }
+  },
+  "dataSchema": {
+    "type": "object",
+    "properties": {
+      "tripName": { "type": "string" },
+      "dates": { "type": "string" },
+      "traveler": { "type": "string" },
+      "days": { "type": "array" },
+      "gallery": { "type": "array" }
+    }
+  },
+  "styles": {
+    "title": {
+      "fontSize": 22,
+      "fontWeight": "bold",
+      "color": "#1e293b"
+    },
+    "subtitle": {
+      "fontSize": 11,
+      "color": "#64748b"
+    },
+    "day-heading": {
+      "fontSize": 15,
+      "fontWeight": "bold",
+      "color": "#1e293b"
+    },
+    "description": {
+      "fontSize": 9,
+      "lineHeight": 1.4,
+      "color": "#475569"
+    },
+    "activity": {
+      "fontSize": 9,
+      "lineHeight": 1.3,
+      "color": "#334155"
+    },
+    "section-title": {
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "color": "#1e293b"
+    },
+    "footer": {
+      "fontSize": 8,
+      "color": "#94a3b8",
+      "textAlign": "center"
+    }
+  },
+  "fonts": [],
+  "sections": [
+    {
+      "id": "itinerary",
+      "bookmark": "Tokyo Adventure",
+      "bands": [
+        {
+          "id": "header",
+          "type": "title",
+          "height": 80,
+          "elements": [
+            {
+              "id": "trip-name",
+              "type": "text",
+              "x": 0,
+              "y": 5,
+              "width": 542,
+              "height": 30,
+              "style": "title",
+              "properties": { "content": "{{ tripName }}" }
+            },
+            {
+              "id": "trip-dates",
+              "type": "text",
+              "x": 0,
+              "y": 38,
+              "width": 542,
+              "height": 14,
+              "style": "subtitle",
+              "properties": { "content": "{{ dates }}" }
+            },
+            {
+              "id": "trip-traveler",
+              "type": "text",
+              "x": 0,
+              "y": 54,
+              "width": 542,
+              "height": 14,
+              "style": "subtitle",
+              "properties": { "content": "Traveler: {{ traveler }}" }
+            },
+            {
+              "id": "header-line",
+              "type": "line",
+              "x": 0,
+              "y": 74,
+              "width": 542,
+              "height": 1,
+              "properties": { "color": "#1e293b", "thickness": 2 }
+            }
+          ]
+        },
+        {
+          "id": "day1",
+          "type": "body",
+          "height": 200,
+          "bookmark": "Day 1 — Asakusa",
+          "elements": [
+            {
+              "id": "day1-heading",
+              "type": "text",
+              "x": 0,
+              "y": 8,
+              "width": 542,
+              "height": 20,
+              "style": "day-heading",
+              "properties": { "content": "{{ days[0].label }} — {{ days[0].title }}" }
+            },
+            {
+              "id": "day1-line",
+              "type": "line",
+              "x": 0,
+              "y": 28,
+              "width": 542,
+              "height": 1,
+              "properties": { "color": "#e2e8f0", "thickness": 1 }
+            },
+            {
+              "id": "day1-image",
+              "type": "image",
+              "x": 0,
+              "y": 36,
+              "width": 160,
+              "height": 155,
+              "properties": {
+                "src": "{{ days[0].image }}",
+                "fit": "cover"
+              }
+            },
+            {
+              "id": "day1-desc",
+              "type": "text",
+              "x": 175,
+              "y": 36,
+              "width": 367,
+              "height": 30,
+              "style": "description",
+              "properties": { "content": "{{ days[0].description }}" }
+            },
+            {
+              "id": "day1-activities",
+              "type": "list",
+              "x": 180,
+              "y": 72,
+              "width": 362,
+              "height": 120,
+              "style": "activity",
+              "properties": {
+                "listType": "numbered",
+                "itemSpacing": 5,
+                "items": "{{ days[0].activities }}"
+              }
+            }
+          ]
+        },
+        {
+          "id": "day2",
+          "type": "body",
+          "height": 200,
+          "bookmark": "Day 2 — Shibuya",
+          "elements": [
+            {
+              "id": "day2-heading",
+              "type": "text",
+              "x": 0,
+              "y": 8,
+              "width": 542,
+              "height": 20,
+              "style": "day-heading",
+              "properties": { "content": "{{ days[1].label }} — {{ days[1].title }}" }
+            },
+            {
+              "id": "day2-line",
+              "type": "line",
+              "x": 0,
+              "y": 28,
+              "width": 542,
+              "height": 1,
+              "properties": { "color": "#e2e8f0", "thickness": 1 }
+            },
+            {
+              "id": "day2-image",
+              "type": "image",
+              "x": 0,
+              "y": 36,
+              "width": 160,
+              "height": 155,
+              "properties": {
+                "src": "{{ days[1].image }}",
+                "fit": "cover"
+              }
+            },
+            {
+              "id": "day2-desc",
+              "type": "text",
+              "x": 175,
+              "y": 36,
+              "width": 367,
+              "height": 30,
+              "style": "description",
+              "properties": { "content": "{{ days[1].description }}" }
+            },
+            {
+              "id": "day2-activities",
+              "type": "list",
+              "x": 180,
+              "y": 72,
+              "width": 362,
+              "height": 120,
+              "style": "activity",
+              "properties": {
+                "listType": "numbered",
+                "itemSpacing": 5,
+                "items": "{{ days[1].activities }}"
+              }
+            }
+          ]
+        },
+        {
+          "id": "day3",
+          "type": "body",
+          "height": 200,
+          "bookmark": "Day 3 — Akihabara",
+          "elements": [
+            {
+              "id": "day3-heading",
+              "type": "text",
+              "x": 0,
+              "y": 8,
+              "width": 542,
+              "height": 20,
+              "style": "day-heading",
+              "properties": { "content": "{{ days[2].label }} — {{ days[2].title }}" }
+            },
+            {
+              "id": "day3-line",
+              "type": "line",
+              "x": 0,
+              "y": 28,
+              "width": 542,
+              "height": 1,
+              "properties": { "color": "#e2e8f0", "thickness": 1 }
+            },
+            {
+              "id": "day3-image",
+              "type": "image",
+              "x": 0,
+              "y": 36,
+              "width": 160,
+              "height": 155,
+              "properties": {
+                "src": "{{ days[2].image }}",
+                "fit": "cover"
+              }
+            },
+            {
+              "id": "day3-desc",
+              "type": "text",
+              "x": 175,
+              "y": 36,
+              "width": 367,
+              "height": 30,
+              "style": "description",
+              "properties": { "content": "{{ days[2].description }}" }
+            },
+            {
+              "id": "day3-activities",
+              "type": "list",
+              "x": 180,
+              "y": 72,
+              "width": 362,
+              "height": 120,
+              "style": "activity",
+              "properties": {
+                "listType": "numbered",
+                "itemSpacing": 5,
+                "items": "{{ days[2].activities }}"
+              }
+            }
+          ]
+        },
+        {
+          "id": "gallery",
+          "type": "body",
+          "height": 200,
+          "bookmark": "Photo Gallery",
+          "elements": [
+            {
+              "id": "gallery-title",
+              "type": "text",
+              "x": 0,
+              "y": 8,
+              "width": 542,
+              "height": 20,
+              "style": "section-title",
+              "properties": { "content": "Photo Highlights" }
+            },
+            {
+              "id": "gallery-line",
+              "type": "line",
+              "x": 0,
+              "y": 28,
+              "width": 542,
+              "height": 1,
+              "properties": { "color": "#e2e8f0", "thickness": 1 }
+            },
+            {
+              "id": "gallery-grid",
+              "type": "container",
+              "x": 0,
+              "y": 38,
+              "width": 542,
+              "height": 155,
+              "properties": {
+                "layout": "grid",
+                "gridColumns": 2,
+                "gap": 10
+              },
+              "elements": [
+                {
+                  "id": "photo1",
+                  "type": "image",
+                  "x": 0,
+                  "y": 0,
+                  "width": 266,
+                  "height": 72,
+                  "properties": { "src": "{{ gallery[0] }}", "fit": "cover" }
+                },
+                {
+                  "id": "photo2",
+                  "type": "image",
+                  "x": 0,
+                  "y": 0,
+                  "width": 266,
+                  "height": 72,
+                  "properties": { "src": "{{ gallery[1] }}", "fit": "cover" }
+                },
+                {
+                  "id": "photo3",
+                  "type": "image",
+                  "x": 0,
+                  "y": 0,
+                  "width": 266,
+                  "height": 72,
+                  "properties": { "src": "{{ gallery[2] }}", "fit": "cover" }
+                },
+                {
+                  "id": "photo4",
+                  "type": "image",
+                  "x": 0,
+                  "y": 0,
+                  "width": 266,
+                  "height": 72,
+                  "properties": { "src": "{{ gallery[3] }}", "fit": "cover" }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "page-ftr",
+          "type": "pageFooter",
+          "height": 20,
+          "elements": [
+            {
+              "id": "ftr-text",
+              "type": "text",
+              "x": 0,
+              "y": 5,
+              "width": 542,
+              "height": 12,
+              "style": "footer",
+              "properties": { "content": "{{ tripName }} — Page {{ _pageNumber }} of {{ _totalPages }}" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

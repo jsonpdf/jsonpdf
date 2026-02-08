@@ -1,0 +1,35 @@
+{
+  "dashboardTitle": "Operations Dashboard",
+  "dateRange": "Q4 2024 (Oct — Dec)",
+  "generatedDate": "January 15, 2025",
+  "kpis": [
+    { "label": "Total Revenue", "value": "$2.4M", "change": "+12.3%", "positive": true },
+    { "label": "Active Users", "value": "18,452", "change": "+8.7%", "positive": true },
+    { "label": "Churn Rate", "value": "3.2%", "change": "+0.4%", "positive": false },
+    { "label": "Avg Response", "value": "142ms", "change": "-18ms", "positive": true }
+  ],
+  "monthlySales": [
+    { "month": "Jul", "revenue": 180000 },
+    { "month": "Aug", "revenue": 195000 },
+    { "month": "Sep", "revenue": 210000 },
+    { "month": "Oct", "revenue": 245000 },
+    { "month": "Nov", "revenue": 268000 },
+    { "month": "Dec", "revenue": 290000 }
+  ],
+  "categoryBreakdown": [
+    { "category": "Enterprise", "amount": 125000 },
+    { "category": "SMB", "amount": 85000 },
+    { "category": "Startup", "amount": 52000 },
+    { "category": "Individual", "amount": 28000 }
+  ],
+  "recentTransactions": [
+    { "id": "TXN-4821", "customer": "Acme Corp", "amount": "$12,500", "status": "Completed", "date": "Dec 28" },
+    { "id": "TXN-4820", "customer": "Globex Inc", "amount": "$8,750", "status": "Completed", "date": "Dec 27" },
+    { "id": "TXN-4819", "customer": "Initech LLC", "amount": "$5,200", "status": "Pending", "date": "Dec 27" },
+    { "id": "TXN-4818", "customer": "Umbrella Co", "amount": "$15,800", "status": "Completed", "date": "Dec 26" },
+    { "id": "TXN-4817", "customer": "Stark Industries", "amount": "$22,000", "status": "Completed", "date": "Dec 25" },
+    { "id": "TXN-4816", "customer": "Wayne Enterprises", "amount": "$9,400", "status": "Refunded", "date": "Dec 24" },
+    { "id": "TXN-4815", "customer": "Cyberdyne Systems", "amount": "$6,100", "status": "Completed", "date": "Dec 23" },
+    { "id": "TXN-4814", "customer": "Soylent Corp", "amount": "$3,850", "status": "Pending", "date": "Dec 22" }
+  ]
+}

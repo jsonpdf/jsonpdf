@@ -1,0 +1,29 @@
+{
+  "reportTitle": "Cloud Migration Assessment",
+  "subtitle": "Infrastructure Modernization Strategy for Acme Corp",
+  "author": "Dr. Elena Rodriguez",
+  "department": "Technology Architecture",
+  "date": "January 2025",
+  "documentId": "TR-2025-0042",
+  "introText": "This report presents the findings of a comprehensive assessment of Acme Corp's existing on-premises infrastructure and outlines a phased migration strategy to cloud-native services. The assessment covers current workload analysis, cost projections, risk factors, and recommended architecture patterns. Over six months, our team evaluated 47 applications across four business units, categorizing each by migration complexity, business criticality, and cloud readiness score.",
+  "methodologySteps": [
+    "Inventory all existing applications and infrastructure components across data centers",
+    "Classify workloads using the 6R framework (Rehost, Replatform, Refactor, Repurchase, Retire, Retain)",
+    "Conduct dependency mapping between services using automated discovery tools",
+    "Estimate cloud resource requirements and projected costs for each migration path",
+    "Assess security and compliance requirements against cloud provider certifications",
+    "Build proof-of-concept migrations for three high-priority applications"
+  ],
+  "resultsText": "The assessment identified 47 applications suitable for migration. Of these, 12 are candidates for direct rehosting (lift-and-shift), 18 require replatforming with moderate changes, 8 should be refactored to cloud-native architectures, 4 can be replaced with SaaS alternatives, and 5 are recommended for retirement. The projected annual savings after full migration is $2.4M, with a break-even timeline of 14 months.",
+  "conclusionText": "Based on the findings presented in this report, we recommend proceeding with a three-phase migration over 18 months. Phase 1 should prioritize the 12 rehost candidates to demonstrate quick wins and build organizational confidence. Phase 2 addresses the replatforming workloads, and Phase 3 tackles the refactoring efforts. A dedicated Cloud Center of Excellence should be established to govern the migration process and ensure consistent application of best practices.",
+  "appendixItems": [
+    { "id": "A-1", "application": "Customer Portal", "category": "Refactor", "complexity": "High", "savings": "$180,000" },
+    { "id": "A-2", "application": "Inventory System", "category": "Rehost", "complexity": "Low", "savings": "$45,000" },
+    { "id": "A-3", "application": "Payment Gateway", "category": "Replatform", "complexity": "Medium", "savings": "$92,000" },
+    { "id": "A-4", "application": "HR Management", "category": "Repurchase", "complexity": "Low", "savings": "$67,000" },
+    { "id": "A-5", "application": "Legacy Reporting", "category": "Retire", "complexity": "N/A", "savings": "$38,000" },
+    { "id": "A-6", "application": "Email Server", "category": "Repurchase", "complexity": "Low", "savings": "$55,000" },
+    { "id": "A-7", "application": "Data Warehouse", "category": "Refactor", "complexity": "High", "savings": "$210,000" },
+    { "id": "A-8", "application": "CI/CD Pipeline", "category": "Replatform", "complexity": "Medium", "savings": "$34,000" }
+  ]
+}

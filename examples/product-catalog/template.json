@@ -1,0 +1,309 @@
+{
+  "version": "1.0",
+  "name": "Product Catalog",
+  "description": "A multi-page product catalog with cards, conditional styles, and shape-based image placeholders.",
+  "page": {
+    "width": 595,
+    "height": 842,
+    "margins": { "top": 30, "right": 30, "bottom": 30, "left": 30 }
+  },
+  "dataSchema": {
+    "type": "object",
+    "properties": {
+      "catalogName": { "type": "string" },
+      "products": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "description": { "type": "string" },
+            "price": { "type": "number" },
+            "originalPrice": { "type": "number" },
+            "sku": { "type": "string" },
+            "category": { "type": "string" },
+            "color": { "type": "string" },
+            "inStock": { "type": "boolean" },
+            "onSale": { "type": "boolean" }
+          }
+        }
+      }
+    }
+  },
+  "styles": {
+    "catalog-title": {
+      "fontSize": 16,
+      "fontWeight": "bold",
+      "color": "#1a1a2e"
+    },
+    "page-info": {
+      "fontSize": 9,
+      "color": "#999999",
+      "textAlign": "right"
+    },
+    "product-name": {
+      "fontSize": 13,
+      "fontWeight": "bold",
+      "color": "#1a1a2e"
+    },
+    "product-name-oos": {
+      "fontSize": 13,
+      "fontWeight": "bold",
+      "color": "#999999"
+    },
+    "description": {
+      "fontSize": 9,
+      "color": "#666666",
+      "lineHeight": 1.3
+    },
+    "price": {
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "color": "#16a34a"
+    },
+    "original-price": {
+      "fontSize": 10,
+      "color": "#999999",
+      "textDecoration": "line-through"
+    },
+    "sku": {
+      "fontSize": 7,
+      "color": "#bbbbbb"
+    },
+    "category": {
+      "fontSize": 8,
+      "fontWeight": "bold",
+      "color": "#ffffff"
+    },
+    "badge": {
+      "fontSize": 8,
+      "fontWeight": "bold",
+      "color": "#ffffff"
+    },
+    "oos-label": {
+      "fontSize": 9,
+      "fontWeight": "bold",
+      "color": "#dc2626"
+    },
+    "footer": {
+      "fontSize": 8,
+      "color": "#999999",
+      "textAlign": "center"
+    }
+  },
+  "fonts": [],
+  "sections": [
+    {
+      "id": "catalog",
+      "bands": [
+        {
+          "id": "header",
+          "type": "pageHeader",
+          "height": 35,
+          "elements": [
+            {
+              "id": "catalog-name",
+              "type": "text",
+              "x": 0,
+              "y": 0,
+              "width": 300,
+              "height": 22,
+              "style": "catalog-title",
+              "properties": { "content": "{{ catalogName }}" }
+            },
+            {
+              "id": "page-info",
+              "type": "text",
+              "x": 335,
+              "y": 5,
+              "width": 200,
+              "height": 14,
+              "style": "page-info",
+              "properties": { "content": "Page {{ _pageNumber }}" }
+            },
+            {
+              "id": "header-line",
+              "type": "line",
+              "x": 0,
+              "y": 28,
+              "width": 535,
+              "height": 1,
+              "properties": { "color": "#eeeeee", "thickness": 1 }
+            }
+          ]
+        },
+        {
+          "id": "product",
+          "type": "detail",
+          "height": 115,
+          "dataSource": "products",
+          "elements": [
+            {
+              "id": "card-bg",
+              "type": "shape",
+              "x": 0,
+              "y": 5,
+              "width": 535,
+              "height": 105,
+              "properties": {
+                "shapeType": "rect",
+                "stroke": "#eeeeee",
+                "strokeWidth": 1,
+                "borderRadius": 6
+              }
+            },
+            {
+              "id": "img-placeholder",
+              "type": "shape",
+              "x": 10,
+              "y": 15,
+              "width": 85,
+              "height": 85,
+              "properties": {
+                "shapeType": "rect",
+                "fill": "{{ item.color }}",
+                "borderRadius": 4
+              }
+            },
+            {
+              "id": "category-badge",
+              "type": "shape",
+              "x": 15,
+              "y": 72,
+              "width": 75,
+              "height": 18,
+              "properties": {
+                "shapeType": "rect",
+                "fill": "#333333",
+                "borderRadius": 9
+              }
+            },
+            {
+              "id": "category-text",
+              "type": "text",
+              "x": 15,
+              "y": 74,
+              "width": 75,
+              "height": 14,
+              "style": "category",
+              "styleOverrides": { "textAlign": "center" },
+              "properties": { "content": "{{ item.category }}" }
+            },
+            {
+              "id": "product-name",
+              "type": "text",
+              "x": 110,
+              "y": 15,
+              "width": 300,
+              "height": 18,
+              "style": "product-name",
+              "conditionalStyles": [
+                {
+                  "condition": "item.inStock == false",
+                  "style": "product-name-oos"
+                }
+              ],
+              "properties": { "content": "{{ item.name }}" }
+            },
+            {
+              "id": "product-desc",
+              "type": "text",
+              "x": 110,
+              "y": 36,
+              "width": 310,
+              "height": 35,
+              "style": "description",
+              "properties": { "content": "{{ item.description }}" }
+            },
+            {
+              "id": "product-price",
+              "type": "text",
+              "x": 110,
+              "y": 76,
+              "width": 80,
+              "height": 18,
+              "style": "price",
+              "properties": { "content": "{{ item.price | money }}" }
+            },
+            {
+              "id": "original-price",
+              "type": "text",
+              "x": 195,
+              "y": 79,
+              "width": 70,
+              "height": 14,
+              "style": "original-price",
+              "condition": "item.onSale",
+              "properties": { "content": "{{ item.originalPrice | money }}" }
+            },
+            {
+              "id": "sale-badge-bg",
+              "type": "shape",
+              "x": 468,
+              "y": 15,
+              "width": 55,
+              "height": 20,
+              "condition": "item.onSale",
+              "properties": {
+                "shapeType": "rect",
+                "fill": "#dc2626",
+                "borderRadius": 10
+              }
+            },
+            {
+              "id": "sale-badge-text",
+              "type": "text",
+              "x": 468,
+              "y": 18,
+              "width": 55,
+              "height": 14,
+              "style": "badge",
+              "styleOverrides": { "textAlign": "center" },
+              "condition": "item.onSale",
+              "properties": { "content": "SALE" }
+            },
+            {
+              "id": "oos-label",
+              "type": "text",
+              "x": 453,
+              "y": 80,
+              "width": 70,
+              "height": 14,
+              "style": "oos-label",
+              "condition": "item.inStock == false",
+              "properties": { "content": "Out of Stock" }
+            },
+            {
+              "id": "product-sku",
+              "type": "text",
+              "x": 420,
+              "y": 93,
+              "width": 103,
+              "height": 10,
+              "style": "sku",
+              "styleOverrides": { "textAlign": "right" },
+              "properties": { "content": "SKU: {{ item.sku }}" }
+            }
+          ]
+        },
+        {
+          "id": "page-ftr",
+          "type": "pageFooter",
+          "height": 20,
+          "elements": [
+            {
+              "id": "footer-text",
+              "type": "text",
+              "x": 0,
+              "y": 5,
+              "width": 535,
+              "height": 12,
+              "style": "footer",
+              "properties": { "content": "{{ catalogName }} — Page {{ _pageNumber }} of {{ _totalPages }}" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

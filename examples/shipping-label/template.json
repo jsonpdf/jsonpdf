@@ -1,0 +1,274 @@
+{
+  "version": "1.0",
+  "name": "Shipping Label",
+  "description": "A 4x6 shipping label with barcodes, address boxes, and conditional FRAGILE marking.",
+  "page": {
+    "width": 288,
+    "height": 432,
+    "margins": { "top": 15, "right": 15, "bottom": 15, "left": 15 }
+  },
+  "dataSchema": {
+    "type": "object",
+    "properties": {
+      "sender": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "address": { "type": "string" },
+          "city": { "type": "string" },
+          "state": { "type": "string" },
+          "zip": { "type": "string" }
+        }
+      },
+      "recipient": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "address": { "type": "string" },
+          "city": { "type": "string" },
+          "state": { "type": "string" },
+          "zip": { "type": "string" }
+        }
+      },
+      "trackingNumber": { "type": "string" },
+      "trackingUrl": { "type": "string" },
+      "serviceType": { "type": "string" },
+      "weight": { "type": "string" },
+      "fragile": { "type": "boolean" }
+    }
+  },
+  "styles": {
+    "label-title": {
+      "fontSize": 7,
+      "fontWeight": "bold",
+      "color": "#666666"
+    },
+    "from-name": {
+      "fontSize": 9,
+      "fontWeight": "bold"
+    },
+    "from-address": {
+      "fontSize": 8,
+      "color": "#333333"
+    },
+    "to-name": {
+      "fontSize": 12,
+      "fontWeight": "bold"
+    },
+    "to-address": {
+      "fontSize": 10
+    },
+    "tracking": {
+      "fontSize": 7,
+      "fontFamily": "Courier",
+      "color": "#333333",
+      "textAlign": "center"
+    },
+    "service": {
+      "fontSize": 11,
+      "fontWeight": "bold",
+      "textAlign": "center"
+    },
+    "weight-text": {
+      "fontSize": 9,
+      "color": "#555555",
+      "textAlign": "right"
+    },
+    "fragile": {
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "color": "#cc0000",
+      "textAlign": "center"
+    }
+  },
+  "fonts": [],
+  "sections": [
+    {
+      "id": "label",
+      "bands": [
+        {
+          "id": "label-body",
+          "type": "body",
+          "height": 402,
+          "elements": [
+            {
+              "id": "from-box",
+              "type": "shape",
+              "x": 0,
+              "y": 0,
+              "width": 258,
+              "height": 75,
+              "properties": {
+                "shapeType": "rect",
+                "stroke": "#999999",
+                "strokeWidth": 0.5,
+                "borderRadius": 4
+              }
+            },
+            {
+              "id": "from-label",
+              "type": "text",
+              "x": 8,
+              "y": 5,
+              "width": 40,
+              "height": 10,
+              "style": "label-title",
+              "properties": { "content": "FROM:" }
+            },
+            {
+              "id": "from-name",
+              "type": "text",
+              "x": 8,
+              "y": 18,
+              "width": 240,
+              "height": 12,
+              "style": "from-name",
+              "properties": { "content": "{{ sender.name }}" }
+            },
+            {
+              "id": "from-addr",
+              "type": "text",
+              "x": 8,
+              "y": 32,
+              "width": 240,
+              "height": 12,
+              "style": "from-address",
+              "properties": { "content": "{{ sender.address }}" }
+            },
+            {
+              "id": "from-city",
+              "type": "text",
+              "x": 8,
+              "y": 45,
+              "width": 240,
+              "height": 12,
+              "style": "from-address",
+              "properties": { "content": "{{ sender.city }}, {{ sender.state }} {{ sender.zip }}" }
+            },
+            {
+              "id": "to-box",
+              "type": "shape",
+              "x": 0,
+              "y": 90,
+              "width": 258,
+              "height": 100,
+              "properties": {
+                "shapeType": "rect",
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "borderRadius": 4
+              }
+            },
+            {
+              "id": "to-label",
+              "type": "text",
+              "x": 8,
+              "y": 95,
+              "width": 30,
+              "height": 10,
+              "style": "label-title",
+              "properties": { "content": "TO:" }
+            },
+            {
+              "id": "to-name",
+              "type": "text",
+              "x": 8,
+              "y": 110,
+              "width": 240,
+              "height": 16,
+              "style": "to-name",
+              "properties": { "content": "{{ recipient.name }}" }
+            },
+            {
+              "id": "to-addr",
+              "type": "text",
+              "x": 8,
+              "y": 130,
+              "width": 240,
+              "height": 14,
+              "style": "to-address",
+              "properties": { "content": "{{ recipient.address }}" }
+            },
+            {
+              "id": "to-city",
+              "type": "text",
+              "x": 8,
+              "y": 148,
+              "width": 240,
+              "height": 14,
+              "style": "to-address",
+              "properties": { "content": "{{ recipient.city }}, {{ recipient.state }} {{ recipient.zip }}" }
+            },
+            {
+              "id": "separator",
+              "type": "line",
+              "x": 0,
+              "y": 205,
+              "width": 258,
+              "height": 1,
+              "properties": { "dashPattern": [4, 3], "color": "#999999", "thickness": 1 }
+            },
+            {
+              "id": "barcode-linear",
+              "type": "barcode",
+              "x": 15,
+              "y": 218,
+              "width": 228,
+              "height": 55,
+              "properties": {
+                "value": "{{ trackingNumber }}",
+                "format": "code128",
+                "includeText": true,
+                "textSize": 8
+              }
+            },
+            {
+              "id": "qr-code",
+              "type": "barcode",
+              "x": 84,
+              "y": 285,
+              "width": 90,
+              "height": 90,
+              "properties": {
+                "value": "{{ trackingUrl }}",
+                "format": "qrcode"
+              }
+            },
+            {
+              "id": "service-type",
+              "type": "text",
+              "x": 0,
+              "y": 380,
+              "width": 170,
+              "height": 16,
+              "style": "service",
+              "properties": { "content": "{{ serviceType }}" }
+            },
+            {
+              "id": "weight",
+              "type": "text",
+              "x": 158,
+              "y": 383,
+              "width": 100,
+              "height": 14,
+              "style": "weight-text",
+              "properties": { "content": "{{ weight }}" }
+            },
+            {
+              "id": "fragile-mark",
+              "type": "text",
+              "x": 80,
+              "y": 170,
+              "width": 100,
+              "height": 30,
+              "rotation": 340,
+              "style": "fragile",
+              "condition": "fragile",
+              "properties": { "content": "FRAGILE" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

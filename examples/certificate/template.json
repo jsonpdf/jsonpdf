@@ -1,0 +1,238 @@
+{
+  "version": "1.0",
+  "name": "Certificate of Achievement",
+  "description": "An elegant certificate showcasing custom fonts, shapes, rotation, and landscape orientation.",
+  "page": {
+    "width": 792,
+    "height": 612,
+    "orientation": "landscape",
+    "margins": { "top": 50, "right": 50, "bottom": 50, "left": 50 }
+  },
+  "dataSchema": {
+    "type": "object",
+    "properties": {
+      "recipientName": { "type": "string" },
+      "courseName": { "type": "string" },
+      "date": { "type": "string" },
+      "certificateId": { "type": "string" },
+      "issuerName": { "type": "string" }
+    }
+  },
+  "styles": {
+    "certificate-title": {
+      "fontFamily": "Playfair Display",
+      "fontSize": 36,
+      "fontWeight": "bold",
+      "color": "#1a1a2e",
+      "textAlign": "center"
+    },
+    "recipient-name": {
+      "fontFamily": "Playfair Display",
+      "fontSize": 28,
+      "fontWeight": "bold",
+      "color": "#16213e",
+      "textAlign": "center"
+    },
+    "body-text": {
+      "fontSize": 14,
+      "color": "#333333",
+      "textAlign": "center"
+    },
+    "date-text": {
+      "fontSize": 12,
+      "fontStyle": "italic",
+      "color": "#555555",
+      "textAlign": "center"
+    },
+    "watermark": {
+      "fontSize": 72,
+      "fontWeight": "bold",
+      "color": "#d4af37",
+      "textAlign": "center",
+      "opacity": 0.08
+    },
+    "cert-id": {
+      "fontSize": 8,
+      "color": "#999999",
+      "textAlign": "right"
+    },
+    "issuer": {
+      "fontSize": 12,
+      "color": "#333333",
+      "textAlign": "center"
+    }
+  },
+  "fonts": [
+    {
+      "family": "Playfair Display",
+      "weight": 700,
+      "src": "./node_modules/@fontsource/playfair-display/files/playfair-display-latin-700-normal.woff"
+    }
+  ],
+  "sections": [
+    {
+      "id": "cert-section",
+      "bands": [
+        {
+          "id": "bg",
+          "type": "background",
+          "height": 512,
+          "elements": [
+            {
+              "id": "border-outer",
+              "type": "shape",
+              "x": 0,
+              "y": 0,
+              "width": 692,
+              "height": 512,
+              "properties": {
+                "shapeType": "rect",
+                "stroke": "#d4af37",
+                "strokeWidth": 3
+              }
+            },
+            {
+              "id": "border-inner",
+              "type": "shape",
+              "x": 12,
+              "y": 12,
+              "width": 668,
+              "height": 488,
+              "properties": {
+                "shapeType": "rect",
+                "stroke": "#d4af37",
+                "strokeWidth": 1
+              }
+            }
+          ]
+        },
+        {
+          "id": "cert-body",
+          "type": "body",
+          "height": 512,
+          "elements": [
+            {
+              "id": "watermark",
+              "type": "text",
+              "x": 130,
+              "y": 180,
+              "width": 432,
+              "height": 100,
+              "rotation": 335,
+              "style": "watermark",
+              "properties": { "content": "CERTIFIED" }
+            },
+            {
+              "id": "line-top",
+              "type": "line",
+              "x": 180,
+              "y": 60,
+              "width": 332,
+              "height": 1,
+              "properties": { "color": "#d4af37", "thickness": 2 }
+            },
+            {
+              "id": "title",
+              "type": "text",
+              "x": 46,
+              "y": 80,
+              "width": 600,
+              "height": 50,
+              "style": "certificate-title",
+              "properties": { "content": "Certificate of Achievement" }
+            },
+            {
+              "id": "line-below-title",
+              "type": "line",
+              "x": 180,
+              "y": 140,
+              "width": 332,
+              "height": 1,
+              "properties": { "color": "#d4af37", "thickness": 2 }
+            },
+            {
+              "id": "certifies-text",
+              "type": "text",
+              "x": 46,
+              "y": 170,
+              "width": 600,
+              "height": 20,
+              "style": "body-text",
+              "properties": { "content": "This certifies that" }
+            },
+            {
+              "id": "recipient",
+              "type": "text",
+              "x": 46,
+              "y": 200,
+              "width": 600,
+              "height": 40,
+              "style": "recipient-name",
+              "properties": { "content": "{{ recipientName }}" }
+            },
+            {
+              "id": "completed-text",
+              "type": "text",
+              "x": 46,
+              "y": 255,
+              "width": 600,
+              "height": 20,
+              "style": "body-text",
+              "properties": { "content": "has successfully completed the course" }
+            },
+            {
+              "id": "course-name",
+              "type": "text",
+              "x": 46,
+              "y": 285,
+              "width": 600,
+              "height": 30,
+              "style": "body-text",
+              "styleOverrides": { "fontWeight": "bold", "fontSize": 18 },
+              "properties": { "content": "{{ courseName }}" }
+            },
+            {
+              "id": "date-line",
+              "type": "line",
+              "x": 230,
+              "y": 360,
+              "width": 232,
+              "height": 1,
+              "properties": { "color": "#cccccc", "thickness": 1 }
+            },
+            {
+              "id": "award-date",
+              "type": "text",
+              "x": 46,
+              "y": 370,
+              "width": 600,
+              "height": 20,
+              "style": "date-text",
+              "properties": { "content": "Awarded on {{ date }}" }
+            },
+            {
+              "id": "issuer",
+              "type": "text",
+              "x": 46,
+              "y": 410,
+              "width": 600,
+              "height": 20,
+              "style": "issuer",
+              "properties": { "content": "{{ issuerName }}" }
+            },
+            {
+              "id": "cert-id",
+              "type": "text",
+              "x": 400,
+              "y": 480,
+              "width": 260,
+              "height": 15,
+              "style": "cert-id",
+              "properties": { "content": "Certificate ID: {{ certificateId }}" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
