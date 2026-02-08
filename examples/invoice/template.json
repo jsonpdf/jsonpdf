@@ -75,13 +75,15 @@
     "col-header": {
       "fontSize": 9,
       "fontWeight": "bold",
-      "color": "#ffffff"
+      "color": "#ffffff",
+      "textDecoration": "underline"
     },
     "col-header-right": {
       "fontSize": 9,
       "fontWeight": "bold",
       "color": "#ffffff",
-      "textAlign": "right"
+      "textAlign": "right",
+      "textDecoration": "underline"
     },
     "item-text": {
       "fontSize": 9,
@@ -105,13 +107,15 @@
       "fontSize": 12,
       "fontWeight": "bold",
       "textAlign": "right",
-      "color": "#1a1a2e"
+      "color": "#1a1a2e",
+      "borderBottom": { "width": 2, "color": "#1a1a2e" }
     },
     "grand-total-value": {
       "fontSize": 12,
       "fontWeight": "bold",
       "textAlign": "right",
-      "color": "#1a1a2e"
+      "color": "#1a1a2e",
+      "borderBottom": { "width": 2, "color": "#1a1a2e" }
     },
     "footer": {
       "fontSize": 8,

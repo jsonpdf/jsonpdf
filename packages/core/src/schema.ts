@@ -24,7 +24,7 @@ const textDecorationValues = [
   'line-through',
   'underline line-through',
 ] as const;
-const textAlignValues = ['left', 'center', 'right'] as const;
+const textAlignValues = ['left', 'center', 'right', 'justify'] as const;
 const orientationValues = ['portrait', 'landscape'] as const;
 const columnModeValues = ['tile', 'flow'] as const;
 

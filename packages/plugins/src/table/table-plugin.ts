@@ -1,9 +1,10 @@
-import { rgb } from 'pdf-lib';
+import { rgb, pushGraphicsState, popGraphicsState, setCharacterSpacing } from 'pdf-lib';
 import { parseColor } from '@jsonpdf/core';
 import type { Style, ValidationError } from '@jsonpdf/core';
 import type { Plugin, MeasureContext, RenderContext } from '../types.js';
 import { getFont, getLineHeight } from '../utils.js';
 import { wrapText, measureTextWidth } from '../text/word-wrap.js';
+import { drawTextDecoration } from '../text/text-decoration.js';
 import {
   type TableProps,
   type TableColumn,
@@ -70,6 +71,7 @@ export const tablePlugin: Plugin<TableProps> = {
           width: ctx.width,
           height: m.headerHeight,
           color: rgb(bg.r, bg.g, bg.b),
+          opacity: ctx.opacity,
         });
       }
 
@@ -121,6 +123,7 @@ export const tablePlugin: Plugin<TableProps> = {
           width: ctx.width,
           height: rowHeight,
           color: rgb(bg.r, bg.g, bg.b),
+          opacity: ctx.opacity,
         });
       }
 
@@ -213,11 +216,22 @@ function renderRowCells(
   const lineHeight = getLineHeight(style);
   const color = parseColor(style.color ?? '#000000');
   const ascent = font.heightAtSize(fontSize, { descender: false });
+  const ls = style.letterSpacing ?? 0;
+  const decoration = style.textDecoration;
+  const needsCharSpacing = ls !== 0;
 
   let colX = 0;
   for (let c = 0; c < cells.length; c++) {
     const contentWidth = Math.max(0, columnWidths[c] - 2 * cellPadding);
-    const wrapped = wrapText(cells[c], font, fontSize, contentWidth, lineHeight);
+    const wrapped = wrapText(
+      cells[c],
+      font,
+      fontSize,
+      contentWidth,
+      lineHeight,
+      undefined,
+      ls || undefined,
+    );
     const align = columns[c]?.align ?? style.textAlign ?? 'left';
 
     for (let i = 0; i < wrapped.lines.length; i++) {
@@ -226,7 +240,7 @@ function renderRowCells(
 
       let lineX = ctx.x + colX + cellPadding;
       if (align === 'center' || align === 'right') {
-        const lineWidth = measureTextWidth(line, font, fontSize);
+        const lineWidth = measureTextWidth(line, font, fontSize, ls || undefined);
         if (align === 'center') {
           lineX += (contentWidth - lineWidth) / 2;
         } else {
@@ -235,13 +249,37 @@ function renderRowCells(
       }
 
       const lineY = ctx.y - offsetY - cellPadding - ascent - i * lineHeight;
+
+      if (needsCharSpacing) {
+        ctx.page.pushOperators(pushGraphicsState(), setCharacterSpacing(ls));
+      }
       ctx.page.drawText(line, {
         x: lineX,
         y: lineY,
         font,
         size: fontSize,
         color: rgb(color.r, color.g, color.b),
+        opacity: ctx.opacity,
       });
+      if (needsCharSpacing) {
+        ctx.page.pushOperators(popGraphicsState());
+      }
+
+      // Text decoration
+      if (decoration && decoration !== 'none') {
+        const lineWidth = measureTextWidth(line, font, fontSize, ls || undefined);
+        drawTextDecoration(
+          ctx.page,
+          decoration,
+          lineX,
+          lineY,
+          lineWidth,
+          font,
+          fontSize,
+          color,
+          ctx.opacity,
+        );
+      }
     }
 
     colX += columnWidths[c];
@@ -267,6 +305,7 @@ function drawRowTopAndVerticals(
     end: { x: ctx.x + ctx.width, y: topY },
     thickness: borderWidth,
     color: pdfColor,
+    opacity: ctx.opacity,
   });
 
   // Vertical borders (left edge + column separators + right edge)
@@ -277,6 +316,7 @@ function drawRowTopAndVerticals(
       end: { x: ctx.x + colX, y: bottomY },
       thickness: borderWidth,
       color: pdfColor,
+      opacity: ctx.opacity,
     });
     if (c < columnWidths.length) colX += columnWidths[c];
   }
@@ -296,5 +336,6 @@ function drawTableBottomBorder(
     end: { x: ctx.x + ctx.width, y: bottomY },
     thickness: borderWidth,
     color: pdfColor,
+    opacity: ctx.opacity,
   });
 }

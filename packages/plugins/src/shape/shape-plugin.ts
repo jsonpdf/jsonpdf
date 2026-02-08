@@ -110,6 +110,8 @@ export const shapePlugin: Plugin<ShapeProps> = {
             borderColor: pdfStroke,
             borderWidth: strokeWidth,
             borderDashArray: props.dashPattern,
+            opacity: ctx.opacity,
+            borderOpacity: ctx.opacity,
           });
         } else {
           ctx.page.drawRectangle({
@@ -121,6 +123,8 @@ export const shapePlugin: Plugin<ShapeProps> = {
             borderColor: pdfStroke,
             borderWidth: strokeWidth,
             borderDashArray: props.dashPattern,
+            opacity: ctx.opacity,
+            borderOpacity: ctx.opacity,
           });
         }
         break;
@@ -137,6 +141,8 @@ export const shapePlugin: Plugin<ShapeProps> = {
           borderColor: pdfStroke,
           borderWidth: strokeWidth,
           borderDashArray: props.dashPattern,
+          opacity: ctx.opacity,
+          borderOpacity: ctx.opacity,
         });
         break;
       }
@@ -152,6 +158,8 @@ export const shapePlugin: Plugin<ShapeProps> = {
           borderColor: pdfStroke,
           borderWidth: strokeWidth,
           borderDashArray: props.dashPattern,
+          opacity: ctx.opacity,
+          borderOpacity: ctx.opacity,
         });
         break;
       }

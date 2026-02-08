@@ -476,3 +476,124 @@ describe('renderPdf: cross-references', () => {
     expect(result.pageCount).toBe(1);
   });
 });
+
+describe('renderPdf: Phase 6 style features', () => {
+  it('renders element with backgroundColor', async () => {
+    let t = createTemplate({ name: 'BG Color Element' });
+    t = addStyle(t, 'bgStyle', { backgroundColor: '#FF0000' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'el1',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 20,
+      style: 'bgStyle',
+      properties: { content: 'Red background' },
+    });
+
+    const result = await renderPdf(t);
+    expect(result.pageCount).toBe(1);
+    expect(result.bytes.length).toBeGreaterThan(0);
+    const header = new TextDecoder().decode(result.bytes.slice(0, 5));
+    expect(header).toBe('%PDF-');
+  });
+
+  it('renders element with borderTop only', async () => {
+    let t = createTemplate({ name: 'Border Top' });
+    t = addStyle(t, 'topBorder', { borderTop: { width: 1, color: '#FF0000' } });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'el1',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 20,
+      style: 'topBorder',
+      properties: { content: 'Top border only' },
+    });
+
+    const result = await renderPdf(t);
+    expect(result.pageCount).toBe(1);
+    expect(result.bytes.length).toBeGreaterThan(0);
+  });
+
+  it('renders element with all individual borders', async () => {
+    let t = createTemplate({ name: 'All Borders' });
+    t = addStyle(t, 'allBorders', {
+      borderTop: { width: 1, color: '#FF0000' },
+      borderRight: { width: 2, color: '#00FF00' },
+      borderBottom: { width: 1, color: '#0000FF' },
+      borderLeft: { width: 2, color: '#FF00FF' },
+    });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'el1',
+      type: 'text',
+      x: 10,
+      y: 10,
+      width: 200,
+      height: 40,
+      style: 'allBorders',
+      properties: { content: 'All borders' },
+    });
+
+    const result = await renderPdf(t);
+    expect(result.pageCount).toBe(1);
+    expect(result.bytes.length).toBeGreaterThan(0);
+  });
+
+  it('renders element with borderRadius and backgroundColor', async () => {
+    let t = createTemplate({ name: 'Border Radius' });
+    t = addStyle(t, 'rounded', {
+      backgroundColor: '#3498db',
+      borderRadius: 8,
+    });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'el1',
+      type: 'text',
+      x: 10,
+      y: 10,
+      width: 200,
+      height: 40,
+      style: 'rounded',
+      properties: { content: 'Rounded corners' },
+    });
+
+    const result = await renderPdf(t);
+    expect(result.pageCount).toBe(1);
+    expect(result.bytes.length).toBeGreaterThan(0);
+    const header = new TextDecoder().decode(result.bytes.slice(0, 5));
+    expect(header).toBe('%PDF-');
+  });
+
+  it('renders element with opacity', async () => {
+    let t = createTemplate({ name: 'Opacity' });
+    t = addStyle(t, 'semiTransparent', { opacity: 0.5 });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'el1',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 20,
+      style: 'semiTransparent',
+      properties: { content: 'Semi-transparent text' },
+    });
+
+    const result = await renderPdf(t);
+    expect(result.pageCount).toBe(1);
+    expect(result.bytes.length).toBeGreaterThan(0);
+    const header = new TextDecoder().decode(result.bytes.slice(0, 5));
+    expect(header).toBe('%PDF-');
+  });
+});

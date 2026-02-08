@@ -27,7 +27,8 @@
       "fontSize": 22,
       "fontWeight": "bold",
       "color": "#1a1a2e",
-      "textAlign": "center"
+      "textAlign": "center",
+      "letterSpacing": 2
     },
     "contact": {
       "fontSize": 9,
@@ -37,7 +38,8 @@
     "section-title": {
       "fontSize": 12,
       "fontWeight": "bold",
-      "color": "#1a1a2e"
+      "color": "#1a1a2e",
+      "letterSpacing": 1
     },
     "body-text": {
       "fontSize": 9.5,

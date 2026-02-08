@@ -67,6 +67,7 @@ export const linePlugin: Plugin<LineProps> = {
         thickness,
         color: pdfColor,
         dashArray: props.dashPattern,
+        opacity: ctx.opacity,
       });
     } else {
       const lineY = ctx.y - ctx.height / 2;
@@ -76,6 +77,7 @@ export const linePlugin: Plugin<LineProps> = {
         thickness,
         color: pdfColor,
         dashArray: props.dashPattern,
+        opacity: ctx.opacity,
       });
     }
 

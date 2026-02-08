@@ -67,6 +67,8 @@ export interface RenderContext extends MeasureContext {
   renderBands?: (bands: Band[]) => Promise<void>;
   /** Map from anchor ID to the PDFPage it appears on. For internal "#anchor" links. */
   anchorPageMap?: Map<string, PDFPage>;
+  /** Opacity for this element (0-1). Plugins should pass this to pdf-lib draw calls. */
+  opacity?: number;
 }
 
 /** An element plugin that can measure and render a specific element type. */

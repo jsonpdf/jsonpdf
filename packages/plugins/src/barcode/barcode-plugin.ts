@@ -99,6 +99,7 @@ export const barcodePlugin: Plugin<BarcodeProps> = {
       y: imgY,
       width: drawWidth,
       height: drawHeight,
+      opacity: ctx.opacity,
     });
   },
 };

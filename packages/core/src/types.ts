@@ -149,7 +149,7 @@ export interface Style {
   textDecoration?: 'none' | 'underline' | 'line-through' | 'underline line-through';
   color?: string;
   backgroundColor?: string;
-  textAlign?: 'left' | 'center' | 'right';
+  textAlign?: 'left' | 'center' | 'right' | 'justify';
   lineHeight?: number;
   letterSpacing?: number;
   borderWidth?: number;
