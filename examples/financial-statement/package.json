@@ -2,7 +2,7 @@
   "name": "@jsonpdf/example-financial-statement",
   "private": true,
   "scripts": {
-    "render": "pnpm exec jsonpdf render -t template.json -d data.json -o output.pdf"
+    "render": "jsonpdf render -t template.json -d data.json -o output.pdf"
   },
   "dependencies": {
     "@jsonpdf/cli": "workspace:*"

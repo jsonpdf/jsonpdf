@@ -26,6 +26,9 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Relink workspace bins
+        run: pnpm install --frozen-lockfile
+
       - name: Typecheck
         run: pnpm typecheck
 
