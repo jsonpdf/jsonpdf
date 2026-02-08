@@ -111,7 +111,7 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 ### Phase 1: Core Types + Static Rendering
 
 - [x] `@jsonpdf/core` — TypeScript interfaces, utilities, JSON Schema validation
-- [x] `@jsonpdf/template` — Template factory, validation, basic add helpers (full manipulation API in Phase 6)
+- [x] `@jsonpdf/template` — Template factory, validation, basic add helpers (full manipulation API in Phase 9)
 - [x] `@jsonpdf/plugins` — Text plugin (word wrapping, font measurement, multi-line)
 - [x] `@jsonpdf/plugins` — Line plugin (solid and dashed via `dashPattern`)
 - [x] `@jsonpdf/plugins` — List plugin (bullet, numbered, lettered with nesting and RichContent items)
@@ -141,7 +141,7 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 - [x] Renderer — Conditional element styles (`conditionalStyles`) — completed in Phase 2
 - [x] Renderer — Hyperlinks (`link` on StyledRun) and PDF bookmarks (`bookmark` on Section/Band)
 - [x] Renderer — Cross-references (`anchor` on Element/Band, `{{ "id" | ref }}` Liquid filter)
-- [x] Renderer — Widow/orphan control (`widows`, `orphans` in Style) — plumbing for Phase 8
+- [x] Renderer — Widow/orphan control (`widows`, `orphans` in Style) — plumbing only, full implementation in Phase 7
 - [x] Renderer — Multi-column sections (`columns`, `columnGap`) — tile mode
 - [x] Renderer — Asymmetric column widths (`columnWidths` on Section)
 - [x] Renderer — Variable page height (`autoHeight` on PageConfig)
@@ -163,7 +163,30 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 - [x] Chart plugin (Vega-Lite → SVG → image plugin)
 - [x] Frame plugin (nested band container for side-by-side repeating content)
 
-### Phase 6: Editor MVP
+### Phase 6: Text & Style Rendering
+
+- [ ] Text — `textDecoration`: underline, line-through, underline+line-through
+- [ ] Text — `letterSpacing`: inter-character spacing in text rendering
+- [ ] Text — `textAlign: "justify"`: full justification with word spacing
+- [ ] Style — `opacity` (0–1): graphics state transparency on any element
+- [ ] Style — Individual borders (`borderTop`, `borderRight`, `borderBottom`, `borderLeft`) on all elements
+- [ ] Style — `borderRadius` on container and image elements (currently shape-only)
+- [ ] Layout — `columnFooter` float mode (`float: true` sits under last detail row)
+
+### Phase 7: Long-Form Document Support
+
+- [ ] Text — Widow/orphan control (full implementation in word-wrap, currently plumbing-only)
+- [ ] Renderer — Footnotes (`footnote` on StyledRun, dynamic per-page space reservation)
+- [ ] Renderer — Text reflow across columns (`columnMode: "flow"` on Section)
+- [ ] Renderer — Auto-generated Table of Contents (`_bookmarks` built-in data source)
+- [ ] Style — Gradient fills (linear, radial) on `backgroundColor`
+
+### Phase 8: Example Updates
+
+- [ ] Update existing examples to showcase Phase 6–7 features
+- [ ] Add new examples for long-form documents (footnotes, TOC, justified text)
+
+### Phase 9: Editor MVP
 
 - [ ] `@jsonpdf/template` — Full manipulation API (update, remove, move, clone, queries)
 - [ ] Canvas rendering (pages, bands, elements)
@@ -173,7 +196,7 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 - [ ] Template import/export (JSON)
 - [ ] Live PDF preview
 
-### Phase 7: Editor Full
+### Phase 10: Editor Full
 
 - [ ] Undo/redo
 - [ ] Copy/paste, multi-select
@@ -182,13 +205,6 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 - [ ] Style manager
 - [ ] Data schema editor with sample data generation
 - [ ] Template gallery / starter templates
-
-### Phase 8: Long-Form Document Support
-
-- [ ] Renderer — Auto-generated Table of Contents (`_bookmarks` built-in data source)
-- [ ] Renderer — Footnotes (`footnote` on StyledRun, dynamic per-page space reservation)
-- [ ] Renderer — Text reflow across columns (`columnMode: "flow"` on Section)
-- [ ] Style — Gradient fills (linear, radial) on `backgroundColor`
 
 ## License
 
