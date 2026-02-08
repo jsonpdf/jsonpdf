@@ -325,4 +325,97 @@ describe('useEditorStore', () => {
       expect(useEditorStore.getState().template).toBe(before);
     });
   });
+
+  describe('addSection', () => {
+    it('appends section with generated ID, name, and empty bands', () => {
+      useEditorStore.getState().addSection();
+      const state = useEditorStore.getState();
+      expect(state.template.sections).toHaveLength(1);
+      const sec = state.template.sections[0];
+      expect(sec.id).toMatch(/^sec_/);
+      expect(sec.name).toBe('Section 1');
+      expect(sec.bands).toEqual([]);
+    });
+
+    it('increments section name based on existing count', () => {
+      useEditorStore.getState().addSection();
+      useEditorStore.getState().addSection();
+      const state = useEditorStore.getState();
+      expect(state.template.sections).toHaveLength(2);
+      expect(state.template.sections[0].name).toBe('Section 1');
+      expect(state.template.sections[1].name).toBe('Section 2');
+    });
+
+    it('auto-selects the new section', () => {
+      useEditorStore.setState({
+        selectedElementId: 'el1',
+        selectedBandId: 'b1',
+        selectedSectionId: 'sec1',
+      });
+      useEditorStore.getState().addSection();
+      const state = useEditorStore.getState();
+      expect(state.selectedElementId).toBeNull();
+      expect(state.selectedBandId).toBeNull();
+      expect(state.selectedSectionId).toBe(state.template.sections[0].id);
+    });
+  });
+
+  describe('removeSection', () => {
+    it('removes the section and clears selection', () => {
+      let t = createTemplate();
+      t = addSection(t, { id: 'sec1', name: 'One', bands: [] });
+      t = addSection(t, { id: 'sec2', name: 'Two', bands: [] });
+      useEditorStore.setState({
+        template: t,
+        selectedSectionId: 'sec1',
+      });
+      useEditorStore.getState().removeSection('sec1');
+      const state = useEditorStore.getState();
+      expect(state.template.sections).toHaveLength(1);
+      expect(state.template.sections[0].id).toBe('sec2');
+      expect(state.selectedSectionId).toBeNull();
+      expect(state.selectedBandId).toBeNull();
+      expect(state.selectedElementId).toBeNull();
+    });
+
+    it('no-ops for invalid section ID', () => {
+      let t = createTemplate();
+      t = addSection(t, { id: 'sec1', bands: [] });
+      useEditorStore.setState({ template: t });
+      const before = useEditorStore.getState().template;
+      useEditorStore.getState().removeSection('nonexistent');
+      expect(useEditorStore.getState().template).toBe(before);
+    });
+  });
+
+  describe('moveSection', () => {
+    function setupThreeSections() {
+      let t = createTemplate();
+      t = addSection(t, { id: 'sec1', name: 'One', bands: [] });
+      t = addSection(t, { id: 'sec2', name: 'Two', bands: [] });
+      t = addSection(t, { id: 'sec3', name: 'Three', bands: [] });
+      useEditorStore.setState({ template: t });
+    }
+
+    it('moves section forward', () => {
+      setupThreeSections();
+      useEditorStore.getState().moveSection('sec1', 2);
+      const ids = useEditorStore.getState().template.sections.map((s) => s.id);
+      expect(ids).toEqual(['sec2', 'sec3', 'sec1']);
+    });
+
+    it('moves section backward', () => {
+      setupThreeSections();
+      useEditorStore.getState().moveSection('sec3', 0);
+      const ids = useEditorStore.getState().template.sections.map((s) => s.id);
+      expect(ids).toEqual(['sec3', 'sec1', 'sec2']);
+    });
+
+    it('no-ops for invalid section ID', () => {
+      setupThreeSections();
+      const before = useEditorStore.getState().template;
+      useEditorStore.getState().moveSection('nonexistent', 0);
+      expect(useEditorStore.getState().template).toBe(before);
+    });
+  });
 });

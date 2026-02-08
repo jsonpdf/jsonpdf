@@ -215,12 +215,16 @@ describe('OutlinePanel', () => {
       expect(frameEl.getAttribute('draggable')).toBeNull();
     });
 
-    it('band and section nodes are not draggable', () => {
+    it('sections are draggable', () => {
+      render(<OutlinePanel />);
+      const section = screen.getByText('Main').closest('[role="treeitem"]')!;
+      expect(section.getAttribute('draggable')).toBe('true');
+    });
+
+    it('band nodes are not draggable', () => {
       render(<OutlinePanel />);
       const band = screen.getByText('Detail').closest('[role="treeitem"]')!;
       expect(band.getAttribute('draggable')).toBeNull();
-      const section = screen.getByText('Main').closest('[role="treeitem"]')!;
-      expect(section.getAttribute('draggable')).toBeNull();
     });
 
     it('frame-internal band nodes are not drop targets', () => {
@@ -246,6 +250,25 @@ describe('OutlinePanel', () => {
       const b2 = useEditorStore.getState().template.sections[0].bands[1];
       expect(b1.elements.map((e) => e.id)).toContain('el-text');
       expect(b2.elements.map((e) => e.id)).not.toContain('el-text');
+    });
+  });
+
+  describe('Add Section button', () => {
+    it('renders the Add Section button', () => {
+      render(<OutlinePanel />);
+      expect(screen.getByRole('button', { name: 'Add section' })).toBeDefined();
+    });
+
+    it('adds a section on click', () => {
+      render(<OutlinePanel />);
+      const btn = screen.getByRole('button', { name: 'Add section' });
+      fireEvent.click(btn);
+      const state = useEditorStore.getState();
+      expect(state.template.sections).toHaveLength(2); // 1 from setup + 1 new
+      const newSec = state.template.sections[1];
+      expect(newSec.name).toBe('Section 2');
+      expect(newSec.bands).toEqual([]);
+      expect(state.selectedSectionId).toBe(newSec.id);
     });
   });
 });

@@ -118,3 +118,25 @@
   background: var(--jp-color-accent-light);
   outline: 1px dashed var(--jp-color-accent);
 }
+
+/* ---- Add Section button ---- */
+
+.addSectionBtn {
+  display: block;
+  width: calc(100% - 2 * var(--jp-space-xs));
+  margin: var(--jp-space-xs);
+  padding: var(--jp-space-xs) var(--jp-space-sm);
+  border: 1px dashed var(--jp-color-border);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--jp-color-text-secondary);
+  font-size: var(--jp-font-size-sm);
+  cursor: pointer;
+  text-align: center;
+}
+
+.addSectionBtn:hover {
+  background: var(--jp-color-surface-secondary);
+  border-color: var(--jp-color-accent);
+  color: var(--jp-color-accent);
+}

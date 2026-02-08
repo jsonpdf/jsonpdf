@@ -27,4 +27,12 @@ describe('computeDropPosition', () => {
     // NaN from 0/0 is not < 0.5, so returns 'after'
     expect(computeDropPosition(100, zeroRect, 'element')).toBe('after');
   });
+
+  it('returns "before" for top half of section', () => {
+    expect(computeDropPosition(110, rect, 'section')).toBe('before');
+  });
+
+  it('returns "after" for bottom half of section', () => {
+    expect(computeDropPosition(130, rect, 'section')).toBe('after');
+  });
 });
