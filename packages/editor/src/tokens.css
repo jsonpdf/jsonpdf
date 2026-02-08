@@ -36,6 +36,7 @@
   /* Layout */
   --jp-toolbar-height: 40px;
   --jp-sidebar-width: 280px;
+  --jp-outline-width: 220px;
 
   /* Form fields */
   --jp-color-field-bg: #ffffff;

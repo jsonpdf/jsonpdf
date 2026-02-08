@@ -41,8 +41,8 @@ function findElementWithOffsets(
 export function useSelectionGeometry(
   selectedElementId: string | null,
   pages: DesignPage[],
-  pageOffsets: number[],
-  canvasPadding: number,
+  pageXOffsets: number[],
+  pageYOffsets: number[],
 ): SelectionGeometry | null {
   return useMemo(() => {
     if (!selectedElementId) return null;
@@ -55,8 +55,8 @@ export function useSelectionGeometry(
         const found = findElementWithOffsets(db.band.elements, selectedElementId, 0, 0);
         if (found) {
           return {
-            x: canvasPadding + margins.left + found.offsetX + found.element.x,
-            y: pageOffsets[pi] + margins.top + db.offsetY + found.offsetY + found.element.y,
+            x: pageXOffsets[pi] + margins.left + found.offsetX + found.element.x,
+            y: pageYOffsets[pi] + margins.top + db.offsetY + found.offsetY + found.element.y,
             width: found.element.width,
             height: found.element.height,
             rotation: found.element.rotation ?? 0,
@@ -66,5 +66,5 @@ export function useSelectionGeometry(
     }
 
     return null;
-  }, [selectedElementId, pages, pageOffsets, canvasPadding]);
+  }, [selectedElementId, pages, pageXOffsets, pageYOffsets]);
 }

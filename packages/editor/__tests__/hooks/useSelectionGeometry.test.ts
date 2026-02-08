@@ -28,13 +28,15 @@ function makePage(overrides: Partial<DesignPage>): DesignPage {
 
 describe('useSelectionGeometry', () => {
   it('returns null when no selection', () => {
-    const { result } = renderHook(() => useSelectionGeometry(null, [], [], PADDING));
+    const { result } = renderHook(() => useSelectionGeometry(null, [], [], []));
     expect(result.current).toBeNull();
   });
 
   it('returns null when element not found', () => {
     const pages = [makePage({ bands: [] })];
-    const { result } = renderHook(() => useSelectionGeometry('missing', pages, [PADDING], PADDING));
+    const { result } = renderHook(() =>
+      useSelectionGeometry('missing', pages, [PADDING], [PADDING]),
+    );
     expect(result.current).toBeNull();
   });
 
@@ -45,13 +47,12 @@ describe('useSelectionGeometry', () => {
       elements: [{ id: 'el1', type: 'text', x: 10, y: 20, width: 100, height: 50, properties: {} }],
     });
     const pages = [makePage({ bands: [{ band, offsetY: 0, height: 100 }] })];
-    const offsets = [PADDING];
 
-    const { result } = renderHook(() => useSelectionGeometry('el1', pages, offsets, PADDING));
+    const { result } = renderHook(() => useSelectionGeometry('el1', pages, [PADDING], [PADDING]));
 
     expect(result.current).toEqual({
-      x: PADDING + 40 + 10, // padding + margin.left + el.x
-      y: PADDING + 40 + 0 + 20, // pageOffset + margin.top + band.offsetY + el.y
+      x: PADDING + 40 + 10, // pageX + margin.left + el.x
+      y: PADDING + 40 + 0 + 20, // pageY + margin.top + band.offsetY + el.y
       width: 100,
       height: 50,
       rotation: 0,
@@ -73,9 +74,10 @@ describe('useSelectionGeometry', () => {
         bands: [{ band: band2, offsetY: 0, height: 100 }],
       }),
     ];
-    const offsets = [PADDING, 872]; // second page further down
 
-    const { result } = renderHook(() => useSelectionGeometry('el2', pages, offsets, PADDING));
+    const { result } = renderHook(() =>
+      useSelectionGeometry('el2', pages, [PADDING, PADDING], [PADDING, 872]),
+    );
 
     expect(result.current).toEqual({
       x: PADDING + 40 + 5,
@@ -106,13 +108,14 @@ describe('useSelectionGeometry', () => {
       ],
     });
     const pages = [makePage({ bands: [{ band, offsetY: 50, height: 100 }] })];
-    const offsets = [PADDING];
 
-    const { result } = renderHook(() => useSelectionGeometry('child1', pages, offsets, PADDING));
+    const { result } = renderHook(() =>
+      useSelectionGeometry('child1', pages, [PADDING], [PADDING]),
+    );
 
     expect(result.current).toEqual({
-      x: PADDING + 40 + 30 + 5, // padding + margin + container.x + child.x
-      y: PADDING + 40 + 50 + 40 + 10, // pageOffset + margin + bandOffset + container.y + child.y
+      x: PADDING + 40 + 30 + 5, // pageX + margin + container.x + child.x
+      y: PADDING + 40 + 50 + 40 + 10, // pageY + margin + bandOffset + container.y + child.y
       width: 60,
       height: 20,
       rotation: 0,
@@ -138,7 +141,7 @@ describe('useSelectionGeometry', () => {
     });
     const pages = [makePage({ bands: [{ band, offsetY: 0, height: 100 }] })];
 
-    const { result } = renderHook(() => useSelectionGeometry('el1', pages, [PADDING], PADDING));
+    const { result } = renderHook(() => useSelectionGeometry('el1', pages, [PADDING], [PADDING]));
 
     expect(result.current?.rotation).toBe(45);
   });
