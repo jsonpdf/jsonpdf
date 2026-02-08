@@ -362,7 +362,7 @@ export async function layoutTemplate(
           title,
           pageNumber: page.pageIndex + 1,
           level: 1,
-          anchorId: layoutBand.band.id,
+          anchorId: layoutBand.band.anchor ?? layoutBand.band.id,
         });
       }
     }

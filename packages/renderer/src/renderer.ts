@@ -606,12 +606,6 @@ export async function renderPdf(
 
   // 9b. Collect cross-reference anchors and register ref filter
   const anchorMap = collectAnchors(measureLayout);
-  // Merge bookmark-derived anchor IDs so internal links (#anchorId) in TOC entries resolve
-  for (const bk of measureLayout.bookmarks) {
-    if (!anchorMap.has(bk.anchorId)) {
-      anchorMap.set(bk.anchorId, bk.pageNumber);
-    }
-  }
   engine.registerFilter('ref', (anchorId: unknown) => {
     return anchorMap.get(String(anchorId)) ?? '??';
   });
@@ -651,9 +645,17 @@ export async function renderPdf(
   }
 
   // 11b. Build anchor-to-PDFPage map for internal links
+  // Uses pass 2 layout so page positions reflect expanded _bookmarks detail bands.
+  // Bookmark-derived anchors (from section/band ids) are merged for TOC links.
+  const linkAnchorMap = collectAnchors(layout);
+  for (const bk of layout.bookmarks) {
+    if (!linkAnchorMap.has(bk.anchorId)) {
+      linkAnchorMap.set(bk.anchorId, bk.pageNumber);
+    }
+  }
   const anchorPageMap = new Map<string, PDFPage>();
-  for (const [anchorId, pageNum] of anchorMap) {
-    anchorPageMap.set(anchorId, pdfPages[pageNum - 1].page); // 1-based → 0-based
+  for (const [anchorId, pageNum] of linkAnchorMap) {
+    anchorPageMap.set(anchorId, pdfPages[pageNum - 1].page);
   }
 
   // 12. Render pages
