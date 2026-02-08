@@ -25,7 +25,7 @@ export function TemplateCanvas({ viewportWidth }: TemplateCanvasProps) {
   // Compute total canvas size
   const maxPageWidth = pages.reduce((max, p) => Math.max(max, p.pageConfig.width), 0);
   const totalHeight = pages.reduce(
-    (sum, p) => sum + p.pageConfig.height + PAGE_GAP,
+    (sum, p) => sum + p.designHeight + PAGE_GAP,
     CANVAS_PADDING * 2 - PAGE_GAP,
   );
 
@@ -46,7 +46,7 @@ export function TemplateCanvas({ viewportWidth }: TemplateCanvasProps) {
     let currentY = CANVAS_PADDING;
     return pages.map((p) => {
       const y = currentY;
-      currentY += p.pageConfig.height + PAGE_GAP;
+      currentY += p.designHeight + PAGE_GAP;
       return y;
     });
   }, [pages]);

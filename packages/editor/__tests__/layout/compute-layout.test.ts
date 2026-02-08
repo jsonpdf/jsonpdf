@@ -61,6 +61,16 @@ describe('computeDesignLayout', () => {
     expect(pages[0].totalHeight).toBe(160);
   });
 
+  it('computes designHeight as margins + totalHeight', () => {
+    let t = createTemplate();
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', makeBand({ id: 'b1', height: 100 }));
+    t = addBand(t, 'sec1', makeBand({ id: 'b2', height: 60 }));
+    const pages = computeDesignLayout(t);
+    // default margins: top=40, bottom=40
+    expect(pages[0].designHeight).toBe(40 + 160 + 40);
+  });
+
   it('sorts bands by display order', () => {
     let t = createTemplate();
     t = addSection(t, { id: 'sec1', bands: [] });

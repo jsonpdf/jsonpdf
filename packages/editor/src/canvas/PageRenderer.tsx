@@ -20,7 +20,8 @@ interface PageRendererProps {
 }
 
 export function PageRenderer({ page, x, y, styles }: PageRendererProps) {
-  const { width, height, margins } = page.pageConfig;
+  const { width, margins } = page.pageConfig;
+  const height = page.designHeight;
   const contentWidth = width - margins.left - margins.right;
 
   return (

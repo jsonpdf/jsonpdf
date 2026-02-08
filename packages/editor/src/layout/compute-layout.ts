@@ -7,6 +7,8 @@ export interface DesignPage {
   pageConfig: PageConfig;
   bands: DesignBand[];
   totalHeight: number;
+  /** Computed design-time page height: margins.top + totalHeight + margins.bottom. */
+  designHeight: number;
 }
 
 export interface DesignBand {
@@ -56,12 +58,16 @@ export function computeDesignLayout(template: Template): DesignPage[] {
       return db;
     });
 
+    const totalHeight = offsetY;
+    const designHeight = pageConfig.margins.top + totalHeight + pageConfig.margins.bottom;
+
     return {
       sectionIndex,
       sectionId: section.id,
       pageConfig,
       bands,
-      totalHeight: offsetY,
+      totalHeight,
+      designHeight,
     };
   });
 }
