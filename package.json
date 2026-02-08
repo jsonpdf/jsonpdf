@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc --build",
     "typecheck": "tsc --build --noEmit",
-    "lint": "eslint 'packages/*/src/**/*.ts'",
+    "lint": "eslint 'packages/*/src/**/*.{ts,tsx}'",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",

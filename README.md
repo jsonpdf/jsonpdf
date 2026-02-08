@@ -190,8 +190,9 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 
 ### Phase 9: Editor MVP
 
-- [ ] `@jsonpdf/template` — Full manipulation API (update, remove, move, clone, queries)
-- [ ] Canvas rendering (pages, bands, elements)
+- [x] `@jsonpdf/template` — Full manipulation API (update, remove, move, clone, queries)
+- [x] Editor scaffolding (React + Konva + Zustand + CSS Modules, Vite library build)
+- [x] Canvas rendering (pages with margin guides, bands with type labels, 11 element type renderers)
 - [ ] Element selection, drag, resize
 - [ ] Property panel (auto-generated from propsSchema)
 - [ ] Band/section management
