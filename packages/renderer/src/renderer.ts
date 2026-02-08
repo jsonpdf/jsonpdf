@@ -60,6 +60,7 @@ interface RenderEnv {
   styles: Record<string, Style>;
   doc: PDFDocument;
   imageCache: ImageCache;
+  anchorPageMap?: Map<string, PDFPage>;
 }
 
 /**
@@ -261,6 +262,7 @@ async function renderElementAtPosition(
     y: pdfY - padding.top,
     width: effectiveElement.width - padding.left - padding.right,
     height: height - padding.top - padding.bottom,
+    anchorPageMap: env.anchorPageMap,
   };
 
   // 7. Add child callbacks for container elements
@@ -455,28 +457,51 @@ export async function renderPdf(
     imageCache,
   );
 
-  // 11. Render pages
-  const env: RenderEnv = { engine, registry, fonts, styles: template.styles, doc, imageCache };
-  const bookmarkEntries: BookmarkEntry[] = [];
-  let lastSectionIndex = -1;
-
+  // 11. Create all pages first (needed for internal GoTo links across pages)
+  interface PageEntry {
+    page: PDFPage;
+    layoutPage: (typeof layout.pages)[number];
+    pageConfig: ReturnType<typeof mergePageConfig>;
+    pageHeight: number;
+  }
+  const pdfPages: PageEntry[] = [];
   for (const layoutPage of layout.pages) {
     const section = template.sections[layoutPage.sectionIndex];
     const pageConfig = mergePageConfig(template.page, section.page);
     const pageHeight = layoutPage.computedHeight ?? pageConfig.height;
     const page = doc.addPage([pageConfig.width, pageHeight]);
+    pdfPages.push({ page, layoutPage, pageConfig, pageHeight });
+  }
 
+  // 11b. Build anchor-to-PDFPage map for internal links
+  const anchorPageMap = new Map<string, PDFPage>();
+  for (const [anchorId, pageNum] of anchorMap) {
+    const target = pdfPages[pageNum - 1]; // 1-based → 0-based
+    if (target) anchorPageMap.set(anchorId, target.page);
+  }
+
+  // 12. Render pages
+  const env: RenderEnv = {
+    engine, registry, fonts, styles: template.styles, doc, imageCache, anchorPageMap,
+  };
+  const bookmarkEntries: BookmarkEntry[] = [];
+  let lastSectionIndex = -1;
+
+  for (const { page, layoutPage, pageConfig, pageHeight } of pdfPages) {
     // Section bookmark (only on first page of each section)
-    if (layoutPage.sectionIndex !== lastSectionIndex && section.bookmark) {
-      const scope = layoutPage.bands.length > 0 ? layoutPage.bands[0].scope : {};
-      const title = await engine.resolve(section.bookmark, scope);
-      bookmarkEntries.push({
-        title,
-        page,
-        top: pageHeight,
-        left: 0,
-        level: 0,
-      });
+    if (layoutPage.sectionIndex !== lastSectionIndex) {
+      const section = template.sections[layoutPage.sectionIndex];
+      if (section.bookmark) {
+        const scope = layoutPage.bands.length > 0 ? layoutPage.bands[0].scope : {};
+        const title = await engine.resolve(section.bookmark, scope);
+        bookmarkEntries.push({
+          title,
+          page,
+          top: pageHeight,
+          left: 0,
+          level: 0,
+        });
+      }
     }
     lastSectionIndex = layoutPage.sectionIndex;
 
