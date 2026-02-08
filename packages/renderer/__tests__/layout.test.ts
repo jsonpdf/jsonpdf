@@ -1109,6 +1109,7 @@ describe('layoutTemplate: bookmark collection (_bookmarks)', () => {
       title: 'Section One',
       pageNumber: 1,
       level: 0,
+      anchorId: 'sec1',
     });
   });
 
@@ -1129,6 +1130,7 @@ describe('layoutTemplate: bookmark collection (_bookmarks)', () => {
       title: 'Chapter 1',
       pageNumber: 1,
       level: 1,
+      anchorId: 'b1',
     });
   });
 

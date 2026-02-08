@@ -47,6 +47,8 @@ export interface BookmarkLayoutEntry {
   pageNumber: number;
   /** Nesting level: 0 = section, 1 = band. */
   level: number;
+  /** Anchor ID for internal links (derived from section/band id). */
+  anchorId: string;
 }
 
 export interface LayoutResult {
@@ -346,6 +348,7 @@ export async function layoutTemplate(
           title,
           pageNumber: page.pageIndex + 1,
           level: 0,
+          anchorId: section.id,
         });
       }
     }
@@ -359,6 +362,7 @@ export async function layoutTemplate(
           title,
           pageNumber: page.pageIndex + 1,
           level: 1,
+          anchorId: layoutBand.band.id,
         });
       }
     }
