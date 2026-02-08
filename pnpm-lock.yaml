@@ -30,6 +30,96 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@25.2.1)
 
+  examples/certificate:
+    dependencies:
+      '@fontsource/playfair-display':
+        specifier: ^5.0.0
+        version: 5.2.8
+      '@jsonpdf/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+
+  examples/dashboard:
+    dependencies:
+      '@jsonpdf/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+
+  examples/event-ticket:
+    dependencies:
+      '@fontsource/oswald':
+        specifier: ^5.0.0
+        version: 5.2.8
+      '@jsonpdf/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+
+  examples/financial-statement:
+    dependencies:
+      '@jsonpdf/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+
+  examples/invoice:
+    dependencies:
+      '@jsonpdf/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+
+  examples/newsletter:
+    dependencies:
+      '@fontsource/merriweather':
+        specifier: ^5.0.0
+        version: 5.2.11
+      '@fontsource/oswald':
+        specifier: ^5.0.0
+        version: 5.2.8
+      '@jsonpdf/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+
+  examples/pay-stub:
+    dependencies:
+      '@jsonpdf/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+
+  examples/product-catalog:
+    dependencies:
+      '@jsonpdf/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+
+  examples/resume:
+    dependencies:
+      '@jsonpdf/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+
+  examples/sales-report:
+    dependencies:
+      '@jsonpdf/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+
+  examples/shipping-label:
+    dependencies:
+      '@jsonpdf/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+
+  examples/technical-report:
+    dependencies:
+      '@jsonpdf/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+
+  examples/travel-itinerary:
+    dependencies:
+      '@jsonpdf/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+
   packages/cli:
     dependencies:
       '@jsonpdf/core':
@@ -309,6 +399,15 @@ packages:
   '@eslint/plugin-kit@0.4.1':
     resolution: {integrity: sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@fontsource/merriweather@5.2.11':
+    resolution: {integrity: sha512-ZiIMeUh5iT8d73o6xlSF8GKgjV5pgiFrufYc5jZTVAfExtWKqM2vQHnsqXSFMv4ELhAcjt6Vf+5T3oVGXhAizQ==}
+
+  '@fontsource/oswald@5.2.8':
+    resolution: {integrity: sha512-DFoPK1BqsFIQhVjs2xgO/oL9veF9oUJgFojEWIU+nazUrfqsBDtAMI4n9L9CZFX3kQNDLcCyzKx1xoEDvQT4WQ==}
+
+  '@fontsource/playfair-display@5.2.8':
+    resolution: {integrity: sha512-fUEhib70SszNhQVsGbUMSsWJhr7Je0rdeuZdtGpDNu0GKF1xJM8QhpI/y0pckU25GcChXm9TLOmeZupkvvZo2g==}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -1610,6 +1709,12 @@ snapshots:
     dependencies:
       '@eslint/core': 0.17.0
       levn: 0.4.1
+
+  '@fontsource/merriweather@5.2.11': {}
+
+  '@fontsource/oswald@5.2.8': {}
+
+  '@fontsource/playfair-display@5.2.8': {}
 
   '@humanfs/core@0.19.1': {}
 

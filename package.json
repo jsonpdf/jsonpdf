@@ -12,7 +12,8 @@
     "lint": "eslint 'packages/*/src/**/*.ts'",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "examples": "pnpm build && pnpm -r --filter '@jsonpdf/example-*' run render"
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",
