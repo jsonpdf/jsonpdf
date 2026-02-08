@@ -32,27 +32,19 @@
   "skills": [
     {
       "content": "Programming Languages",
-      "children": [
-        { "content": "Python, TypeScript, Go, SQL, Rust" }
-      ]
+      "children": [{ "content": "Python, TypeScript, Go, SQL, Rust" }]
     },
     {
       "content": "Frameworks & Libraries",
-      "children": [
-        { "content": "React, Next.js, Node.js, FastAPI, Django" }
-      ]
+      "children": [{ "content": "React, Next.js, Node.js, FastAPI, Django" }]
     },
     {
       "content": "Cloud & Infrastructure",
-      "children": [
-        { "content": "AWS (EC2, S3, Lambda, RDS), Docker, Kubernetes, Terraform" }
-      ]
+      "children": [{ "content": "AWS (EC2, S3, Lambda, RDS), Docker, Kubernetes, Terraform" }]
     },
     {
       "content": "Data & Messaging",
-      "children": [
-        { "content": "PostgreSQL, Redis, Kafka, ClickHouse, Elasticsearch" }
-      ]
+      "children": [{ "content": "PostgreSQL, Redis, Kafka, ClickHouse, Elasticsearch" }]
     }
   ],
   "achievements": [

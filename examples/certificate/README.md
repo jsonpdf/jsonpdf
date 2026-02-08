@@ -16,20 +16,20 @@ An elegant certificate showcasing custom fonts, decorative borders, rotation, an
 
 ## Template Structure
 
-| Band | Type | Content |
-|------|------|---------|
-| `bg` | background | Double gold rectangular border (outer + inner shapes) |
-| `cert-body` | body | Watermark, title, recipient, course, date, issuer, cert ID |
+| Band        | Type       | Content                                                    |
+| ----------- | ---------- | ---------------------------------------------------------- |
+| `bg`        | background | Double gold rectangular border (outer + inner shapes)      |
+| `cert-body` | body       | Watermark, title, recipient, course, date, issuer, cert ID |
 
 ## Data Schema
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `recipientName` | string | Name displayed on the certificate |
-| `courseName` | string | Course or achievement title |
-| `date` | string | Award date |
-| `certificateId` | string | Unique certificate identifier |
-| `issuerName` | string | Name and title of the issuing authority |
+| Field           | Type   | Description                             |
+| --------------- | ------ | --------------------------------------- |
+| `recipientName` | string | Name displayed on the certificate       |
+| `courseName`    | string | Course or achievement title             |
+| `date`          | string | Award date                              |
+| `certificateId` | string | Unique certificate identifier           |
+| `issuerName`    | string | Name and title of the issuing authority |
 
 ## Running
 

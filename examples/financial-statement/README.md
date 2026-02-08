@@ -14,22 +14,22 @@ An annual financial statement with income statement and balance sheet, showcasin
 
 ## Template Structure
 
-| Band | Type | Content |
-|------|------|---------|
-| `header` | title | Company name, report title, period, separator line |
-| `income-stmt` | body | "INCOME STATEMENT" heading, 4-column table (Code, Account, FY 2024, FY 2023) |
-| `balance-sheet` | body | "BALANCE SHEET" heading + subtitle, 3-column table (Code, Account, Amount), `pageBreakBefore: true` |
-| `page-ftr` | pageFooter | Document number (pad filter), page number |
+| Band            | Type       | Content                                                                                             |
+| --------------- | ---------- | --------------------------------------------------------------------------------------------------- |
+| `header`        | title      | Company name, report title, period, separator line                                                  |
+| `income-stmt`   | body       | "INCOME STATEMENT" heading, 4-column table (Code, Account, FY 2024, FY 2023)                        |
+| `balance-sheet` | body       | "BALANCE SHEET" heading + subtitle, 3-column table (Code, Account, Amount), `pageBreakBefore: true` |
+| `page-ftr`      | pageFooter | Document number (pad filter), page number                                                           |
 
 ## Data Schema
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `company` | string | Company name |
-| `period` | string | Reporting period |
-| `documentId` | number | Document identifier (formatted with pad filter) |
-| `incomeRows` | array | Income statement line items (code, account, fy2024, fy2023) |
-| `balanceRows` | array | Balance sheet line items (code, account, amount) |
+| Field         | Type   | Description                                                 |
+| ------------- | ------ | ----------------------------------------------------------- |
+| `company`     | string | Company name                                                |
+| `period`      | string | Reporting period                                            |
+| `documentId`  | number | Document identifier (formatted with pad filter)             |
+| `incomeRows`  | array  | Income statement line items (code, account, fy2024, fy2023) |
+| `balanceRows` | array  | Balance sheet line items (code, account, amount)            |
 
 ## Running
 

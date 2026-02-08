@@ -8,20 +8,104 @@
     { "department": "Partnerships", "revenue": 145000 }
   ],
   "employees": [
-    { "name": "Sarah Mitchell", "department": "Enterprise", "role": "Sr. Account Executive", "sales": 142000, "deals": 8 },
-    { "name": "David Park", "department": "Enterprise", "role": "Account Executive", "sales": 118000, "deals": 6 },
-    { "name": "Rachel Torres", "department": "Enterprise", "role": "Account Executive", "sales": 105000, "deals": 7 },
-    { "name": "Michael Chen", "department": "Enterprise", "role": "Sr. Account Executive", "sales": 120000, "deals": 5 },
-    { "name": "Lisa Nakamura", "department": "Mid-Market", "role": "Account Manager", "sales": 89000, "deals": 14 },
-    { "name": "James Wilson", "department": "Mid-Market", "role": "Account Manager", "sales": 76000, "deals": 11 },
-    { "name": "Emma Rodriguez", "department": "Mid-Market", "role": "Sr. Account Manager", "sales": 98000, "deals": 12 },
-    { "name": "Kevin O'Brien", "department": "Mid-Market", "role": "Account Manager", "sales": 49000, "deals": 8 },
-    { "name": "Priya Sharma", "department": "SMB", "role": "Sales Representative", "sales": 52000, "deals": 22 },
-    { "name": "Tom Anderson", "department": "SMB", "role": "Sales Representative", "sales": 44000, "deals": 18 },
-    { "name": "Maria Lopez", "department": "SMB", "role": "Sr. Sales Representative", "sales": 58000, "deals": 25 },
-    { "name": "Alex Kim", "department": "SMB", "role": "Sales Representative", "sales": 44000, "deals": 19 },
-    { "name": "Chris Taylor", "department": "Partnerships", "role": "Partner Manager", "sales": 68000, "deals": 4 },
-    { "name": "Nina Patel", "department": "Partnerships", "role": "Sr. Partner Manager", "sales": 77000, "deals": 3 }
+    {
+      "name": "Sarah Mitchell",
+      "department": "Enterprise",
+      "role": "Sr. Account Executive",
+      "sales": 142000,
+      "deals": 8
+    },
+    {
+      "name": "David Park",
+      "department": "Enterprise",
+      "role": "Account Executive",
+      "sales": 118000,
+      "deals": 6
+    },
+    {
+      "name": "Rachel Torres",
+      "department": "Enterprise",
+      "role": "Account Executive",
+      "sales": 105000,
+      "deals": 7
+    },
+    {
+      "name": "Michael Chen",
+      "department": "Enterprise",
+      "role": "Sr. Account Executive",
+      "sales": 120000,
+      "deals": 5
+    },
+    {
+      "name": "Lisa Nakamura",
+      "department": "Mid-Market",
+      "role": "Account Manager",
+      "sales": 89000,
+      "deals": 14
+    },
+    {
+      "name": "James Wilson",
+      "department": "Mid-Market",
+      "role": "Account Manager",
+      "sales": 76000,
+      "deals": 11
+    },
+    {
+      "name": "Emma Rodriguez",
+      "department": "Mid-Market",
+      "role": "Sr. Account Manager",
+      "sales": 98000,
+      "deals": 12
+    },
+    {
+      "name": "Kevin O'Brien",
+      "department": "Mid-Market",
+      "role": "Account Manager",
+      "sales": 49000,
+      "deals": 8
+    },
+    {
+      "name": "Priya Sharma",
+      "department": "SMB",
+      "role": "Sales Representative",
+      "sales": 52000,
+      "deals": 22
+    },
+    {
+      "name": "Tom Anderson",
+      "department": "SMB",
+      "role": "Sales Representative",
+      "sales": 44000,
+      "deals": 18
+    },
+    {
+      "name": "Maria Lopez",
+      "department": "SMB",
+      "role": "Sr. Sales Representative",
+      "sales": 58000,
+      "deals": 25
+    },
+    {
+      "name": "Alex Kim",
+      "department": "SMB",
+      "role": "Sales Representative",
+      "sales": 44000,
+      "deals": 19
+    },
+    {
+      "name": "Chris Taylor",
+      "department": "Partnerships",
+      "role": "Partner Manager",
+      "sales": 68000,
+      "deals": 4
+    },
+    {
+      "name": "Nina Patel",
+      "department": "Partnerships",
+      "role": "Sr. Partner Manager",
+      "sales": 77000,
+      "deals": 3
+    }
   ],
   "grandTotal": 1140000,
   "employeeCount": 14,

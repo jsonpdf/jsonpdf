@@ -465,7 +465,10 @@
                             "height": 12,
                             "style": "row-text",
                             "conditionalStyles": [
-                              { "condition": "item.type == \"overtime\"", "style": "row-text-overtime" }
+                              {
+                                "condition": "item.type == \"overtime\"",
+                                "style": "row-text-overtime"
+                              }
                             ],
                             "properties": { "content": "{{ item.description }}" }
                           },
@@ -478,7 +481,10 @@
                             "height": 12,
                             "style": "row-amount",
                             "conditionalStyles": [
-                              { "condition": "item.type == \"overtime\"", "style": "row-amount-overtime" }
+                              {
+                                "condition": "item.type == \"overtime\"",
+                                "style": "row-amount-overtime"
+                              }
                             ],
                             "properties": { "content": "{{ item.hours }}" }
                           },
@@ -491,7 +497,10 @@
                             "height": 12,
                             "style": "row-amount",
                             "conditionalStyles": [
-                              { "condition": "item.type == \"overtime\"", "style": "row-amount-overtime" }
+                              {
+                                "condition": "item.type == \"overtime\"",
+                                "style": "row-amount-overtime"
+                              }
                             ],
                             "properties": { "content": "{{ item.rate | money }}" }
                           },
@@ -504,7 +513,10 @@
                             "height": 12,
                             "style": "row-amount",
                             "conditionalStyles": [
-                              { "condition": "item.type == \"overtime\"", "style": "row-amount-overtime" }
+                              {
+                                "condition": "item.type == \"overtime\"",
+                                "style": "row-amount-overtime"
+                              }
                             ],
                             "properties": { "content": "{{ item.amount | money }}" }
                           }
@@ -841,7 +853,9 @@
               "width": 332,
               "height": 10,
               "style": "footer-right",
-              "properties": { "content": "This is not a negotiable document. Retain for your records." }
+              "properties": {
+                "content": "This is not a negotiable document. Retain for your records."
+              }
             }
           ]
         }

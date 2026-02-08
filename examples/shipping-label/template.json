@@ -197,7 +197,9 @@
               "width": 240,
               "height": 14,
               "style": "to-address",
-              "properties": { "content": "{{ recipient.city }}, {{ recipient.state }} {{ recipient.zip }}" }
+              "properties": {
+                "content": "{{ recipient.city }}, {{ recipient.state }} {{ recipient.zip }}"
+              }
             },
             {
               "id": "separator",

@@ -16,26 +16,26 @@ A compact event ticket with QR code, dashed tear line, and conditional VIP badge
 
 ## Template Structure
 
-| Band | Type | Content |
-|------|------|---------|
+| Band          | Type | Content                                                                                                                                        |
+| ------------- | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ticket-body` | body | Ticket border, header bar, event name, venue, date/time, gate/row/seat, attendee, VIP badge, tear line, QR code, ticket ID, vertical stub text |
 
 ## Data Schema
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `eventName` | string | Event title |
-| `venue` | string | Venue name |
-| `address` | string | Venue address |
-| `date` | string | Event date |
-| `time` | string | Event time |
-| `gate` | string | Gate assignment |
-| `row` | string | Row number |
-| `seat` | string | Seat number |
-| `attendeeName` | string | Ticket holder's name |
-| `ticketId` | string | Unique ticket identifier |
-| `ticketUrl` | string | Validation URL (rendered as QR code) |
-| `vip` | boolean | When true, displays a gold VIP badge |
+| Field          | Type    | Description                          |
+| -------------- | ------- | ------------------------------------ |
+| `eventName`    | string  | Event title                          |
+| `venue`        | string  | Venue name                           |
+| `address`      | string  | Venue address                        |
+| `date`         | string  | Event date                           |
+| `time`         | string  | Event time                           |
+| `gate`         | string  | Gate assignment                      |
+| `row`          | string  | Row number                           |
+| `seat`         | string  | Seat number                          |
+| `attendeeName` | string  | Ticket holder's name                 |
+| `ticketId`     | string  | Unique ticket identifier             |
+| `ticketUrl`    | string  | Validation URL (rendered as QR code) |
+| `vip`          | boolean | When true, displays a gold VIP badge |
 
 ## Running
 

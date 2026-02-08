@@ -385,7 +385,9 @@
               "width": 542,
               "height": 12,
               "style": "footer",
-              "properties": { "content": "{{ tripName }} — Page {{ _pageNumber }} of {{ _totalPages }}" }
+              "properties": {
+                "content": "{{ tripName }} — Page {{ _pageNumber }} of {{ _totalPages }}"
+              }
             }
           ]
         }

@@ -570,7 +570,9 @@
               "width": 545,
               "height": 10,
               "style": "footer",
-              "properties": { "content": "{{ dashboardTitle }} — {{ dateRange }} — Generated {{ generatedDate }}" }
+              "properties": {
+                "content": "{{ dashboardTitle }} — {{ dateRange }} — Generated {{ generatedDate }}"
+              }
             }
           ]
         }

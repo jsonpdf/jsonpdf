@@ -415,7 +415,9 @@
               "width": 535,
               "height": 14,
               "style": "footer",
-              "properties": { "content": "{{ newsletterName }} — Issue #{{ issueNumber }} — {{ issueDate }}" }
+              "properties": {
+                "content": "{{ newsletterName }} — Issue #{{ issueNumber }} — {{ issueDate }}"
+              }
             }
           ]
         }

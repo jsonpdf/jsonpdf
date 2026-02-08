@@ -14,30 +14,30 @@ A professional single-page resume showcasing multiple list types, rich text with
 
 ## Template Structure
 
-| Band | Type | Content |
-|------|------|---------|
-| `header` | title | Name (centered), contact info with hyperlinks, separator line |
-| `summary-section` | body | "PROFESSIONAL SUMMARY" + paragraph |
-| `experience-section` | body | "EXPERIENCE" + 2 job entries with bullet point responsibilities |
-| `skills-section` | body | "TECHNICAL SKILLS" + lettered list with nested children |
-| `achievements-section` | body | "KEY ACHIEVEMENTS" + numbered list |
-| `education-section` | body | "EDUCATION" + 2 degree entries |
-| `page-ftr` | pageFooter | Name |
+| Band                   | Type       | Content                                                         |
+| ---------------------- | ---------- | --------------------------------------------------------------- |
+| `header`               | title      | Name (centered), contact info with hyperlinks, separator line   |
+| `summary-section`      | body       | "PROFESSIONAL SUMMARY" + paragraph                              |
+| `experience-section`   | body       | "EXPERIENCE" + 2 job entries with bullet point responsibilities |
+| `skills-section`       | body       | "TECHNICAL SKILLS" + lettered list with nested children         |
+| `achievements-section` | body       | "KEY ACHIEVEMENTS" + numbered list                              |
+| `education-section`    | body       | "EDUCATION" + 2 degree entries                                  |
+| `page-ftr`             | pageFooter | Name                                                            |
 
 ## Data Schema
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `name` | string | Full name |
-| `email` | string | Email address (used as hyperlink) |
-| `phone` | string | Phone number |
-| `location` | string | City, state |
-| `website` | string | Personal website URL (used as hyperlink) |
-| `summary` | string | Professional summary paragraph |
-| `jobs` | array | Work experience (title, company, location, dates, responsibilities) |
-| `skills` | array | Skill categories with nested items (`{ content, children }`) |
-| `achievements` | array | Career highlights (strings) |
-| `education` | array | Degrees (degree, school, year) |
+| Field          | Type   | Description                                                         |
+| -------------- | ------ | ------------------------------------------------------------------- |
+| `name`         | string | Full name                                                           |
+| `email`        | string | Email address (used as hyperlink)                                   |
+| `phone`        | string | Phone number                                                        |
+| `location`     | string | City, state                                                         |
+| `website`      | string | Personal website URL (used as hyperlink)                            |
+| `summary`      | string | Professional summary paragraph                                      |
+| `jobs`         | array  | Work experience (title, company, location, dates, responsibilities) |
+| `skills`       | array  | Skill categories with nested items (`{ content, children }`)        |
+| `achievements` | array  | Career highlights (strings)                                         |
+| `education`    | array  | Degrees (degree, school, year)                                      |
 
 ## Running
 

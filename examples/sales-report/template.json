@@ -150,8 +150,16 @@
                   "height": 120,
                   "mark": { "type": "bar", "cornerRadiusEnd": 4 },
                   "encoding": {
-                    "x": { "field": "department", "type": "nominal", "axis": { "labelAngle": 0, "title": null } },
-                    "y": { "field": "revenue", "type": "quantitative", "axis": { "title": "Revenue ($)", "format": "$,.0f" } },
+                    "x": {
+                      "field": "department",
+                      "type": "nominal",
+                      "axis": { "labelAngle": 0, "title": null }
+                    },
+                    "y": {
+                      "field": "revenue",
+                      "type": "quantitative",
+                      "axis": { "title": "Revenue ($)", "format": "$,.0f" }
+                    },
                     "color": { "value": "#3b82f6" }
                   }
                 },
@@ -343,7 +351,9 @@
               "width": 532,
               "height": 12,
               "style": "footer",
-              "properties": { "content": "{{ reportTitle }} — Page {{ _pageNumber }} of {{ _totalPages }}" }
+              "properties": {
+                "content": "{{ reportTitle }} — Page {{ _pageNumber }} of {{ _totalPages }}"
+              }
             }
           ]
         }
