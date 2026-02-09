@@ -26,6 +26,8 @@ export interface TreeNode {
   placeholder?: boolean;
   /** Set on inline "+ Add" nodes for multi-band types. */
   addBandType?: BandType;
+  /** Index of this band in section.bands (real bands only, for reorder DnD). */
+  bandArrayIndex?: number;
 }
 
 /* ------------------------------------------------------------------ */
@@ -33,10 +35,12 @@ export interface TreeNode {
 /* ------------------------------------------------------------------ */
 
 export interface DragSource {
-  kind: 'element' | 'section';
+  kind: 'element' | 'section' | 'band';
   elementId: string;
   sourceBandId: string;
   sourceIndex: number;
+  /** Band type of the dragged band (for same-type-only reorder matching). */
+  bandType?: string;
 }
 
 export interface DropIndicatorState {
@@ -104,6 +108,8 @@ function buildBandNode(
   sectionId: string,
   frameOwnerId?: string,
   frameOwnerBandId?: string,
+  bandArrayIndex?: number,
+  draggable = false,
 ): TreeNode {
   const meta = BAND_TYPE_META[band.type];
   const children = band.elements.map((el) =>
@@ -120,11 +126,18 @@ function buildBandNode(
     bandId: band.id,
     frameOwnerId,
     frameOwnerBandId,
-    draggable: false,
+    draggable,
+    bandArrayIndex,
   };
 }
 
 function buildSectionChildren(sectionId: string, bands: Band[]): TreeNode[] {
+  // Build lookup: band id → index in the section.bands array
+  const bandIndexMap = new Map<string, number>();
+  for (let i = 0; i < bands.length; i++) {
+    bandIndexMap.set(bands[i].id, i);
+  }
+
   // Group existing bands by type
   const byType = new Map<BandType, Band[]>();
   for (const band of bands) {
@@ -142,10 +155,14 @@ function buildSectionChildren(sectionId: string, bands: Band[]): TreeNode[] {
     const existing = byType.get(type);
     const isSingular = SINGULAR_BAND_TYPES.has(type);
     const meta = BAND_TYPE_META[type];
+    // Multi-type bands are draggable when 2+ of the same type exist
+    const canDrag = !isSingular && existing != null && existing.length >= 2;
 
     if (existing) {
       for (const band of existing) {
-        children.push(buildBandNode(band, sectionId));
+        children.push(
+          buildBandNode(band, sectionId, undefined, undefined, bandIndexMap.get(band.id), canDrag),
+        );
       }
     }
 
