@@ -1,7 +1,11 @@
 import { createContext, useMemo, useRef, useState } from 'react';
-import type { Template, Band, Element } from '@jsonpdf/core';
+import type { Template, Band, BandType, Element } from '@jsonpdf/core';
 import { useEditorStore } from '../../store';
-import { BAND_TYPE_META } from '../../constants/band-types';
+import {
+  BAND_TYPE_META,
+  BAND_DISPLAY_ORDER,
+  SINGULAR_BAND_TYPES,
+} from '../../constants/band-types';
 import { OutlineNode } from './OutlineNode';
 
 export interface TreeNode {
@@ -18,6 +22,10 @@ export interface TreeNode {
   frameOwnerBandId?: string;
   /** Whether this element can be dragged (direct band children only, not nested/frame-internal). */
   draggable: boolean;
+  /** True for band types that don't exist yet (shown dimmed). */
+  placeholder?: boolean;
+  /** Set on inline "+ Add" nodes for multi-band types. */
+  addBandType?: BandType;
 }
 
 /* ------------------------------------------------------------------ */
@@ -116,13 +124,71 @@ function buildBandNode(
   };
 }
 
+function buildSectionChildren(sectionId: string, bands: Band[]): TreeNode[] {
+  // Group existing bands by type
+  const byType = new Map<BandType, Band[]>();
+  for (const band of bands) {
+    const list = byType.get(band.type);
+    if (list) {
+      list.push(band);
+    } else {
+      byType.set(band.type, [band]);
+    }
+  }
+
+  const children: TreeNode[] = [];
+
+  for (const type of BAND_DISPLAY_ORDER) {
+    const existing = byType.get(type);
+    const isSingular = SINGULAR_BAND_TYPES.has(type);
+    const meta = BAND_TYPE_META[type];
+
+    if (existing) {
+      for (const band of existing) {
+        children.push(buildBandNode(band, sectionId));
+      }
+    }
+
+    if (isSingular && !existing) {
+      // Placeholder for absent singular band type
+      children.push({
+        id: `${sectionId}::${type}`,
+        kind: 'band',
+        label: meta.label,
+        typeLabel: type,
+        children: [],
+        sectionId,
+        draggable: false,
+        placeholder: true,
+      });
+    }
+
+    if (!isSingular) {
+      // "+ Add" button node for multi-band types
+      children.push({
+        id: `${sectionId}::add-${type}`,
+        kind: 'band',
+        label: `+ Add ${meta.label}`,
+        typeLabel: type,
+        children: [],
+        sectionId,
+        draggable: false,
+        placeholder: true,
+        addBandType: type,
+      });
+    }
+  }
+
+  return children;
+}
+
 function buildTree(template: Template): TreeNode[] {
   return template.sections.map((section) => ({
     id: section.id,
     kind: 'section' as const,
     label: section.name ?? section.id,
     typeLabel: 'Section',
-    children: section.bands.map((band) => buildBandNode(band, section.id)),
+    children: buildSectionChildren(section.id, section.bands),
     sectionId: section.id,
     draggable: true,
   }));

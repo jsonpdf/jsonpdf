@@ -253,6 +253,61 @@ describe('OutlinePanel', () => {
     });
   });
 
+  describe('placeholder band nodes', () => {
+    it('renders placeholder nodes for absent singular band types', () => {
+      render(<OutlinePanel />);
+      // The test template has pageHeader and detail bands.
+      // Singular band types that are absent should show as placeholders.
+      // e.g., Title, Column Header, Column Footer, Summary, Background, No Data, Page Footer, Last Page Footer
+      expect(screen.getByText('Title')).toBeDefined();
+      expect(screen.getByText('Column Header')).toBeDefined();
+      expect(screen.getByText('Summary')).toBeDefined();
+      expect(screen.getByText('Background')).toBeDefined();
+      expect(screen.getByText('No Data')).toBeDefined();
+    });
+
+    it('does not render placeholder for existing singular band type', () => {
+      render(<OutlinePanel />);
+      // pageHeader exists — should appear once (real node), not duplicated as placeholder
+      const pageHeaders = screen.getAllByText('Page Header');
+      expect(pageHeaders).toHaveLength(1);
+    });
+
+    it('placeholder nodes have dimmed/italic style class', () => {
+      render(<OutlinePanel />);
+      // Title is a placeholder (not in template)
+      const titleNode = screen.getByText('Title').closest('[role="treeitem"]')!;
+      expect(titleNode.className).toContain('nodePlaceholder');
+    });
+
+    it('clicking a placeholder selects it', () => {
+      render(<OutlinePanel />);
+      fireEvent.click(screen.getByText('Title'));
+      const state = useEditorStore.getState();
+      expect(state.selectedBandId).toBe('sec1::title');
+      expect(state.selectedSectionId).toBe('sec1');
+      expect(state.selectedElementId).toBeNull();
+    });
+
+    it('renders "+ Add Body" inline button for multi-band types', () => {
+      render(<OutlinePanel />);
+      expect(screen.getByRole('button', { name: 'Add Body' })).toBeDefined();
+      expect(screen.getByRole('button', { name: 'Add Detail' })).toBeDefined();
+      expect(screen.getByRole('button', { name: 'Add Group Header' })).toBeDefined();
+      expect(screen.getByRole('button', { name: 'Add Group Footer' })).toBeDefined();
+    });
+
+    it('clicking "+ Add Body" adds a body band', () => {
+      render(<OutlinePanel />);
+      const addBtn = screen.getByRole('button', { name: 'Add Body' });
+      fireEvent.click(addBtn);
+      const state = useEditorStore.getState();
+      const bodyBands = state.template.sections[0].bands.filter((b) => b.type === 'body');
+      expect(bodyBands).toHaveLength(1);
+      expect(state.selectedBandId).toBe(bodyBands[0].id);
+    });
+  });
+
   describe('Add Section button', () => {
     it('renders the Add Section button', () => {
       render(<OutlinePanel />);

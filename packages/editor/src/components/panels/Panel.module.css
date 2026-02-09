@@ -40,3 +40,23 @@
   background: var(--jp-color-danger, #dc3545);
   color: #fff;
 }
+
+.addBandBtn {
+  display: block;
+  width: 100%;
+  margin-top: var(--jp-space-md);
+  padding: var(--jp-space-xs) var(--jp-space-sm);
+  border: 1px dashed var(--jp-color-border);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--jp-color-text-secondary);
+  font-size: var(--jp-font-size-sm);
+  cursor: pointer;
+  text-align: center;
+}
+
+.addBandBtn:hover {
+  background: var(--jp-color-surface-secondary);
+  border-color: var(--jp-color-accent);
+  color: var(--jp-color-accent);
+}

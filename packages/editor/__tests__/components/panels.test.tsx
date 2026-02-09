@@ -160,6 +160,46 @@ describe('BandPanel', () => {
     fireEvent.blur(input);
     expect(useEditorStore.getState().template.sections[0].bands[0].height).toBe(150);
   });
+
+  it('shows delete band button', () => {
+    render(<Sidebar />);
+    expect(screen.getByRole('button', { name: 'Delete band' })).toBeTruthy();
+  });
+
+  it('removes band on delete click', () => {
+    render(<Sidebar />);
+    fireEvent.click(screen.getByRole('button', { name: 'Delete band' }));
+    const state = useEditorStore.getState();
+    expect(state.template.sections[0].bands).toHaveLength(0);
+    expect(state.selectedBandId).toBeNull();
+  });
+});
+
+describe('AddBandPanel', () => {
+  beforeEach(() => {
+    useEditorStore.setState({
+      template: buildTestTemplate(),
+      selectedElementId: null,
+      selectedBandId: 'sec1::title',
+      selectedSectionId: 'sec1',
+    });
+  });
+
+  it('shows AddBandPanel when placeholder band ID is selected', () => {
+    render(<Sidebar />);
+    expect(screen.getByText('Title Band')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Add Title band' })).toBeTruthy();
+  });
+
+  it('clicking "Add Band" creates the band and switches to BandPanel', () => {
+    render(<Sidebar />);
+    fireEvent.click(screen.getByRole('button', { name: 'Add Title band' }));
+    const state = useEditorStore.getState();
+    const titleBands = state.template.sections[0].bands.filter((b) => b.type === 'title');
+    expect(titleBands).toHaveLength(1);
+    // After adding, selectedBandId should be the new real band ID
+    expect(state.selectedBandId).toBe(titleBands[0].id);
+  });
 });
 
 describe('ElementPanel', () => {

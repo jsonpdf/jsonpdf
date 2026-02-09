@@ -326,6 +326,36 @@ describe('useEditorStore', () => {
     });
   });
 
+  describe('removeBand', () => {
+    it('removes the band and clears band/element selection', () => {
+      let t = createTemplate();
+      t = addSection(t, { id: 'sec1', bands: [] });
+      t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 100, elements: [] });
+      t = addBand(t, 'sec1', { id: 'b2', type: 'detail', height: 50, elements: [] });
+      useEditorStore.setState({
+        template: t,
+        selectedBandId: 'b1',
+        selectedSectionId: 'sec1',
+      });
+      useEditorStore.getState().removeBand('b1');
+      const state = useEditorStore.getState();
+      expect(state.template.sections[0].bands).toHaveLength(1);
+      expect(state.template.sections[0].bands[0].id).toBe('b2');
+      expect(state.selectedBandId).toBeNull();
+      expect(state.selectedElementId).toBeNull();
+    });
+
+    it('no-ops for invalid band ID', () => {
+      let t = createTemplate();
+      t = addSection(t, { id: 'sec1', bands: [] });
+      t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 100, elements: [] });
+      useEditorStore.setState({ template: t });
+      const before = useEditorStore.getState().template;
+      useEditorStore.getState().removeBand('nonexistent');
+      expect(useEditorStore.getState().template).toBe(before);
+    });
+  });
+
   describe('addSection', () => {
     it('appends section with generated ID, name, and empty bands', () => {
       useEditorStore.getState().addSection();
@@ -384,6 +414,33 @@ describe('useEditorStore', () => {
       useEditorStore.setState({ template: t });
       const before = useEditorStore.getState().template;
       useEditorStore.getState().removeSection('nonexistent');
+      expect(useEditorStore.getState().template).toBe(before);
+    });
+  });
+
+  describe('addBand', () => {
+    it('creates band with generated ID, correct type, default height 50, and selects it', () => {
+      let t = createTemplate();
+      t = addSection(t, { id: 'sec1', bands: [] });
+      useEditorStore.setState({ template: t });
+      useEditorStore.getState().addBand('sec1', 'detail');
+      const state = useEditorStore.getState();
+      const bands = state.template.sections[0].bands;
+      expect(bands).toHaveLength(1);
+      expect(bands[0].type).toBe('detail');
+      expect(bands[0].height).toBe(50);
+      expect(bands[0].elements).toEqual([]);
+      expect(bands[0].id).toMatch(/^band_/);
+      expect(state.selectedBandId).toBe(bands[0].id);
+      expect(state.selectedSectionId).toBe('sec1');
+      expect(state.selectedElementId).toBeNull();
+    });
+
+    it('no-ops on invalid section ID', () => {
+      const t = createTemplate();
+      useEditorStore.setState({ template: t });
+      const before = useEditorStore.getState().template;
+      useEditorStore.getState().addBand('nonexistent', 'body');
       expect(useEditorStore.getState().template).toBe(before);
     });
   });
