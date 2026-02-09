@@ -1,0 +1,57 @@
+.palette {
+  border-bottom: 1px solid var(--jp-color-border);
+  flex-shrink: 0;
+}
+
+.header {
+  font-weight: 600;
+  font-size: var(--jp-font-size-sm);
+  color: var(--jp-color-text-secondary);
+  padding: var(--jp-space-sm) 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--jp-space-xs);
+  padding-bottom: var(--jp-space-md);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--jp-space-xs);
+  padding: var(--jp-space-xs) var(--jp-space-sm);
+  border: 1px solid var(--jp-color-border-light);
+  border-radius: 3px;
+  cursor: grab;
+  user-select: none;
+  font-size: var(--jp-font-size-sm);
+  color: var(--jp-color-text-primary);
+  background: var(--jp-color-surface);
+}
+
+.item:hover {
+  border-color: var(--jp-color-accent);
+  background: var(--jp-color-surface-secondary);
+}
+
+.item:active {
+  cursor: grabbing;
+}
+
+.itemAbbr {
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+  font-weight: 600;
+  color: var(--jp-color-text-secondary);
+}
+
+.itemLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

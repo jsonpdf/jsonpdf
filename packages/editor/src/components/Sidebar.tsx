@@ -7,6 +7,7 @@ import { SectionPanel } from './panels/SectionPanel';
 import { BandPanel } from './panels/BandPanel';
 import { AddBandPanel } from './panels/AddBandPanel';
 import { ElementPanel } from './panels/ElementPanel';
+import { ElementPalette } from './ElementPalette';
 import styles from './Sidebar.module.css';
 
 export function Sidebar() {
@@ -55,5 +56,10 @@ export function Sidebar() {
     content = <TemplatePanel />;
   }
 
-  return <div className={styles.sidebar}>{content}</div>;
+  return (
+    <div className={styles.sidebar}>
+      <ElementPalette />
+      <div className={styles.panelArea}>{content}</div>
+    </div>
+  );
 }
