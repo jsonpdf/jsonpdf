@@ -509,4 +509,95 @@ describe('useEditorStore', () => {
       expect(useEditorStore.getState().template).toBe(before);
     });
   });
+
+  describe('importTemplate', () => {
+    it('imports valid template JSON and clears selection', () => {
+      useEditorStore.setState({
+        selectedElementId: 'el1',
+        selectedBandId: 'b1',
+        selectedSectionId: 'sec1',
+      });
+
+      let t = createTemplate({ name: 'Imported' });
+      t = addSection(t, { id: 'sec1', bands: [] });
+      const json = JSON.stringify(t);
+
+      const result = useEditorStore.getState().importTemplate(json);
+      expect(result).toEqual({ success: true });
+
+      const state = useEditorStore.getState();
+      expect(state.template.name).toBe('Imported');
+      expect(state.template.sections).toHaveLength(1);
+      expect(state.selectedElementId).toBeNull();
+      expect(state.selectedBandId).toBeNull();
+      expect(state.selectedSectionId).toBeNull();
+    });
+
+    it('rejects invalid JSON', () => {
+      const before = useEditorStore.getState().template;
+      const result = useEditorStore.getState().importTemplate('not json{{{');
+      expect(result).toEqual({ success: false, error: 'Invalid JSON' });
+      expect(useEditorStore.getState().template).toBe(before);
+    });
+
+    it('rejects schema-invalid template', () => {
+      const before = useEditorStore.getState().template;
+      const result = useEditorStore.getState().importTemplate(JSON.stringify({ invalid: true }));
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.length).toBeGreaterThan(0);
+      }
+      expect(useEditorStore.getState().template).toBe(before);
+    });
+
+    it('does not modify state on validation failure', () => {
+      let t = createTemplate({ name: 'Current' });
+      t = addSection(t, { id: 'sec1', bands: [] });
+      useEditorStore.setState({ template: t });
+
+      // Missing required fields
+      useEditorStore.getState().importTemplate(JSON.stringify({ version: '1.0' }));
+      expect(useEditorStore.getState().template.name).toBe('Current');
+    });
+  });
+
+  describe('exportTemplate', () => {
+    it('returns pretty-printed JSON of the current template', () => {
+      const t = createTemplate({ name: 'Export Test' });
+      useEditorStore.setState({ template: t });
+
+      const json = useEditorStore.getState().exportTemplate();
+      const parsed = JSON.parse(json);
+      expect(parsed.name).toBe('Export Test');
+      expect(parsed.version).toBe('1.0');
+    });
+
+    it('round-trips import/export', () => {
+      let t = createTemplate({ name: 'Round Trip' });
+      t = addSection(t, { id: 'sec1', bands: [] });
+      t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 100, elements: [] });
+      t = addElement(t, 'b1', {
+        id: 'el1',
+        type: 'text',
+        x: 10,
+        y: 20,
+        width: 100,
+        height: 50,
+        properties: { content: 'hello' },
+      });
+      useEditorStore.setState({ template: t });
+
+      const exported = useEditorStore.getState().exportTemplate();
+
+      // Reset to empty
+      useEditorStore.setState({ template: createTemplate() });
+      expect(useEditorStore.getState().template.sections).toHaveLength(0);
+
+      // Re-import
+      const result = useEditorStore.getState().importTemplate(exported);
+      expect(result).toEqual({ success: true });
+      expect(useEditorStore.getState().template.name).toBe('Round Trip');
+      expect(useEditorStore.getState().template.sections[0].bands[0].elements[0].id).toBe('el1');
+    });
+  });
 });

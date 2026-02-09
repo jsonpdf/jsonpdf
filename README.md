@@ -200,8 +200,8 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 - [x] Outline panel (hierarchical tree of sections, bands, elements with click-to-select)
 - [x] Element drag-and-drop reordering in outline panel (within band, across bands)
 - [x] Section management: add, delete, drag-and-drop reorder (kind-isolated from element drags)
-- [ ] Band management: add/remove bands
-- [ ] Template import/export (JSON)
+- [x] Band management: add, delete, drag-and-drop reorder (same-type siblings only)
+- [x] Template import/export (JSON)
 - [ ] Live PDF preview
 
 ### Phase 10: Editor Full

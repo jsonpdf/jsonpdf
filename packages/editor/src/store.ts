@@ -3,6 +3,7 @@ import type { Template, Element, Band, BandType, Section, PageConfig } from '@js
 import { generateId } from '@jsonpdf/core';
 import {
   createTemplate,
+  validateTemplate,
   updateElement,
   removeElement,
   updateBand,
@@ -55,9 +56,11 @@ export interface EditorState {
   addSection: () => void;
   removeSection: (sectionId: string) => void;
   moveSection: (sectionId: string, toIndex: number) => void;
+  importTemplate: (json: string) => { success: true } | { success: false; error: string };
+  exportTemplate: () => string;
 }
 
-export const useEditorStore = create<EditorState>((set) => ({
+export const useEditorStore = create<EditorState>((set, get) => ({
   template: createTemplate(),
   zoom: 1.0,
   scrollX: 0,
@@ -259,5 +262,29 @@ export const useEditorStore = create<EditorState>((set) => ({
         return state;
       }
     });
+  },
+  importTemplate: (json) => {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(json);
+    } catch {
+      return { success: false, error: 'Invalid JSON' };
+    }
+    const template = parsed as Template;
+    const result = validateTemplate(template);
+    if (!result.valid) {
+      const msgs = result.errors.map((e) => `${e.path}: ${e.message}`).join('\n');
+      return { success: false, error: msgs };
+    }
+    set({
+      template,
+      selectedElementId: null,
+      selectedBandId: null,
+      selectedSectionId: null,
+    });
+    return { success: true };
+  },
+  exportTemplate: () => {
+    return JSON.stringify(get().template, null, 2);
   },
 }));
