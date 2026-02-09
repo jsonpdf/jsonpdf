@@ -17,6 +17,36 @@
   white-space: nowrap;
 }
 
+.fileControls {
+  display: flex;
+  align-items: center;
+  gap: var(--jp-space-xs);
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.toolbarBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 var(--jp-space-sm);
+  border: 1px solid var(--jp-color-border);
+  border-radius: 4px;
+  background: var(--jp-color-surface);
+  color: var(--jp-color-text-primary);
+  cursor: pointer;
+  font-size: var(--jp-font-size-sm);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.toolbarBtn:hover {
+  background: var(--jp-color-surface-secondary);
+}
+
 .zoomControls {
   display: flex;
   align-items: center;
