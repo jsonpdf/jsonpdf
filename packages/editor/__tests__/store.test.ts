@@ -561,6 +561,50 @@ describe('useEditorStore', () => {
     });
   });
 
+  describe('addElement', () => {
+    function setupWithBand() {
+      let t = createTemplate();
+      t = addSection(t, { id: 'sec1', bands: [] });
+      t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+      useEditorStore.setState({ template: t });
+    }
+
+    it('creates element with correct type and default properties', () => {
+      setupWithBand();
+      useEditorStore.getState().addElement('band1', 'text');
+      const els = useEditorStore.getState().template.sections[0].bands[0].elements;
+      expect(els).toHaveLength(1);
+      expect(els[0].type).toBe('text');
+      expect(els[0].properties.content).toBe('Text');
+      expect(els[0].id).toMatch(/^el_/);
+    });
+
+    it('auto-selects the new element', () => {
+      setupWithBand();
+      useEditorStore.getState().addElement('band1', 'shape');
+      const state = useEditorStore.getState();
+      const el = state.template.sections[0].bands[0].elements[0];
+      expect(state.selectedElementId).toBe(el.id);
+      expect(state.selectedBandId).toBe('band1');
+      expect(state.selectedSectionId).toBe('sec1');
+    });
+
+    it('uses custom x/y when provided', () => {
+      setupWithBand();
+      useEditorStore.getState().addElement('band1', 'text', 55, 77);
+      const el = useEditorStore.getState().template.sections[0].bands[0].elements[0];
+      expect(el.x).toBe(55);
+      expect(el.y).toBe(77);
+    });
+
+    it('no-ops for invalid band ID', () => {
+      setupWithBand();
+      const before = useEditorStore.getState().template;
+      useEditorStore.getState().addElement('nonexistent', 'text');
+      expect(useEditorStore.getState().template).toBe(before);
+    });
+  });
+
   describe('exportTemplate', () => {
     it('returns pretty-printed JSON of the current template', () => {
       const t = createTemplate({ name: 'Export Test' });

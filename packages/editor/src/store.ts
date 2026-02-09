@@ -11,13 +11,16 @@ import {
   updateTemplate,
   addSection as addSectionOp,
   addBand as addBandOp,
+  addElement as addElementOp,
   removeBand as removeBandOp,
   moveBand as moveBandOp,
   removeSection as removeSectionOp,
   reorderElement as reorderElementOp,
   moveElement as moveElementOp,
   moveSection as moveSectionOp,
+  findBand,
 } from '@jsonpdf/template';
+import { createDefaultElement } from './constants/element-defaults';
 
 export interface EditorState {
   template: Template;
@@ -56,6 +59,7 @@ export interface EditorState {
   addSection: () => void;
   removeSection: (sectionId: string) => void;
   moveSection: (sectionId: string, toIndex: number) => void;
+  addElement: (bandId: string, elementType: string, x?: number, y?: number) => void;
   importTemplate: (json: string) => { success: true } | { success: false; error: string };
   exportTemplate: () => string;
 }
@@ -258,6 +262,25 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     set((state) => {
       try {
         return { template: moveSectionOp(state.template, sectionId, toIndex) };
+      } catch {
+        return state;
+      }
+    });
+  },
+  addElement: (bandId, elementType, x, y) => {
+    set((state) => {
+      const element = createDefaultElement(elementType);
+      if (x != null) element.x = x;
+      if (y != null) element.y = y;
+      try {
+        const newTemplate = addElementOp(state.template, bandId, element);
+        const bandResult = findBand(newTemplate, bandId);
+        return {
+          template: newTemplate,
+          selectedElementId: element.id,
+          selectedBandId: bandId,
+          selectedSectionId: bandResult?.section.id ?? null,
+        };
       } catch {
         return state;
       }

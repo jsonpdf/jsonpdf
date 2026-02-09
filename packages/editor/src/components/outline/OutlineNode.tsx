@@ -3,6 +3,7 @@ import { useEditorStore } from '../../store';
 import type { TreeNode } from './OutlineTree';
 import { OutlineDragContext } from './OutlineTree';
 import { BAND_TYPE_META } from '../../constants/band-types';
+import { DRAG_TYPE } from '../ElementPalette';
 import styles from './Outline.module.css';
 
 interface OutlineNodeProps {
@@ -114,7 +115,33 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
   const handleDragOver = useCallback(
     (e: React.DragEvent) => {
       if (!dragCtx) return;
+
+      // Check for palette drag (external HTML5 drag from ElementPalette)
+      const isPaletteDrag = e.dataTransfer.types.includes(DRAG_TYPE);
       const source = dragCtx.dragRef.current;
+
+      if (isPaletteDrag && !source) {
+        // Palette drag — only accept on band nodes (not placeholder) or element nodes
+        if (node.kind === 'band' && !node.placeholder) {
+          e.preventDefault();
+          e.stopPropagation();
+          const prev = dragCtx.dropIndicator;
+          if (!prev || prev.targetId !== node.id || prev.position !== 'inside') {
+            dragCtx.setDropIndicator({ targetId: node.id, position: 'inside' });
+          }
+        } else if (node.kind === 'element' && node.bandId) {
+          e.preventDefault();
+          e.stopPropagation();
+          const rect = e.currentTarget.getBoundingClientRect();
+          const position = computeDropPosition(e.clientY, rect, 'element', 'element');
+          const prev = dragCtx.dropIndicator;
+          if (!prev || prev.targetId !== node.id || prev.position !== position) {
+            dragCtx.setDropIndicator({ targetId: node.id, position });
+          }
+        }
+        return;
+      }
+
       if (!source || source.elementId === node.id) return;
 
       // Kind-matching rules
@@ -141,7 +168,7 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
         dragCtx.setDropIndicator({ targetId: node.id, position });
       }
     },
-    [dragCtx, node.id, node.kind, node.placeholder, node.typeLabel, node.draggable],
+    [dragCtx, node.id, node.kind, node.placeholder, node.typeLabel, node.draggable, node.bandId],
   );
 
   const handleDragLeave = useCallback(
@@ -162,6 +189,37 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
       if (!dragCtx) return;
       e.preventDefault();
       e.stopPropagation();
+
+      // Handle palette drops (no dragRef.current)
+      const paletteType = e.dataTransfer.getData(DRAG_TYPE);
+      if (paletteType && !dragCtx.dragRef.current) {
+        const currentIndicator = dragCtx.dropIndicator;
+        dragCtx.setDropIndicator(null);
+
+        const store = useEditorStore.getState();
+        if (node.kind === 'band' && !node.placeholder) {
+          store.addElement(node.id, paletteType);
+        } else if (node.kind === 'element' && node.bandId && currentIndicator) {
+          const targetIndex = index ?? 0;
+          const insertIndex =
+            currentIndicator.position === 'before' ? targetIndex : targetIndex + 1;
+          store.addElement(node.bandId, paletteType);
+          // Reorder the newly added element to the correct position
+          const newState = useEditorStore.getState();
+          if (newState.selectedElementId) {
+            const band = newState.template.sections
+              .flatMap((s) => s.bands)
+              .find((b) => b.id === node.bandId);
+            if (band) {
+              const currentIndex = band.elements.length - 1;
+              if (insertIndex !== currentIndex) {
+                store.reorderElement(newState.selectedElementId, insertIndex);
+              }
+            }
+          }
+        }
+        return;
+      }
 
       const source = dragCtx.dragRef.current;
       const currentIndicator = dragCtx.dropIndicator;
@@ -234,7 +292,7 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
         }
       }
     },
-    [dragCtx, node.kind, node.bandId, node.id, index],
+    [dragCtx, node.kind, node.bandId, node.id, node.placeholder, index],
   );
 
   /* ---------- Inline add-button for multi-band types ---------- */
@@ -273,7 +331,7 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
     !node.frameOwnerId &&
     !node.placeholder &&
     (node.kind === 'band' ||
-      (node.kind === 'element' && node.draggable) ||
+      (node.kind === 'element' && (node.draggable || !!node.bandId)) ||
       (node.kind === 'section' && dragSource?.kind === 'section'));
 
   return (

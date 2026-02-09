@@ -3,5 +3,12 @@
   border-left: 1px solid var(--jp-color-border);
   background: var(--jp-color-surface);
   padding: var(--jp-space-md);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panelArea {
+  flex: 1;
   overflow-y: auto;
 }

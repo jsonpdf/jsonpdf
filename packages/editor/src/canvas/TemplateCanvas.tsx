@@ -8,7 +8,7 @@ import { PageRenderer } from './PageRenderer';
 import { SelectionOverlay } from './SelectionOverlay';
 
 /** Gap between pages and padding around the canvas (in points). */
-const PAGE_GAP = 40;
+export const PAGE_GAP = 40;
 export const CANVAS_PADDING = 40;
 
 interface TemplateCanvasProps {
