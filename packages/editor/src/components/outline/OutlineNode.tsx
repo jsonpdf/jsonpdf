@@ -2,6 +2,7 @@ import { useState, useContext, useCallback } from 'react';
 import { useEditorStore } from '../../store';
 import type { TreeNode } from './OutlineTree';
 import { OutlineDragContext } from './OutlineTree';
+import { BAND_TYPE_META } from '../../constants/band-types';
 import styles from './Outline.module.css';
 
 interface OutlineNodeProps {
@@ -24,6 +25,7 @@ export function computeDropPosition(
 export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
   const [expanded, setExpanded] = useState(true);
   const isSelected = useEditorStore((s) => {
+    if (node.placeholder) return s.selectedBandId === node.id && s.selectedElementId === null;
     if (node.kind === 'element') return s.selectedElementId === node.id;
     if (node.kind === 'band') return s.selectedBandId === node.id && s.selectedElementId === null;
     return (
@@ -31,6 +33,7 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
     );
   });
   const setSelection = useEditorStore((s) => s.setSelection);
+  const addBandAction = useEditorStore((s) => s.addBand);
 
   const dragCtx = useContext(OutlineDragContext);
 
@@ -188,6 +191,25 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
     [dragCtx, node.kind, node.bandId, node.id, index],
   );
 
+  /* ---------- Inline add-button for multi-band types ---------- */
+
+  if (node.addBandType) {
+    const bandType = node.addBandType;
+    const meta = BAND_TYPE_META[bandType];
+    return (
+      <button
+        className={styles.addBandInline}
+        style={{ paddingLeft: depth * 16 + 8 }}
+        onClick={() => {
+          addBandAction(node.sectionId, bandType);
+        }}
+        aria-label={`Add ${meta.label}`}
+      >
+        + Add {meta.label}
+      </button>
+    );
+  }
+
   /* ---------- CSS classes ---------- */
 
   const nodeClasses = [
@@ -195,12 +217,14 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
     isSelected ? styles.nodeSelected : '',
     isDragSource ? styles.nodeDragging : '',
     indicatorPos === 'inside' ? styles.dropTargetInside : '',
+    node.placeholder ? styles.nodePlaceholder : '',
   ]
     .filter(Boolean)
     .join(' ');
 
   const isDropTarget =
     !node.frameOwnerId &&
+    !node.placeholder &&
     (node.kind === 'band' ||
       (node.kind === 'element' && node.draggable) ||
       (node.kind === 'section' && dragCtx?.dragRef.current?.kind === 'section'));

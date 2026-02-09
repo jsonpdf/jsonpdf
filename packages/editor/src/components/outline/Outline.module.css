@@ -140,3 +140,26 @@
   border-color: var(--jp-color-accent);
   color: var(--jp-color-accent);
 }
+
+/* ---- Placeholder band nodes ---- */
+
+.nodePlaceholder {
+  opacity: 0.45;
+  font-style: italic;
+}
+
+.addBandInline {
+  display: flex;
+  align-items: center;
+  padding: 2px var(--jp-space-sm);
+  margin: 0 var(--jp-space-xs);
+  border: none;
+  background: transparent;
+  color: var(--jp-color-text-tertiary);
+  font-size: var(--jp-font-size-xs);
+  cursor: pointer;
+}
+
+.addBandInline:hover {
+  color: var(--jp-color-accent);
+}

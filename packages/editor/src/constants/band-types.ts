@@ -73,3 +73,33 @@ export const BAND_TYPE_META: Record<BandType, BandTypeMeta> = {
     fill: 'rgba(234, 179, 8, 0.05)',
   },
 };
+
+/** Band types that allow only 0 or 1 instance per section. */
+export const SINGULAR_BAND_TYPES: ReadonlySet<BandType> = new Set<BandType>([
+  'title',
+  'pageHeader',
+  'pageFooter',
+  'lastPageFooter',
+  'columnHeader',
+  'columnFooter',
+  'summary',
+  'background',
+  'noData',
+]);
+
+/** Display order for bands in the outline (matches renderer rendering order). */
+export const BAND_DISPLAY_ORDER: readonly BandType[] = [
+  'background',
+  'title',
+  'pageHeader',
+  'columnHeader',
+  'groupHeader',
+  'detail',
+  'groupFooter',
+  'columnFooter',
+  'body',
+  'noData',
+  'summary',
+  'pageFooter',
+  'lastPageFooter',
+];

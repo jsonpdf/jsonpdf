@@ -17,6 +17,7 @@ interface BandPanelProps {
 export function BandPanel({ band }: BandPanelProps) {
   const updateBandProps = useEditorStore((s) => s.updateBandProps);
   const updateBandHeight = useEditorStore((s) => s.updateBandHeight);
+  const removeBandAction = useEditorStore((s) => s.removeBand);
 
   const update = useCallback(
     (updates: Partial<Omit<Band, 'id' | 'elements'>>) => {
@@ -131,6 +132,16 @@ export function BandPanel({ band }: BandPanelProps) {
           }}
         />
       </PropertyGroup>
+
+      <button
+        className={styles.deleteBtn}
+        onClick={() => {
+          removeBandAction(band.id);
+        }}
+        aria-label="Delete band"
+      >
+        Delete Band
+      </button>
     </div>
   );
 }
