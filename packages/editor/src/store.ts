@@ -11,6 +11,7 @@ import {
   addSection as addSectionOp,
   addBand as addBandOp,
   removeBand as removeBandOp,
+  moveBand as moveBandOp,
   removeSection as removeSectionOp,
   reorderElement as reorderElementOp,
   moveElement as moveElementOp,
@@ -49,6 +50,7 @@ export interface EditorState {
   reorderElement: (elementId: string, toIndex: number) => void;
   moveElementToBand: (elementId: string, toBandId: string, toIndex?: number) => void;
   removeBand: (bandId: string) => void;
+  reorderBand: (bandId: string, sectionId: string, toIndex: number) => void;
   addBand: (sectionId: string, type: BandType) => void;
   addSection: () => void;
   removeSection: (sectionId: string) => void;
@@ -192,6 +194,15 @@ export const useEditorStore = create<EditorState>((set) => ({
           selectedElementId: null,
           selectedBandId: null,
         };
+      } catch {
+        return state;
+      }
+    });
+  },
+  reorderBand: (bandId, sectionId, toIndex) => {
+    set((state) => {
+      try {
+        return { template: moveBandOp(state.template, bandId, sectionId, toIndex) };
       } catch {
         return state;
       }

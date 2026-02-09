@@ -418,6 +418,40 @@ describe('useEditorStore', () => {
     });
   });
 
+  describe('reorderBand', () => {
+    function setupThreeBands() {
+      let t = createTemplate();
+      t = addSection(t, { id: 'sec1', bands: [] });
+      t = addBand(t, 'sec1', { id: 'b1', type: 'detail', height: 50, elements: [] });
+      t = addBand(t, 'sec1', { id: 'b2', type: 'detail', height: 50, elements: [] });
+      t = addBand(t, 'sec1', { id: 'b3', type: 'detail', height: 50, elements: [] });
+      useEditorStore.setState({ template: t });
+    }
+
+    it('moves band forward within section', () => {
+      setupThreeBands();
+      // moveBand removes b1 (index 0) then inserts at index 2 → b2, b3, b1
+      useEditorStore.getState().reorderBand('b1', 'sec1', 2);
+      const ids = useEditorStore.getState().template.sections[0].bands.map((b) => b.id);
+      expect(ids).toEqual(['b2', 'b3', 'b1']);
+    });
+
+    it('moves band backward within section', () => {
+      setupThreeBands();
+      // moveBand removes b3 (index 2) then inserts at index 0 → b3, b1, b2
+      useEditorStore.getState().reorderBand('b3', 'sec1', 0);
+      const ids = useEditorStore.getState().template.sections[0].bands.map((b) => b.id);
+      expect(ids).toEqual(['b3', 'b1', 'b2']);
+    });
+
+    it('no-ops for invalid band ID', () => {
+      setupThreeBands();
+      const before = useEditorStore.getState().template;
+      useEditorStore.getState().reorderBand('nonexistent', 'sec1', 0);
+      expect(useEditorStore.getState().template).toBe(before);
+    });
+  });
+
   describe('addBand', () => {
     it('creates band with generated ID, correct type, default height 50, and selects it', () => {
       let t = createTemplate();

@@ -308,6 +308,39 @@ describe('OutlinePanel', () => {
     });
   });
 
+  describe('band reorder draggability', () => {
+    it('multi-type bands with 2+ siblings are draggable', () => {
+      // Add a second detail band so detail bands become draggable
+      let t = buildOutlineTestTemplate();
+      t = addBand(t, 'sec1', { id: 'band3', type: 'detail', height: 50, elements: [] });
+      useEditorStore.setState({ template: t });
+      render(<OutlinePanel />);
+      const detailNodes = screen.getAllByText('Detail');
+      for (const detailNode of detailNodes) {
+        const treeItem = detailNode.closest('[role="treeitem"]')!;
+        expect(treeItem.getAttribute('draggable')).toBe('true');
+      }
+    });
+
+    it('multi-type band with only 1 instance is NOT draggable', () => {
+      // Default test template has only 1 detail band
+      render(<OutlinePanel />);
+      const detailNode = screen.getByText('Detail').closest('[role="treeitem"]')!;
+      expect(detailNode.getAttribute('draggable')).toBeNull();
+    });
+
+    it('reorderBand changes band order via store', () => {
+      let t = buildOutlineTestTemplate();
+      t = addBand(t, 'sec1', { id: 'band3', type: 'detail', height: 50, elements: [] });
+      useEditorStore.setState({ template: t });
+      // band2 is at index 1, band3 is at index 2 — swap them
+      useEditorStore.getState().reorderBand('band2', 'sec1', 2);
+      const ids = useEditorStore.getState().template.sections[0].bands.map((b) => b.id);
+      // band1 (pageHeader), band3 (detail), band2 (detail)
+      expect(ids).toEqual(['band1', 'band3', 'band2']);
+    });
+  });
+
   describe('Add Section button', () => {
     it('renders the Add Section button', () => {
       render(<OutlinePanel />);

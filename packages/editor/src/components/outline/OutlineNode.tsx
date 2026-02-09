@@ -16,9 +16,12 @@ export function computeDropPosition(
   clientY: number,
   rect: { top: number; height: number },
   targetKind: 'band' | 'element' | 'section',
+  sourceKind: 'element' | 'section' | 'band',
 ): 'before' | 'after' | 'inside' {
   const ratio = (clientY - rect.top) / rect.height;
-  if (targetKind === 'band') return 'inside';
+  // Element dropping on band header → "inside" (append to band)
+  // Band dropping on band → before/after (reorder)
+  if (targetKind === 'band' && sourceKind !== 'band') return 'inside';
   return ratio < 0.5 ? 'before' : 'after';
 }
 
@@ -67,17 +70,36 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
     (e: React.DragEvent) => {
       if (!dragCtx || !node.draggable) return;
       e.stopPropagation();
-      dragCtx.dragRef.current = {
-        kind: node.kind === 'section' ? 'section' : 'element',
-        elementId: node.id,
-        sourceBandId: node.bandId ?? '',
-        sourceIndex: index ?? 0,
-      };
+      if (node.kind === 'band') {
+        dragCtx.dragRef.current = {
+          kind: 'band',
+          elementId: node.id,
+          sourceBandId: '',
+          sourceIndex: node.bandArrayIndex ?? 0,
+          bandType: node.typeLabel,
+        };
+      } else {
+        dragCtx.dragRef.current = {
+          kind: node.kind === 'section' ? 'section' : 'element',
+          elementId: node.id,
+          sourceBandId: node.bandId ?? '',
+          sourceIndex: index ?? 0,
+        };
+      }
       dragCtx.setDraggingId(node.id);
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/plain', node.id);
     },
-    [dragCtx, node.id, node.bandId, node.kind, node.draggable, index],
+    [
+      dragCtx,
+      node.id,
+      node.bandId,
+      node.bandArrayIndex,
+      node.kind,
+      node.typeLabel,
+      node.draggable,
+      index,
+    ],
   );
 
   const handleDragEnd = useCallback(() => {
@@ -95,15 +117,23 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
       const source = dragCtx.dragRef.current;
       if (!source || source.elementId === node.id) return;
 
-      // Kind-matching: sections can only drop on sections, elements can't drop on sections
+      // Kind-matching rules
       if (source.kind === 'section' && node.kind !== 'section') return;
       if (source.kind === 'element' && node.kind === 'section') return;
+      // Band drag: only accept same-type bands
+      if (source.kind === 'band') {
+        if (node.kind !== 'band' || node.placeholder || source.bandType !== node.typeLabel) return;
+      }
+      // Don't drop elements/sections on a band that's currently being dragged by another band
+      if (source.kind !== 'band' && node.kind === 'band' && node.draggable) {
+        // Still allow element→band "inside" drops on draggable bands
+      }
 
       e.preventDefault();
       e.stopPropagation();
 
       const rect = e.currentTarget.getBoundingClientRect();
-      const position = computeDropPosition(e.clientY, rect, node.kind);
+      const position = computeDropPosition(e.clientY, rect, node.kind, source.kind);
 
       // Only update state when indicator actually changes
       const prev = dragCtx.dropIndicator;
@@ -111,7 +141,7 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
         dragCtx.setDropIndicator({ targetId: node.id, position });
       }
     },
-    [dragCtx, node.id, node.kind],
+    [dragCtx, node.id, node.kind, node.placeholder, node.typeLabel, node.draggable],
   );
 
   const handleDragLeave = useCallback(
@@ -142,6 +172,22 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
       if (!source || !currentIndicator) return;
 
       const store = useEditorStore.getState();
+
+      // Band reorder (same type within same section)
+      if (source.kind === 'band' && node.kind === 'band' && node.bandArrayIndex != null) {
+        const S = source.sourceIndex;
+        const T = node.bandArrayIndex;
+        let toIndex: number;
+        if (currentIndicator.position === 'before') {
+          toIndex = S < T ? T - 1 : T;
+        } else {
+          toIndex = S < T ? T : T + 1;
+        }
+        if (toIndex !== S) {
+          store.reorderBand(source.elementId, node.sectionId, toIndex);
+        }
+        return;
+      }
 
       // Section reorder
       if (source.kind === 'section' && node.kind === 'section') {
@@ -222,12 +268,13 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
     .filter(Boolean)
     .join(' ');
 
+  const dragSource = dragCtx?.dragRef.current;
   const isDropTarget =
     !node.frameOwnerId &&
     !node.placeholder &&
     (node.kind === 'band' ||
       (node.kind === 'element' && node.draggable) ||
-      (node.kind === 'section' && dragCtx?.dragRef.current?.kind === 'section'));
+      (node.kind === 'section' && dragSource?.kind === 'section'));
 
   return (
     <div>
