@@ -89,4 +89,17 @@ describe('PreviewLayout', () => {
       expect(screen.getByText('Render failed')).toBeDefined();
     });
   });
+
+  it('displays parse error for invalid JSON', () => {
+    render(<PreviewLayout />);
+
+    // Type invalid JSON into the editor
+    fireEvent.change(screen.getByTestId('monaco-editor'), {
+      target: { value: '{invalid json' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Render' }));
+
+    expect(screen.getByText('Invalid JSON — fix syntax errors before rendering')).toBeDefined();
+  });
 });
