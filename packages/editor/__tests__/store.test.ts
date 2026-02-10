@@ -13,6 +13,9 @@ describe('useEditorStore', () => {
       selectedBandId: null,
       selectedSectionId: null,
       activeTab: 'editor',
+      _undoStack: [],
+      _redoStack: [],
+      _isUndoRedoInProgress: false,
     });
   });
 

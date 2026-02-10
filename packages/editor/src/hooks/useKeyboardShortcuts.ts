@@ -16,6 +16,28 @@ export function useKeyboardShortcuts() {
       if (isInputFocused()) return;
 
       const state = useEditorStore.getState();
+      const mod = e.metaKey || e.ctrlKey;
+
+      // Undo: Cmd+Z / Ctrl+Z
+      if (mod && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        state.undo();
+        return;
+      }
+
+      // Redo: Cmd+Shift+Z / Ctrl+Shift+Z
+      if (mod && e.key === 'z' && e.shiftKey) {
+        e.preventDefault();
+        state.redo();
+        return;
+      }
+
+      // Redo: Ctrl+Y (Windows convention)
+      if (e.ctrlKey && e.key === 'y') {
+        e.preventDefault();
+        state.redo();
+        return;
+      }
 
       if (e.key === 'Escape') {
         state.setSelection(null);
