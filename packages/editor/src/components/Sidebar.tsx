@@ -12,13 +12,15 @@ import styles from './Sidebar.module.css';
 
 export function Sidebar() {
   const template = useEditorStore((s) => s.template);
-  const selectedElementId = useEditorStore((s) => s.selectedElementId);
+  const selectedElementIds = useEditorStore((s) => s.selectedElementIds);
   const selectedBandId = useEditorStore((s) => s.selectedBandId);
   const selectedSectionId = useEditorStore((s) => s.selectedSectionId);
 
+  const singleElementId = selectedElementIds.length === 1 ? selectedElementIds[0] : null;
+
   const element = useMemo(
-    () => (selectedElementId ? findElement(template, selectedElementId)?.element : undefined),
-    [template, selectedElementId],
+    () => (singleElementId ? findElement(template, singleElementId)?.element : undefined),
+    [template, singleElementId],
   );
 
   const band = useMemo(
@@ -42,7 +44,15 @@ export function Sidebar() {
 
   let content: React.ReactNode;
 
-  if (element) {
+  if (selectedElementIds.length > 1) {
+    content = (
+      <div className={styles.panelArea}>
+        <div style={{ padding: 'var(--jp-space-md)', color: 'var(--jp-color-text-secondary)' }}>
+          {selectedElementIds.length} elements selected
+        </div>
+      </div>
+    );
+  } else if (element) {
     content = <ElementPanel element={element} />;
   } else if (band) {
     content = <BandPanel band={band} />;

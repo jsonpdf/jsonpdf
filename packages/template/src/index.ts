@@ -29,6 +29,8 @@ export {
   cloneSection,
   cloneBand,
   cloneElement,
+  // Utility
+  deepCloneWithNewIds,
 } from './operations.js';
 export {
   findSection,

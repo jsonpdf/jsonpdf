@@ -10,9 +10,10 @@ function resetStore() {
     zoom: 1.0,
     scrollX: 0,
     scrollY: 0,
-    selectedElementId: null,
+    selectedElementIds: [],
     selectedBandId: null,
     selectedSectionId: null,
+    clipboard: null,
     activeTab: 'editor',
     _undoStack: [],
     _redoStack: [],
@@ -185,7 +186,7 @@ describe('temporal middleware', () => {
     useEditorStore.getState().undo();
 
     const state = useEditorStore.getState();
-    expect(state.selectedElementId).toBeNull();
+    expect(state.selectedElementIds).toEqual([]);
     expect(state.selectedBandId).toBeNull();
     expect(state.selectedSectionId).toBeNull();
   });
@@ -200,7 +201,7 @@ describe('temporal middleware', () => {
     useEditorStore.getState().redo();
 
     const state = useEditorStore.getState();
-    expect(state.selectedElementId).toBeNull();
+    expect(state.selectedElementIds).toEqual([]);
     expect(state.selectedBandId).toBeNull();
     expect(state.selectedSectionId).toBeNull();
   });

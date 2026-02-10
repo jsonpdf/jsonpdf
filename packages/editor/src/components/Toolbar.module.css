@@ -100,6 +100,12 @@
   background: none;
 }
 
+.menuSeparator {
+  height: 1px;
+  margin: var(--jp-space-xs) 0;
+  background: var(--jp-color-border);
+}
+
 .shortcutHint {
   margin-left: var(--jp-space-lg);
   color: var(--jp-color-text-tertiary);

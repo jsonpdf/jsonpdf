@@ -208,8 +208,8 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 
 ### Phase 10: Editor Full
 
-- [ ] Undo/redo
-- [ ] Copy/paste, multi-select
+- [x] Undo/redo
+- [x] Copy/paste, multi-select
 - [ ] Alignment guides and snapping
 - [ ] Zoom and pan
 - [ ] Style manager

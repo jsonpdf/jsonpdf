@@ -1,6 +1,7 @@
 import { useMemo, useCallback } from 'react';
 import { Stage, Layer } from 'react-konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
+import { findElement } from '@jsonpdf/template';
 import { useEditorStore } from '../store';
 import { computeDesignLayout } from '../layout';
 import { useSelectionGeometry } from '../hooks/useSelectionGeometry';
@@ -18,7 +19,7 @@ interface TemplateCanvasProps {
 export function TemplateCanvas({ viewportWidth }: TemplateCanvasProps) {
   const template = useEditorStore((s) => s.template);
   const zoom = useEditorStore((s) => s.zoom);
-  const selectedElementId = useEditorStore((s) => s.selectedElementId);
+  const selectedElementIds = useEditorStore((s) => s.selectedElementIds);
 
   const pages = useMemo(() => computeDesignLayout(template), [template]);
 
@@ -52,7 +53,7 @@ export function TemplateCanvas({ viewportWidth }: TemplateCanvasProps) {
   }, [pages]);
 
   const selectionGeometry = useSelectionGeometry(
-    selectedElementId,
+    selectedElementIds,
     pages,
     pageXOffsets,
     pageYOffsets,
@@ -67,27 +68,28 @@ export function TemplateCanvas({ viewportWidth }: TemplateCanvasProps) {
 
   const handleResizeEnd = useCallback(
     (newX: number, newY: number, newW: number, newH: number) => {
-      if (!selectedElementId || !selectionGeometry) return;
+      if (!selectionGeometry || selectedElementIds.length === 0) return;
 
-      // Convert absolute canvas coordinates back to element-local coordinates
-      // by computing the delta from the original geometry position
       const store = useEditorStore.getState();
-      const template = store.template;
+      const deltaX = newX - selectionGeometry.x;
+      const deltaY = newY - selectionGeometry.y;
 
-      // Find the element to get its current position
-      for (const section of template.sections) {
-        for (const band of section.bands) {
-          const el = findElementRecursive(band.elements, selectedElementId);
-          if (el) {
-            const deltaX = newX - selectionGeometry.x;
-            const deltaY = newY - selectionGeometry.y;
-            store.updateElementBounds(selectedElementId, el.x + deltaX, el.y + deltaY, newW, newH);
-            return;
-          }
+      if (selectedElementIds.length === 1) {
+        // Single element: set exact position and size
+        const singleId = selectedElementIds[0];
+        const result = findElement(store.template, singleId);
+        if (result) {
+          const el = result.element;
+          store.updateElementBounds(singleId, el.x + deltaX, el.y + deltaY, newW, newH);
         }
+      } else {
+        // Multiple elements: proportional resize
+        const scaleX = newW / selectionGeometry.width;
+        const scaleY = newH / selectionGeometry.height;
+        store.resizeSelectedElements(deltaX, deltaY, scaleX, scaleY);
       }
     },
-    [selectedElementId, selectionGeometry],
+    [selectedElementIds, selectionGeometry],
   );
 
   return (
@@ -121,19 +123,4 @@ export function TemplateCanvas({ viewportWidth }: TemplateCanvasProps) {
       </Layer>
     </Stage>
   );
-}
-
-/** Recursively find an element by ID. */
-function findElementRecursive(
-  elements: { id: string; x: number; y: number; elements?: typeof elements }[],
-  id: string,
-): { x: number; y: number } | null {
-  for (const el of elements) {
-    if (el.id === id) return { x: el.x, y: el.y };
-    if (el.elements) {
-      const found = findElementRecursive(el.elements, id);
-      if (found) return found;
-    }
-  }
-  return null;
 }

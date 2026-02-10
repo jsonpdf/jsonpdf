@@ -47,7 +47,7 @@ describe('Sidebar routing', () => {
   beforeEach(() => {
     useEditorStore.setState({
       template: buildTestTemplate(),
-      selectedElementId: null,
+      selectedElementIds: [],
       selectedBandId: null,
       selectedSectionId: null,
     });
@@ -74,7 +74,7 @@ describe('Sidebar routing', () => {
 
   it('shows ElementPanel when element selected', () => {
     useEditorStore.setState({
-      selectedElementId: 'el1',
+      selectedElementIds: ['el1'],
       selectedBandId: 'band1',
       selectedSectionId: 'sec1',
     });
@@ -84,7 +84,7 @@ describe('Sidebar routing', () => {
 
   it('element selection takes priority over band', () => {
     useEditorStore.setState({
-      selectedElementId: 'el1',
+      selectedElementIds: ['el1'],
       selectedBandId: 'band1',
       selectedSectionId: 'sec1',
     });
@@ -99,7 +99,7 @@ describe('TemplatePanel', () => {
   beforeEach(() => {
     useEditorStore.setState({
       template: buildTestTemplate(),
-      selectedElementId: null,
+      selectedElementIds: [],
       selectedBandId: null,
       selectedSectionId: null,
     });
@@ -118,7 +118,7 @@ describe('SectionPanel', () => {
   beforeEach(() => {
     useEditorStore.setState({
       template: buildTestTemplate(),
-      selectedElementId: null,
+      selectedElementIds: [],
       selectedBandId: null,
       selectedSectionId: 'sec1',
     });
@@ -142,7 +142,7 @@ describe('BandPanel', () => {
   beforeEach(() => {
     useEditorStore.setState({
       template: buildTestTemplate(),
-      selectedElementId: null,
+      selectedElementIds: [],
       selectedBandId: 'band1',
       selectedSectionId: 'sec1',
     });
@@ -179,7 +179,7 @@ describe('AddBandPanel', () => {
   beforeEach(() => {
     useEditorStore.setState({
       template: buildTestTemplate(),
-      selectedElementId: null,
+      selectedElementIds: [],
       selectedBandId: 'sec1::title',
       selectedSectionId: 'sec1',
     });
@@ -206,7 +206,7 @@ describe('ElementPanel', () => {
   beforeEach(() => {
     useEditorStore.setState({
       template: buildTestTemplate(),
-      selectedElementId: 'el1',
+      selectedElementIds: ['el1'],
       selectedBandId: 'band1',
       selectedSectionId: 'sec1',
     });
@@ -220,13 +220,13 @@ describe('ElementPanel', () => {
   });
 
   it('shows correct sub-panel for shape element', () => {
-    useEditorStore.setState({ selectedElementId: 'el-shape' });
+    useEditorStore.setState({ selectedElementIds: ['el-shape'] });
     render(<Sidebar />);
     expect(screen.getByText('Shape Element')).toBeTruthy();
   });
 
   it('shows correct sub-panel for image element', () => {
-    useEditorStore.setState({ selectedElementId: 'el-img' });
+    useEditorStore.setState({ selectedElementIds: ['el-img'] });
     render(<Sidebar />);
     expect(screen.getByText('Image Element')).toBeTruthy();
     expect(screen.getByDisplayValue('test.png')).toBeTruthy();
