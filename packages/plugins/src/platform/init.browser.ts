@@ -1,6 +1,8 @@
 import type { InitInput } from '@resvg/resvg-wasm';
 import { initWasm } from '@resvg/resvg-wasm';
 
+import { setFontBuffers } from './font-store.js';
+
 let initialized = false;
 
 /**
@@ -8,8 +10,12 @@ let initialized = false;
  * Must be called once before any SVG rasterization.
  *
  * @param resvgWasm - The WASM binary as a fetch Response or ArrayBuffer
+ * @param fontBuffers - Optional font buffers for SVG text rendering (e.g. sans-serif)
  */
-export async function initBrowser(resvgWasm?: InitInput): Promise<void> {
+export async function initBrowser(
+  resvgWasm?: InitInput,
+  fontBuffers?: Uint8Array[],
+): Promise<void> {
   if (initialized) return;
   if (!resvgWasm) {
     throw new Error(
@@ -18,5 +24,8 @@ export async function initBrowser(resvgWasm?: InitInput): Promise<void> {
     );
   }
   await initWasm(resvgWasm);
+  if (fontBuffers && fontBuffers.length > 0) {
+    setFontBuffers(fontBuffers);
+  }
   initialized = true;
 }
