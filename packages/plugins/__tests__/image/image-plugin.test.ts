@@ -66,20 +66,25 @@ function makeRenderCtx(overrides?: Partial<RenderContext>): RenderContext {
 
 describe('imagePlugin.resolveProps', () => {
   it('merges with defaults', () => {
-    const props = imagePlugin.resolveProps({ src: 'test.png' });
-    expect(props.src).toBe('test.png');
+    const props = imagePlugin.resolveProps({ src: PNG_DATA_URI });
+    expect(props.src).toBe(PNG_DATA_URI);
     expect(props.fit).toBe('contain');
   });
 
   it('respects explicit fit', () => {
-    const props = imagePlugin.resolveProps({ src: 'test.png', fit: 'fill' });
+    const props = imagePlugin.resolveProps({ src: PNG_DATA_URI, fit: 'fill' });
     expect(props.fit).toBe('fill');
   });
 });
 
 describe('imagePlugin.validate', () => {
-  it('returns no errors for valid props', () => {
-    expect(imagePlugin.validate({ src: 'test.png', fit: 'contain' })).toEqual([]);
+  it('returns no errors for valid base64 data URI', () => {
+    expect(imagePlugin.validate({ src: PNG_DATA_URI, fit: 'contain' })).toEqual([]);
+  });
+
+  it('returns no errors for valid SVG data URI', () => {
+    const svgUri = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg"/>')}`;
+    expect(imagePlugin.validate({ src: svgUri, fit: 'cover' })).toEqual([]);
   });
 
   it('returns error for empty src', () => {
@@ -88,8 +93,25 @@ describe('imagePlugin.validate', () => {
     expect(errors[0]!.path).toBe('/src');
   });
 
+  it('returns error for local file path', () => {
+    const errors = imagePlugin.validate({ src: '/path/to/image.png' });
+    expect(errors).toHaveLength(1);
+    expect(errors[0]!.path).toBe('/src');
+    expect(errors[0]!.message).toMatch(/must be a data URI/);
+  });
+
+  it('returns error for HTTP URL', () => {
+    const errors = imagePlugin.validate({ src: 'https://example.com/test.png' });
+    expect(errors).toHaveLength(1);
+    expect(errors[0]!.path).toBe('/src');
+    expect(errors[0]!.message).toMatch(/must be a data URI/);
+  });
+
   it('returns error for invalid fit', () => {
-    const errors = imagePlugin.validate({ src: 'test.png', fit: 'stretch' as 'fill' });
+    const errors = imagePlugin.validate({
+      src: PNG_DATA_URI,
+      fit: 'stretch' as 'fill',
+    });
     expect(errors).toHaveLength(1);
     expect(errors[0]!.path).toBe('/fit');
   });
