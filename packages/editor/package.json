@@ -20,7 +20,9 @@
   },
   "dependencies": {
     "@jsonpdf/core": "workspace:*",
+    "@jsonpdf/renderer": "workspace:*",
     "@jsonpdf/template": "workspace:*",
+    "@monaco-editor/react": "^4.7.0",
     "konva": "^9.3.0",
     "react-konva": "^19.2.0",
     "zustand": "^5.0.0"
@@ -30,6 +32,8 @@
     "react-dom": "^18 || ^19"
   },
   "devDependencies": {
+    "monaco-editor": "^0.52.0",
+    "@resvg/resvg-wasm": "^2.6.2",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.2",
     "@types/react": "^19.0.0",

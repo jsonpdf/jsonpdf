@@ -1,0 +1,32 @@
+.tabBar {
+  display: flex;
+  align-items: stretch;
+  height: 36px;
+  border-top: 1px solid var(--jp-color-border);
+  background: var(--jp-color-surface);
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--jp-space-lg);
+  border: none;
+  border-top: 2px solid transparent;
+  background: none;
+  color: var(--jp-color-text-secondary);
+  cursor: pointer;
+  font-family: var(--jp-font-family);
+  font-size: var(--jp-font-size-sm);
+  font-weight: 500;
+}
+
+.tab:hover {
+  color: var(--jp-color-text-primary);
+  background: var(--jp-color-surface-secondary);
+}
+
+.tab.active {
+  color: var(--jp-color-accent);
+  border-top-color: var(--jp-color-accent);
+}

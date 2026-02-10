@@ -7,6 +7,12 @@
   background: var(--jp-color-surface);
 }
 
+.content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
 .main {
   display: flex;
   flex: 1;

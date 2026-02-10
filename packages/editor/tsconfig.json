@@ -20,5 +20,5 @@
     "rootDir": "src"
   },
   "include": ["src"],
-  "references": [{ "path": "../core" }, { "path": "../template" }]
+  "references": [{ "path": "../core" }, { "path": "../template" }, { "path": "../renderer" }]
 }

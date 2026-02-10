@@ -60,6 +60,8 @@ export interface EditorState {
   removeSection: (sectionId: string) => void;
   moveSection: (sectionId: string, toIndex: number) => void;
   addElement: (bandId: string, elementType: string, x?: number, y?: number) => void;
+  activeTab: 'editor' | 'preview';
+  setActiveTab: (tab: 'editor' | 'preview') => void;
   importTemplate: (json: string) => { success: true } | { success: false; error: string };
   exportTemplate: () => string;
 }
@@ -72,7 +74,11 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   selectedElementId: null,
   selectedBandId: null,
   selectedSectionId: null,
+  activeTab: 'editor',
 
+  setActiveTab: (tab) => {
+    set({ activeTab: tab });
+  },
   setTemplate: (template) => {
     set({ template });
   },
