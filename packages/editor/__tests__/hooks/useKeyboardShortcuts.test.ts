@@ -37,6 +37,9 @@ describe('useKeyboardShortcuts', () => {
       selectedElementId: null,
       selectedBandId: null,
       selectedSectionId: null,
+      _undoStack: [],
+      _redoStack: [],
+      _isUndoRedoInProgress: false,
     });
   });
 
@@ -139,6 +142,78 @@ describe('useKeyboardShortcuts', () => {
     fireKey('Delete');
 
     expect(useEditorStore.getState().template.sections[0].bands[0].elements).toHaveLength(1);
+  });
+
+  it('Cmd+Z triggers undo', () => {
+    setupTemplate();
+    useEditorStore.getState().updateElementPosition('el1', 99, 99);
+    ({ unmount } = renderHook(() => useKeyboardShortcuts()));
+
+    fireKey('z', { metaKey: true });
+
+    const el = useEditorStore.getState().template.sections[0].bands[0].elements[0];
+    expect(el.x).toBe(50);
+    expect(el.y).toBe(60);
+  });
+
+  it('Ctrl+Z triggers undo', () => {
+    setupTemplate();
+    useEditorStore.getState().updateElementPosition('el1', 99, 99);
+    ({ unmount } = renderHook(() => useKeyboardShortcuts()));
+
+    fireKey('z', { ctrlKey: true });
+
+    const el = useEditorStore.getState().template.sections[0].bands[0].elements[0];
+    expect(el.x).toBe(50);
+    expect(el.y).toBe(60);
+  });
+
+  it('Cmd+Shift+Z triggers redo', () => {
+    setupTemplate();
+    useEditorStore.getState().updateElementPosition('el1', 99, 99);
+    useEditorStore.getState().undo();
+    ({ unmount } = renderHook(() => useKeyboardShortcuts()));
+
+    fireKey('z', { metaKey: true, shiftKey: true });
+
+    const el = useEditorStore.getState().template.sections[0].bands[0].elements[0];
+    expect(el.x).toBe(99);
+  });
+
+  it('Ctrl+Shift+Z triggers redo', () => {
+    setupTemplate();
+    useEditorStore.getState().updateElementPosition('el1', 99, 99);
+    useEditorStore.getState().undo();
+    ({ unmount } = renderHook(() => useKeyboardShortcuts()));
+
+    fireKey('z', { ctrlKey: true, shiftKey: true });
+
+    const el = useEditorStore.getState().template.sections[0].bands[0].elements[0];
+    expect(el.x).toBe(99);
+  });
+
+  it('Ctrl+Y triggers redo', () => {
+    setupTemplate();
+    useEditorStore.getState().updateElementPosition('el1', 99, 99);
+    useEditorStore.getState().undo();
+    ({ unmount } = renderHook(() => useKeyboardShortcuts()));
+
+    fireKey('y', { ctrlKey: true });
+
+    const el = useEditorStore.getState().template.sections[0].bands[0].elements[0];
+    expect(el.x).toBe(99);
+  });
+
+  it('undo works without element selection', () => {
+    setupTemplate();
+    useEditorStore.getState().updateElementPosition('el1', 99, 99);
+    useEditorStore.getState().setSelection(null);
+    ({ unmount } = renderHook(() => useKeyboardShortcuts()));
+
+    fireKey('z', { metaKey: true });
+
+    const el = useEditorStore.getState().template.sections[0].bands[0].elements[0];
+    expect(el.x).toBe(50);
   });
 
   it('skips when focus is on input element', () => {

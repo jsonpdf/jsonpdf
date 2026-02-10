@@ -1,10 +1,15 @@
 .toolbar {
   display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--jp-color-border);
+  background: var(--jp-color-surface);
+}
+
+.titleRow {
+  display: flex;
   align-items: center;
   height: var(--jp-toolbar-height);
   padding: 0 var(--jp-space-md);
-  border-bottom: 1px solid var(--jp-color-border);
-  background: var(--jp-color-surface);
   gap: var(--jp-space-md);
 }
 
@@ -17,25 +22,30 @@
   white-space: nowrap;
 }
 
-.fileControls {
+.menuBar {
   display: flex;
   align-items: center;
-  gap: var(--jp-space-xs);
+  height: 28px;
+  padding: 0 var(--jp-space-sm);
+}
+
+.menuContainer {
+  position: relative;
 }
 
 .hiddenInput {
   display: none;
 }
 
-.toolbarBtn {
+.menuBarBtn {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 28px;
+  height: 24px;
   padding: 0 var(--jp-space-sm);
-  border: 1px solid var(--jp-color-border);
+  border: none;
   border-radius: 4px;
-  background: var(--jp-color-surface);
+  background: none;
   color: var(--jp-color-text-primary);
   cursor: pointer;
   font-size: var(--jp-font-size-sm);
@@ -43,8 +53,57 @@
   white-space: nowrap;
 }
 
-.toolbarBtn:hover {
+.menuBarBtn:hover,
+.menuBarBtnActive {
   background: var(--jp-color-surface-secondary);
+}
+
+.menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: var(--jp-space-xs);
+  min-width: 180px;
+  padding: var(--jp-space-xs) 0;
+  border: 1px solid var(--jp-color-border);
+  border-radius: 4px;
+  background: var(--jp-color-surface);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.12);
+  z-index: 100;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--jp-space-xs) var(--jp-space-md);
+  border: none;
+  background: none;
+  color: var(--jp-color-text-primary);
+  cursor: pointer;
+  font-size: var(--jp-font-size-sm);
+  text-align: left;
+  line-height: 1.6;
+}
+
+.menuItem:hover {
+  background: var(--jp-color-surface-secondary);
+}
+
+.menuItemDisabled {
+  color: var(--jp-color-text-tertiary);
+  cursor: default;
+}
+
+.menuItemDisabled:hover {
+  background: none;
+}
+
+.shortcutHint {
+  margin-left: var(--jp-space-lg);
+  color: var(--jp-color-text-tertiary);
+  font-size: var(--jp-font-size-xs);
 }
 
 .zoomControls {
