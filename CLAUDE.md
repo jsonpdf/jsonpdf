@@ -16,6 +16,7 @@ pnpm examples             # Render all example templates to PDF
 ```
 
 Run a single test file:
+
 ```bash
 npx vitest run packages/renderer/__tests__/renderer.test.ts
 ```
