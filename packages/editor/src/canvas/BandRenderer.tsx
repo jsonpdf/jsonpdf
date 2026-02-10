@@ -7,15 +7,13 @@ import { BAND_TYPE_META } from '../constants/band-types';
 import { BandGeometryContext } from '../snap/band-context';
 import { ElementRenderer } from './ElementRenderer';
 import { BandResizeHandle } from './BandResizeHandle';
-
-/** Band type label styling. */
-const LABEL_FONT_SIZE = 9;
-const LABEL_COLOR = '#888888';
-const LABEL_PADDING = 4;
-
-/** Band bottom border. */
-const BORDER_COLOR = '#d0d0d0';
-const BORDER_WIDTH = 0.5;
+import {
+  LABEL_FONT_SIZE,
+  LABEL_COLOR,
+  LABEL_PADDING,
+  BAND_BORDER_COLOR,
+  BAND_BORDER_WIDTH,
+} from './constants';
 
 /** Selected band highlight. */
 const SELECTED_FILL = 'rgba(37, 99, 235, 0.08)';
@@ -84,8 +82,8 @@ export function BandRenderer({
         {/* Bottom border */}
         <Line
           points={[0, height, contentWidth, height]}
-          stroke={BORDER_COLOR}
-          strokeWidth={BORDER_WIDTH}
+          stroke={BAND_BORDER_COLOR}
+          strokeWidth={BAND_BORDER_WIDTH}
         />
 
         {/* Type abbreviation label */}

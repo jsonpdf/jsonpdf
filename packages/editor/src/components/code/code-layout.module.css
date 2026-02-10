@@ -1,0 +1,54 @@
+.layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  min-width: 300px;
+  border-right: 1px solid var(--jp-color-border);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--jp-toolbar-height);
+  padding: 0 var(--jp-space-md);
+  border-bottom: 1px solid var(--jp-color-border);
+  background: var(--jp-color-surface);
+}
+
+.label {
+  font-size: var(--jp-font-size-sm);
+  font-weight: 600;
+  color: var(--jp-color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.editorWrapper {
+  flex: 1;
+  overflow: hidden;
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.error {
+  padding: 4px var(--jp-space-md);
+  background: var(--jp-color-error-bg, #fef2f2);
+  color: var(--jp-color-error, #dc2626);
+  font-size: var(--jp-font-size-sm);
+  white-space: pre-wrap;
+  overflow: auto;
+  max-height: 100px;
+  border-bottom: 1px solid var(--jp-color-border);
+}

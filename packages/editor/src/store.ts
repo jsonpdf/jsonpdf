@@ -71,8 +71,8 @@ export interface EditorState extends TemporalState {
   removeSection: (sectionId: string) => void;
   moveSection: (sectionId: string, toIndex: number) => void;
   addElement: (bandId: string, elementType: string, x?: number, y?: number) => void;
-  activeTab: 'editor' | 'preview';
-  setActiveTab: (tab: 'editor' | 'preview') => void;
+  activeTab: 'editor' | 'code' | 'preview';
+  setActiveTab: (tab: 'editor' | 'code' | 'preview') => void;
   importTemplate: (json: string) => { success: true } | { success: false; error: string };
   exportTemplate: () => string;
 }
