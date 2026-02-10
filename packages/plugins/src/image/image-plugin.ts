@@ -19,7 +19,7 @@ export const imagePropsSchema: JSONSchema = {
   type: 'object',
   required: ['src'],
   properties: {
-    src: { type: 'string', minLength: 1 },
+    src: { type: 'string', minLength: 1, pattern: '^data:' },
     fit: { type: 'string', enum: ['contain', 'cover', 'fill', 'none'] },
   },
 };
@@ -104,6 +104,12 @@ export const imagePlugin: Plugin<ImageProps> = {
     const errors: ValidationError[] = [];
     if (!props.src || typeof props.src !== 'string' || props.src.trim().length === 0) {
       errors.push({ path: '/src', message: 'src is required and must be a non-empty string' });
+    } else if (!props.src.startsWith('data:')) {
+      errors.push({
+        path: '/src',
+        message:
+          'src must be a data URI (e.g. data:image/png;base64,... or data:image/svg+xml,...)',
+      });
     }
     if (props.fit !== undefined && !['contain', 'cover', 'fill', 'none'].includes(props.fit)) {
       errors.push({ path: '/fit', message: 'fit must be contain, cover, fill, or none' });

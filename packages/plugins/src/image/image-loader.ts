@@ -1,10 +1,6 @@
-import { readFileBytes } from '#platform/fs';
 import type { PDFDocument } from 'pdf-lib';
 import type { EmbeddedImage, ImageCache } from '../types.js';
 import { isSvgBytes, rasterizeSvg } from './svg-rasterizer.js';
-
-/** Default fetch timeout in milliseconds (30 seconds). */
-const FETCH_TIMEOUT_MS = 30_000;
 
 export type ImageFormat = 'png' | 'jpeg';
 
@@ -26,8 +22,8 @@ export function detectFormat(bytes: Uint8Array): ImageFormat {
   throw new Error('Unsupported image format: expected PNG or JPEG');
 }
 
-/** Load image bytes from a source string. */
-export async function loadImageBytes(src: string): Promise<LoadedImage> {
+/** Load image bytes from a data URI. */
+export function loadImageBytes(src: string): LoadedImage {
   let bytes: Uint8Array;
   let isSvgDataUri = false;
 
@@ -48,24 +44,10 @@ export async function loadImageBytes(src: string): Promise<LoadedImage> {
       const decoded = decodeURIComponent(src.slice(commaIdx + 1));
       bytes = new TextEncoder().encode(decoded);
     }
-  } else if (src.startsWith('http://') || src.startsWith('https://')) {
-    // URL with timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => {
-      controller.abort();
-    }, FETCH_TIMEOUT_MS);
-    try {
-      const response = await fetch(src, { signal: controller.signal });
-      if (!response.ok) {
-        throw new Error(`Failed to fetch image: ${String(response.status)} ${response.statusText}`);
-      }
-      bytes = new Uint8Array(await response.arrayBuffer());
-    } finally {
-      clearTimeout(timeoutId);
-    }
   } else {
-    // File path
-    bytes = await readFileBytes(src);
+    throw new Error(
+      `Unsupported image source: "${src.slice(0, 80)}". Use a data URI (base64 or URL-encoded).`,
+    );
   }
 
   // SVG: rasterize to PNG before embedding
@@ -98,7 +80,7 @@ export function createImageCache(): ImageCache {
     async getOrEmbed(src: string, doc: PDFDocument): Promise<EmbeddedImage> {
       let promise = cache.get(src);
       if (!promise) {
-        promise = loadImageBytes(src).then((loaded) => embedImage(doc, loaded));
+        promise = embedImage(doc, loadImageBytes(src));
         // Remove from cache on failure so retries can succeed
         promise.catch(() => cache.delete(src));
         cache.set(src, promise);
