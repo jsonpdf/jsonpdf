@@ -92,7 +92,7 @@ describe('renderPdf', () => {
     expect(result.pageCount).toBe(0);
   });
 
-  it('throws for element with invalid plugin properties', async () => {
+  it('throws for element with invalid plugin properties (schema-level)', async () => {
     let t = createTemplate({ name: 'Bad Props' });
     t = addSection(t, { id: 'sec1', bands: [] });
     t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
@@ -103,10 +103,70 @@ describe('renderPdf', () => {
       y: 0,
       width: 200,
       height: 1,
-      properties: { color: 'not-a-hex-color', thickness: -5 },
+      properties: { thickness: -5 },
     });
 
+    // thickness: -5 violates exclusiveMinimum: 0 in the line propsSchema
+    await expect(renderPdf(t)).rejects.toThrow('validation failed');
+  });
+
+  it('throws for element with invalid plugin properties (imperative validate)', async () => {
+    let t = createTemplate({ name: 'Bad Color' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'bad-line',
+      type: 'line',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 1,
+      properties: { color: 'not-a-hex-color' },
+    });
+
+    // color format is checked by imperative validate(), not schema
     await expect(renderPdf(t)).rejects.toThrow('Invalid properties for line element "bad-line"');
+  });
+
+  it('throws for shape element missing required shapeType', async () => {
+    let t = createTemplate({ name: 'Missing shapeType' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'bad-shape',
+      type: 'shape',
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      properties: { fill: '#ff0000' },
+    });
+
+    await expect(renderPdf(t)).rejects.toThrow('validation failed');
+  });
+
+  it('accepts expression values in plugin properties', async () => {
+    let t = createTemplate({ name: 'Expression Props' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'el1',
+      type: 'image',
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      properties: { src: '{{ data.imageSrc }}' },
+    });
+
+    // Should not throw at schema validation — expression strings pass through.
+    // Will fail at render time because the expression resolves to invalid data,
+    // so we use skipValidation=false to specifically test the schema accepts expressions.
+    const result = await renderPdf(t, { skipValidation: false, data: {} }).catch(
+      (e: Error) => e.message,
+    );
+    // The error should NOT be about schema validation; if it fails, it's a render error
+    expect(result).not.toContain('validation failed');
   });
 });
 

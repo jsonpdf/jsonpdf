@@ -5,5 +5,10 @@
     "rootDir": "src"
   },
   "include": ["src"],
-  "references": [{ "path": "../core" }, { "path": "../template" }, { "path": "../renderer" }]
+  "references": [
+    { "path": "../core" },
+    { "path": "../plugins" },
+    { "path": "../template" },
+    { "path": "../renderer" }
+  ]
 }

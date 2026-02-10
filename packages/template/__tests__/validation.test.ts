@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { validateTemplate } from '../src/validation.js';
 import { createTemplate } from '../src/factory.js';
 import { addSection, addBand, addElement, addStyle } from '../src/operations.js';
-import type { Template } from '@jsonpdf/core';
+import type { Template, PluginSchemaEntry } from '@jsonpdf/core';
 
 function buildMinimalTemplate(): Template {
   let t = createTemplate({ name: 'Test' });
@@ -95,6 +95,61 @@ describe('validateTemplate', () => {
       })),
     };
     const result = validateTemplate(t);
+    expect(result.valid).toBe(true);
+  });
+});
+
+describe('validateTemplate with pluginSchemas', () => {
+  const textPluginSchema: PluginSchemaEntry = {
+    type: 'text',
+    propsSchema: {
+      type: 'object',
+      required: ['content'],
+      properties: {
+        content: { oneOf: [{ type: 'string' }, { type: 'array' }] },
+        autoHeight: { type: 'boolean' },
+      },
+    },
+  };
+
+  const linePluginSchema: PluginSchemaEntry = {
+    type: 'line',
+    propsSchema: {
+      type: 'object',
+      properties: {
+        color: { type: 'string' },
+        thickness: { type: 'number', exclusiveMinimum: 0 },
+      },
+    },
+  };
+
+  const plugins = [textPluginSchema, linePluginSchema];
+
+  it('rejects invalid plugin properties when pluginSchemas provided', () => {
+    let t = createTemplate({ name: 'Test' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'el1',
+      type: 'line',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 1,
+      properties: { thickness: -5 },
+    });
+
+    const result = validateTemplate(t, plugins);
+    expect(result.valid).toBe(false);
+  });
+
+  it('works without pluginSchemas (backward compat)', () => {
+    const result = validateTemplate(buildMinimalTemplate());
+    expect(result.valid).toBe(true);
+  });
+
+  it('accepts valid properties when pluginSchemas provided', () => {
+    const result = validateTemplate(buildMinimalTemplate(), plugins);
     expect(result.valid).toBe(true);
   });
 });

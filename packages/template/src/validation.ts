@@ -1,9 +1,12 @@
 import { validateTemplateSchema } from '@jsonpdf/core';
-import type { Template, ValidationResult, ValidationError } from '@jsonpdf/core';
+import type { Template, ValidationResult, ValidationError, PluginSchemaEntry } from '@jsonpdf/core';
 
 /** Validate a template against the schema and semantic rules. */
-export function validateTemplate(template: Template): ValidationResult {
-  const schemaResult = validateTemplateSchema(template);
+export function validateTemplate(
+  template: Template,
+  pluginSchemas?: readonly PluginSchemaEntry[],
+): ValidationResult {
+  const schemaResult = validateTemplateSchema(template, pluginSchemas);
   if (!schemaResult.valid) {
     return schemaResult;
   }
