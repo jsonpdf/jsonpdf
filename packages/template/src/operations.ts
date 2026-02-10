@@ -70,7 +70,7 @@ function replaceAllIds(node: Record<string, unknown>): void {
 }
 
 /** Deep-clone an object with an `id` field, assigning new IDs recursively. */
-function deepCloneWithNewIds<T extends { id: string }>(obj: T): T {
+export function deepCloneWithNewIds<T extends { id: string }>(obj: T): T {
   const clone = structuredClone(obj);
   replaceAllIds(clone as Record<string, unknown>);
   return clone;

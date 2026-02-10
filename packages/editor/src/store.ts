@@ -19,6 +19,8 @@ import {
   moveElement as moveElementOp,
   moveSection as moveSectionOp,
   findBand,
+  findElement,
+  deepCloneWithNewIds,
 } from '@jsonpdf/template';
 import { createDefaultElement } from './constants/element-defaults';
 import { temporal, type TemporalState } from './middleware/temporal';
@@ -28,21 +30,29 @@ export interface EditorState extends TemporalState {
   zoom: number;
   scrollX: number;
   scrollY: number;
-  selectedElementId: string | null;
+  selectedElementIds: string[];
   selectedBandId: string | null;
   selectedSectionId: string | null;
+  clipboard: { elements: Element[]; sourceBandId: string } | null;
 
   setTemplate: (template: Template) => void;
   setZoom: (zoom: number) => void;
   setScroll: (x: number, y: number) => void;
   setSelection: (
-    elementId: string | null,
+    elementIds: string[] | string | null,
     bandId?: string | null,
     sectionId?: string | null,
   ) => void;
+  toggleElementSelection: (elementId: string, bandId: string, sectionId: string) => void;
+  copySelection: () => void;
+  pasteClipboard: () => void;
+  duplicateSelection: () => void;
+  selectAllInBand: () => void;
   updateElementPosition: (elementId: string, x: number, y: number) => void;
+  moveSelectedElements: (dx: number, dy: number) => void;
   updateElementBounds: (elementId: string, x: number, y: number, w: number, h: number) => void;
-  deleteSelectedElement: () => void;
+  resizeSelectedElements: (dx: number, dy: number, scaleX: number, scaleY: number) => void;
+  deleteSelectedElements: () => void;
   updateBandHeight: (bandId: string, height: number) => void;
   updateElementProps: (elementId: string, updates: Partial<Omit<Element, 'id'>>) => void;
   updateBandProps: (bandId: string, updates: Partial<Omit<Band, 'id' | 'elements'>>) => void;
@@ -67,15 +77,23 @@ export interface EditorState extends TemporalState {
   exportTemplate: () => string;
 }
 
+/** Normalize setSelection input: null → [], string → [string], string[] → as-is. */
+function normalizeIds(input: string[] | string | null): string[] {
+  if (input === null) return [];
+  if (typeof input === 'string') return [input];
+  return input;
+}
+
 export const useEditorStore = create<EditorState>(
   temporal((set, get) => ({
     template: createTemplate(),
     zoom: 1.0,
     scrollX: 0,
     scrollY: 0,
-    selectedElementId: null,
+    selectedElementIds: [],
     selectedBandId: null,
     selectedSectionId: null,
+    clipboard: null,
     activeTab: 'editor',
 
     _undoStack: [],
@@ -91,7 +109,7 @@ export const useEditorStore = create<EditorState>(
         template: prevTemplate,
         _undoStack: undoStack,
         _redoStack: [...state._redoStack, state.template],
-        selectedElementId: null,
+        selectedElementIds: [],
         selectedBandId: null,
         selectedSectionId: null,
       });
@@ -107,7 +125,7 @@ export const useEditorStore = create<EditorState>(
         template: nextTemplate,
         _undoStack: [...state._undoStack, state.template],
         _redoStack: redoStack,
-        selectedElementId: null,
+        selectedElementIds: [],
         selectedBandId: null,
         selectedSectionId: null,
       });
@@ -128,17 +146,135 @@ export const useEditorStore = create<EditorState>(
     setScroll: (scrollX, scrollY) => {
       set({ scrollX, scrollY });
     },
-    setSelection: (elementId, bandId, sectionId) => {
+    setSelection: (elementIds, bandId, sectionId) => {
       set({
-        selectedElementId: elementId,
+        selectedElementIds: normalizeIds(elementIds),
         selectedBandId: bandId ?? null,
         selectedSectionId: sectionId ?? null,
+      });
+    },
+    toggleElementSelection: (elementId, bandId, sectionId) => {
+      set((state) => {
+        // If element is in a different band, replace selection
+        if (state.selectedBandId && state.selectedBandId !== bandId) {
+          return {
+            selectedElementIds: [elementId],
+            selectedBandId: bandId,
+            selectedSectionId: sectionId,
+          };
+        }
+        const existing = state.selectedElementIds;
+        if (existing.includes(elementId)) {
+          // Remove from selection
+          const filtered = existing.filter((id) => id !== elementId);
+          return {
+            selectedElementIds: filtered,
+            selectedBandId: filtered.length > 0 ? bandId : null,
+            selectedSectionId: filtered.length > 0 ? sectionId : null,
+          };
+        }
+        // Add to selection
+        return {
+          selectedElementIds: [...existing, elementId],
+          selectedBandId: bandId,
+          selectedSectionId: sectionId,
+        };
+      });
+    },
+    copySelection: () => {
+      const state = get();
+      if (state.selectedElementIds.length === 0 || !state.selectedBandId) return;
+      const elements: Element[] = [];
+      for (const id of state.selectedElementIds) {
+        const result = findElement(state.template, id);
+        if (result) elements.push(structuredClone(result.element));
+      }
+      if (elements.length > 0) {
+        set({ clipboard: { elements, sourceBandId: state.selectedBandId } });
+      }
+    },
+    pasteClipboard: () => {
+      set((state) => {
+        if (!state.clipboard) return state;
+        const targetBandId = state.selectedBandId ?? state.clipboard.sourceBandId;
+        let template = state.template;
+        const newIds: string[] = [];
+        try {
+          for (const el of state.clipboard.elements) {
+            const cloned = deepCloneWithNewIds(el);
+            template = addElementOp(template, targetBandId, cloned);
+            newIds.push(cloned.id);
+          }
+          const bandResult = findBand(template, targetBandId);
+          return {
+            template,
+            selectedElementIds: newIds,
+            selectedBandId: targetBandId,
+            selectedSectionId: bandResult?.section.id ?? state.selectedSectionId,
+          };
+        } catch {
+          return state;
+        }
+      });
+    },
+    duplicateSelection: () => {
+      set((state) => {
+        if (state.selectedElementIds.length === 0 || !state.selectedBandId) return state;
+        let template = state.template;
+        const newIds: string[] = [];
+        try {
+          for (const id of state.selectedElementIds) {
+            const result = findElement(template, id);
+            if (!result) continue;
+            const cloned = deepCloneWithNewIds(result.element);
+            template = addElementOp(template, state.selectedBandId, cloned);
+            newIds.push(cloned.id);
+          }
+          return {
+            template,
+            selectedElementIds: newIds,
+          };
+        } catch {
+          return state;
+        }
+      });
+    },
+    selectAllInBand: () => {
+      const state = get();
+      if (!state.selectedBandId) return;
+      const bandResult = findBand(state.template, state.selectedBandId);
+      if (!bandResult) return;
+      const ids = bandResult.band.elements.map((el) => el.id);
+      set({
+        selectedElementIds: ids,
+        selectedBandId: state.selectedBandId,
+        selectedSectionId: bandResult.section.id,
       });
     },
     updateElementPosition: (elementId, x, y) => {
       set((state) => {
         try {
           return { template: updateElement(state.template, elementId, { x, y }) };
+        } catch {
+          return state;
+        }
+      });
+    },
+    moveSelectedElements: (dx, dy) => {
+      set((state) => {
+        if (state.selectedElementIds.length === 0) return state;
+        let template = state.template;
+        try {
+          for (const id of state.selectedElementIds) {
+            const result = findElement(template, id);
+            if (result) {
+              template = updateElement(template, id, {
+                x: result.element.x + dx,
+                y: result.element.y + dy,
+              });
+            }
+          }
+          return { template };
         } catch {
           return state;
         }
@@ -160,13 +296,52 @@ export const useEditorStore = create<EditorState>(
         }
       });
     },
-    deleteSelectedElement: () => {
+    resizeSelectedElements: (dx, dy, scaleX, scaleY) => {
       set((state) => {
-        if (!state.selectedElementId) return state;
+        if (state.selectedElementIds.length === 0) return state;
+        const clampedScaleX = Math.max(0.01, scaleX);
+        const clampedScaleY = Math.max(0.01, scaleY);
+        const items: Array<{ id: string; x: number; y: number; width: number; height: number }> =
+          [];
+        for (const id of state.selectedElementIds) {
+          const result = findElement(state.template, id);
+          if (result) {
+            const el = result.element;
+            items.push({ id, x: el.x, y: el.y, width: el.width, height: el.height });
+          }
+        }
+        if (items.length === 0) return state;
+        const minX = Math.min(...items.map((e) => e.x));
+        const minY = Math.min(...items.map((e) => e.y));
+        let template = state.template;
         try {
+          for (const item of items) {
+            const relX = item.x - minX;
+            const relY = item.y - minY;
+            template = updateElement(template, item.id, {
+              x: minX + dx + relX * clampedScaleX,
+              y: minY + dy + relY * clampedScaleY,
+              width: Math.max(1, item.width * clampedScaleX),
+              height: Math.max(1, item.height * clampedScaleY),
+            });
+          }
+          return { template };
+        } catch {
+          return state;
+        }
+      });
+    },
+    deleteSelectedElements: () => {
+      set((state) => {
+        if (state.selectedElementIds.length === 0) return state;
+        let template = state.template;
+        try {
+          for (const id of state.selectedElementIds) {
+            template = removeElement(template, id);
+          }
           return {
-            template: removeElement(state.template, state.selectedElementId),
-            selectedElementId: null,
+            template,
+            selectedElementIds: [],
             selectedBandId: null,
             selectedSectionId: null,
           };
@@ -244,7 +419,7 @@ export const useEditorStore = create<EditorState>(
         try {
           return {
             template: removeBandOp(state.template, bandId),
-            selectedElementId: null,
+            selectedElementIds: [],
             selectedBandId: null,
           };
         } catch {
@@ -268,7 +443,7 @@ export const useEditorStore = create<EditorState>(
         try {
           return {
             template: addBandOp(state.template, sectionId, band),
-            selectedElementId: null,
+            selectedElementIds: [],
             selectedBandId: id,
             selectedSectionId: sectionId,
           };
@@ -284,7 +459,7 @@ export const useEditorStore = create<EditorState>(
         const section: Section = { id: sectionId, name, bands: [] };
         return {
           template: addSectionOp(state.template, section),
-          selectedElementId: null,
+          selectedElementIds: [],
           selectedBandId: null,
           selectedSectionId: sectionId,
         };
@@ -295,7 +470,7 @@ export const useEditorStore = create<EditorState>(
         try {
           return {
             template: removeSectionOp(state.template, sectionId),
-            selectedElementId: null,
+            selectedElementIds: [],
             selectedBandId: null,
             selectedSectionId: null,
           };
@@ -323,7 +498,7 @@ export const useEditorStore = create<EditorState>(
           const bandResult = findBand(newTemplate, bandId);
           return {
             template: newTemplate,
-            selectedElementId: element.id,
+            selectedElementIds: [element.id],
             selectedBandId: bandId,
             selectedSectionId: bandResult?.section.id ?? null,
           };
@@ -347,7 +522,7 @@ export const useEditorStore = create<EditorState>(
       }
       set({
         template,
-        selectedElementId: null,
+        selectedElementIds: [],
         selectedBandId: null,
         selectedSectionId: null,
       });

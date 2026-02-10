@@ -34,37 +34,75 @@ function findElementWithOffsets(
   return null;
 }
 
+/** Resolve a single element's absolute stage-coordinate geometry. */
+function findElementStageGeometry(
+  targetId: string,
+  pages: DesignPage[],
+  pageXOffsets: number[],
+  pageYOffsets: number[],
+): { x: number; y: number; width: number; height: number; rotation: number } | null {
+  for (let pi = 0; pi < pages.length; pi++) {
+    const page = pages[pi];
+    const { margins } = page.pageConfig;
+
+    for (const db of page.bands) {
+      const found = findElementWithOffsets(db.band.elements, targetId, 0, 0);
+      if (found) {
+        return {
+          x: pageXOffsets[pi] + margins.left + found.offsetX + found.element.x,
+          y: pageYOffsets[pi] + margins.top + db.offsetY + found.offsetY + found.element.y,
+          width: found.element.width,
+          height: found.element.height,
+          rotation: found.element.rotation ?? 0,
+        };
+      }
+    }
+  }
+  return null;
+}
+
 /**
- * Compute the absolute Stage-coordinate geometry of the selected element.
- * Returns null when nothing is selected or the element isn't found.
+ * Compute the absolute Stage-coordinate geometry of the selected element(s).
+ * For a single element returns its exact bounds and rotation.
+ * For multiple elements returns the enclosing bounding box with rotation 0.
+ * Returns null when nothing is selected or no elements are found.
  */
 export function useSelectionGeometry(
-  selectedElementId: string | null,
+  selectedElementIds: string[],
   pages: DesignPage[],
   pageXOffsets: number[],
   pageYOffsets: number[],
 ): SelectionGeometry | null {
   return useMemo(() => {
-    if (!selectedElementId) return null;
+    if (selectedElementIds.length === 0) return null;
 
-    for (let pi = 0; pi < pages.length; pi++) {
-      const page = pages[pi];
-      const { margins } = page.pageConfig;
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    let singleRotation = 0;
+    let found = false;
 
-      for (const db of page.bands) {
-        const found = findElementWithOffsets(db.band.elements, selectedElementId, 0, 0);
-        if (found) {
-          return {
-            x: pageXOffsets[pi] + margins.left + found.offsetX + found.element.x,
-            y: pageYOffsets[pi] + margins.top + db.offsetY + found.offsetY + found.element.y,
-            width: found.element.width,
-            height: found.element.height,
-            rotation: found.element.rotation ?? 0,
-          };
-        }
+    for (const id of selectedElementIds) {
+      const geo = findElementStageGeometry(id, pages, pageXOffsets, pageYOffsets);
+      if (geo) {
+        found = true;
+        minX = Math.min(minX, geo.x);
+        minY = Math.min(minY, geo.y);
+        maxX = Math.max(maxX, geo.x + geo.width);
+        maxY = Math.max(maxY, geo.y + geo.height);
+        if (selectedElementIds.length === 1) singleRotation = geo.rotation;
       }
     }
 
-    return null;
-  }, [selectedElementId, pages, pageXOffsets, pageYOffsets]);
+    if (!found) return null;
+
+    return {
+      x: minX,
+      y: minY,
+      width: maxX - minX,
+      height: maxY - minY,
+      rotation: singleRotation,
+    };
+  }, [selectedElementIds, pages, pageXOffsets, pageYOffsets]);
 }

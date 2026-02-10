@@ -39,39 +39,65 @@ export function useKeyboardShortcuts() {
         return;
       }
 
+      // Copy: Cmd+C / Ctrl+C
+      if (mod && e.key === 'c') {
+        e.preventDefault();
+        state.copySelection();
+        return;
+      }
+
+      // Paste: Cmd+V / Ctrl+V
+      if (mod && e.key === 'v') {
+        e.preventDefault();
+        state.pasteClipboard();
+        return;
+      }
+
+      // Duplicate: Cmd+D / Ctrl+D
+      if (mod && e.key === 'd') {
+        e.preventDefault();
+        state.duplicateSelection();
+        return;
+      }
+
+      // Select All: Cmd+A / Ctrl+A
+      if (mod && e.key === 'a') {
+        e.preventDefault();
+        state.selectAllInBand();
+        return;
+      }
+
       if (e.key === 'Escape') {
         state.setSelection(null);
         return;
       }
 
-      if (!state.selectedElementId) return;
+      if (state.selectedElementIds.length === 0) return;
 
       if (e.key === 'Delete' || e.key === 'Backspace') {
         e.preventDefault();
-        state.deleteSelectedElement();
+        state.deleteSelectedElements();
         return;
       }
 
       const nudge = e.shiftKey ? NUDGE_LARGE : NUDGE_SMALL;
-      const el = findSelectedElement(state);
-      if (!el) return;
 
       switch (e.key) {
         case 'ArrowLeft':
           e.preventDefault();
-          state.updateElementPosition(state.selectedElementId, el.x - nudge, el.y);
+          state.moveSelectedElements(-nudge, 0);
           break;
         case 'ArrowRight':
           e.preventDefault();
-          state.updateElementPosition(state.selectedElementId, el.x + nudge, el.y);
+          state.moveSelectedElements(nudge, 0);
           break;
         case 'ArrowUp':
           e.preventDefault();
-          state.updateElementPosition(state.selectedElementId, el.x, el.y - nudge);
+          state.moveSelectedElements(0, -nudge);
           break;
         case 'ArrowDown':
           e.preventDefault();
-          state.updateElementPosition(state.selectedElementId, el.x, el.y + nudge);
+          state.moveSelectedElements(0, nudge);
           break;
       }
     }
@@ -81,31 +107,4 @@ export function useKeyboardShortcuts() {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
-}
-
-/** Find the currently selected element in the template to read its x/y. */
-function findSelectedElement(state: ReturnType<typeof useEditorStore.getState>) {
-  const id = state.selectedElementId;
-  if (!id) return null;
-  for (const section of state.template.sections) {
-    for (const band of section.bands) {
-      const found = findInElements(band.elements, id);
-      if (found) return found;
-    }
-  }
-  return null;
-}
-
-function findInElements(
-  elements: { id: string; x: number; y: number; elements?: typeof elements }[],
-  id: string,
-): { x: number; y: number } | null {
-  for (const el of elements) {
-    if (el.id === id) return { x: el.x, y: el.y };
-    if (el.elements) {
-      const found = findInElements(el.elements, id);
-      if (found) return found;
-    }
-  }
-  return null;
 }

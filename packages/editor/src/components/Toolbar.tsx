@@ -13,6 +13,13 @@ export function Toolbar() {
   const redoLen = useEditorStore((s) => s._redoStack.length);
   const undo = useEditorStore((s) => s.undo);
   const redo = useEditorStore((s) => s.redo);
+  const hasSelection = useEditorStore((s) => s.selectedElementIds.length > 0);
+  const hasClipboard = useEditorStore((s) => s.clipboard !== null);
+  const hasBand = useEditorStore((s) => s.selectedBandId !== null);
+  const copySelection = useEditorStore((s) => s.copySelection);
+  const pasteClipboard = useEditorStore((s) => s.pasteClipboard);
+  const duplicateSelection = useEditorStore((s) => s.duplicateSelection);
+  const selectAllInBand = useEditorStore((s) => s.selectAllInBand);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const fileMenuRef = useRef<HTMLDivElement>(null);
   const editMenuRef = useRef<HTMLDivElement>(null);
@@ -83,6 +90,26 @@ export function Toolbar() {
   const handleRedo = () => {
     closeMenu();
     redo();
+  };
+
+  const handleCopy = () => {
+    closeMenu();
+    copySelection();
+  };
+
+  const handlePaste = () => {
+    closeMenu();
+    pasteClipboard();
+  };
+
+  const handleDuplicate = () => {
+    closeMenu();
+    duplicateSelection();
+  };
+
+  const handleSelectAll = () => {
+    closeMenu();
+    selectAllInBand();
   };
 
   return (
@@ -174,6 +201,44 @@ export function Toolbar() {
                 <span className={styles.shortcutHint}>
                   {isMac ? '\u2318\u21E7Z' : 'Ctrl+Shift+Z'}
                 </span>
+              </button>
+              <div className={styles.menuSeparator} />
+              <button
+                className={`${styles.menuItem} ${!hasSelection ? styles.menuItemDisabled : ''}`}
+                role="menuitem"
+                disabled={!hasSelection}
+                onClick={handleCopy}
+              >
+                <span>Copy</span>
+                <span className={styles.shortcutHint}>{isMac ? '\u2318C' : 'Ctrl+C'}</span>
+              </button>
+              <button
+                className={`${styles.menuItem} ${!hasClipboard ? styles.menuItemDisabled : ''}`}
+                role="menuitem"
+                disabled={!hasClipboard}
+                onClick={handlePaste}
+              >
+                <span>Paste</span>
+                <span className={styles.shortcutHint}>{isMac ? '\u2318V' : 'Ctrl+V'}</span>
+              </button>
+              <button
+                className={`${styles.menuItem} ${!hasSelection ? styles.menuItemDisabled : ''}`}
+                role="menuitem"
+                disabled={!hasSelection}
+                onClick={handleDuplicate}
+              >
+                <span>Duplicate</span>
+                <span className={styles.shortcutHint}>{isMac ? '\u2318D' : 'Ctrl+D'}</span>
+              </button>
+              <div className={styles.menuSeparator} />
+              <button
+                className={`${styles.menuItem} ${!hasBand ? styles.menuItemDisabled : ''}`}
+                role="menuitem"
+                disabled={!hasBand}
+                onClick={handleSelectAll}
+              >
+                <span>Select All</span>
+                <span className={styles.shortcutHint}>{isMac ? '\u2318A' : 'Ctrl+A'}</span>
               </button>
             </div>
           )}

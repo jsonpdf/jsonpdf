@@ -9,9 +9,10 @@ describe('useEditorStore', () => {
       zoom: 1.0,
       scrollX: 0,
       scrollY: 0,
-      selectedElementId: null,
+      selectedElementIds: [],
       selectedBandId: null,
       selectedSectionId: null,
+      clipboard: null,
       activeTab: 'editor',
       _undoStack: [],
       _redoStack: [],
@@ -25,7 +26,7 @@ describe('useEditorStore', () => {
     expect(state.zoom).toBe(1.0);
     expect(state.scrollX).toBe(0);
     expect(state.scrollY).toBe(0);
-    expect(state.selectedElementId).toBeNull();
+    expect(state.selectedElementIds).toEqual([]);
     expect(state.selectedBandId).toBeNull();
     expect(state.selectedSectionId).toBeNull();
   });
@@ -61,9 +62,16 @@ describe('useEditorStore', () => {
   it('setSelection sets all selection fields', () => {
     useEditorStore.getState().setSelection('el1', 'band1', 'sec1');
     const state = useEditorStore.getState();
-    expect(state.selectedElementId).toBe('el1');
+    expect(state.selectedElementIds).toEqual(['el1']);
     expect(state.selectedBandId).toBe('band1');
     expect(state.selectedSectionId).toBe('sec1');
+  });
+
+  it('setSelection accepts array of element IDs', () => {
+    useEditorStore.getState().setSelection(['el1', 'el2'], 'band1', 'sec1');
+    const state = useEditorStore.getState();
+    expect(state.selectedElementIds).toEqual(['el1', 'el2']);
+    expect(state.selectedBandId).toBe('band1');
   });
 
   it('activeTab defaults to editor', () => {
@@ -81,7 +89,7 @@ describe('useEditorStore', () => {
     useEditorStore.getState().setSelection('el1', 'band1', 'sec1');
     useEditorStore.getState().setSelection(null);
     const state = useEditorStore.getState();
-    expect(state.selectedElementId).toBeNull();
+    expect(state.selectedElementIds).toEqual([]);
     expect(state.selectedBandId).toBeNull();
     expect(state.selectedSectionId).toBeNull();
   });
@@ -89,7 +97,7 @@ describe('useEditorStore', () => {
   it('setSelection defaults bandId and sectionId to null', () => {
     useEditorStore.getState().setSelection('el1');
     const state = useEditorStore.getState();
-    expect(state.selectedElementId).toBe('el1');
+    expect(state.selectedElementIds).toEqual(['el1']);
     expect(state.selectedBandId).toBeNull();
     expect(state.selectedSectionId).toBeNull();
   });
@@ -129,20 +137,20 @@ describe('useEditorStore', () => {
       expect(el.height).toBe(80);
     });
 
-    it('deleteSelectedElement removes element and clears selection', () => {
+    it('deleteSelectedElements removes element and clears selection', () => {
       setupTemplateWithElement();
       useEditorStore.getState().setSelection('el1', 'band1', 'sec1');
-      useEditorStore.getState().deleteSelectedElement();
+      useEditorStore.getState().deleteSelectedElements();
       const state = useEditorStore.getState();
       expect(state.template.sections[0].bands[0].elements).toHaveLength(0);
-      expect(state.selectedElementId).toBeNull();
+      expect(state.selectedElementIds).toEqual([]);
       expect(state.selectedBandId).toBeNull();
       expect(state.selectedSectionId).toBeNull();
     });
 
-    it('deleteSelectedElement is a no-op when nothing selected', () => {
+    it('deleteSelectedElements is a no-op when nothing selected', () => {
       setupTemplateWithElement();
-      useEditorStore.getState().deleteSelectedElement();
+      useEditorStore.getState().deleteSelectedElements();
       expect(useEditorStore.getState().template.sections[0].bands[0].elements).toHaveLength(1);
     });
 
@@ -357,7 +365,7 @@ describe('useEditorStore', () => {
       expect(state.template.sections[0].bands).toHaveLength(1);
       expect(state.template.sections[0].bands[0].id).toBe('b2');
       expect(state.selectedBandId).toBeNull();
-      expect(state.selectedElementId).toBeNull();
+      expect(state.selectedElementIds).toEqual([]);
     });
 
     it('no-ops for invalid band ID', () => {
@@ -393,13 +401,13 @@ describe('useEditorStore', () => {
 
     it('auto-selects the new section', () => {
       useEditorStore.setState({
-        selectedElementId: 'el1',
+        selectedElementIds: ['el1'],
         selectedBandId: 'b1',
         selectedSectionId: 'sec1',
       });
       useEditorStore.getState().addSection();
       const state = useEditorStore.getState();
-      expect(state.selectedElementId).toBeNull();
+      expect(state.selectedElementIds).toEqual([]);
       expect(state.selectedBandId).toBeNull();
       expect(state.selectedSectionId).toBe(state.template.sections[0].id);
     });
@@ -420,7 +428,7 @@ describe('useEditorStore', () => {
       expect(state.template.sections[0].id).toBe('sec2');
       expect(state.selectedSectionId).toBeNull();
       expect(state.selectedBandId).toBeNull();
-      expect(state.selectedElementId).toBeNull();
+      expect(state.selectedElementIds).toEqual([]);
     });
 
     it('no-ops for invalid section ID', () => {
@@ -482,7 +490,7 @@ describe('useEditorStore', () => {
       expect(bands[0].id).toMatch(/^band_/);
       expect(state.selectedBandId).toBe(bands[0].id);
       expect(state.selectedSectionId).toBe('sec1');
-      expect(state.selectedElementId).toBeNull();
+      expect(state.selectedElementIds).toEqual([]);
     });
 
     it('no-ops on invalid section ID', () => {
@@ -528,7 +536,7 @@ describe('useEditorStore', () => {
   describe('importTemplate', () => {
     it('imports valid template JSON and clears selection', () => {
       useEditorStore.setState({
-        selectedElementId: 'el1',
+        selectedElementIds: ['el1'],
         selectedBandId: 'b1',
         selectedSectionId: 'sec1',
       });
@@ -543,7 +551,7 @@ describe('useEditorStore', () => {
       const state = useEditorStore.getState();
       expect(state.template.name).toBe('Imported');
       expect(state.template.sections).toHaveLength(1);
-      expect(state.selectedElementId).toBeNull();
+      expect(state.selectedElementIds).toEqual([]);
       expect(state.selectedBandId).toBeNull();
       expect(state.selectedSectionId).toBeNull();
     });
@@ -599,7 +607,7 @@ describe('useEditorStore', () => {
       useEditorStore.getState().addElement('band1', 'shape');
       const state = useEditorStore.getState();
       const el = state.template.sections[0].bands[0].elements[0];
-      expect(state.selectedElementId).toBe(el.id);
+      expect(state.selectedElementIds).toEqual([el.id]);
       expect(state.selectedBandId).toBe('band1');
       expect(state.selectedSectionId).toBe('sec1');
     });
@@ -657,6 +665,418 @@ describe('useEditorStore', () => {
       expect(result).toEqual({ success: true });
       expect(useEditorStore.getState().template.name).toBe('Round Trip');
       expect(useEditorStore.getState().template.sections[0].bands[0].elements[0].id).toBe('el1');
+    });
+  });
+
+  describe('toggleElementSelection', () => {
+    function setupWithTwoElements() {
+      let t = createTemplate();
+      t = addSection(t, { id: 'sec1', bands: [] });
+      t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+      t = addElement(t, 'band1', {
+        id: 'el1',
+        type: 'text',
+        x: 10,
+        y: 20,
+        width: 100,
+        height: 50,
+        properties: { content: 'A' },
+      });
+      t = addElement(t, 'band1', {
+        id: 'el2',
+        type: 'text',
+        x: 10,
+        y: 80,
+        width: 100,
+        height: 50,
+        properties: { content: 'B' },
+      });
+      useEditorStore.setState({ template: t });
+    }
+
+    it('adds element to selection', () => {
+      setupWithTwoElements();
+      useEditorStore.getState().setSelection('el1', 'band1', 'sec1');
+      useEditorStore.getState().toggleElementSelection('el2', 'band1', 'sec1');
+      expect(useEditorStore.getState().selectedElementIds).toEqual(['el1', 'el2']);
+    });
+
+    it('removes element from selection', () => {
+      setupWithTwoElements();
+      useEditorStore.setState({
+        selectedElementIds: ['el1', 'el2'],
+        selectedBandId: 'band1',
+        selectedSectionId: 'sec1',
+      });
+      useEditorStore.getState().toggleElementSelection('el1', 'band1', 'sec1');
+      expect(useEditorStore.getState().selectedElementIds).toEqual(['el2']);
+    });
+
+    it('replaces selection when toggling element from different band', () => {
+      setupWithTwoElements();
+      useEditorStore.setState({
+        selectedElementIds: ['el1'],
+        selectedBandId: 'band1',
+        selectedSectionId: 'sec1',
+      });
+      useEditorStore.getState().toggleElementSelection('el2', 'other-band', 'sec1');
+      expect(useEditorStore.getState().selectedElementIds).toEqual(['el2']);
+      expect(useEditorStore.getState().selectedBandId).toBe('other-band');
+    });
+
+    it('clears band/section when last element is deselected', () => {
+      setupWithTwoElements();
+      useEditorStore.setState({
+        selectedElementIds: ['el1'],
+        selectedBandId: 'band1',
+        selectedSectionId: 'sec1',
+      });
+      useEditorStore.getState().toggleElementSelection('el1', 'band1', 'sec1');
+      expect(useEditorStore.getState().selectedElementIds).toEqual([]);
+      expect(useEditorStore.getState().selectedBandId).toBeNull();
+    });
+  });
+
+  describe('copySelection', () => {
+    function setupWithElement() {
+      let t = createTemplate();
+      t = addSection(t, { id: 'sec1', bands: [] });
+      t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+      t = addElement(t, 'band1', {
+        id: 'el1',
+        type: 'text',
+        x: 10,
+        y: 20,
+        width: 100,
+        height: 50,
+        properties: { content: 'test' },
+      });
+      useEditorStore.setState({ template: t });
+    }
+
+    it('copies selected elements to clipboard', () => {
+      setupWithElement();
+      useEditorStore.getState().setSelection('el1', 'band1', 'sec1');
+      useEditorStore.getState().copySelection();
+      const clip = useEditorStore.getState().clipboard;
+      expect(clip).not.toBeNull();
+      expect(clip!.elements).toHaveLength(1);
+      expect(clip!.elements[0].id).toBe('el1');
+      expect(clip!.sourceBandId).toBe('band1');
+    });
+
+    it('is a no-op when nothing selected', () => {
+      setupWithElement();
+      useEditorStore.getState().copySelection();
+      expect(useEditorStore.getState().clipboard).toBeNull();
+    });
+  });
+
+  describe('pasteClipboard', () => {
+    function setupWithElement() {
+      let t = createTemplate();
+      t = addSection(t, { id: 'sec1', bands: [] });
+      t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+      t = addBand(t, 'sec1', { id: 'band2', type: 'detail', height: 100, elements: [] });
+      t = addElement(t, 'band1', {
+        id: 'el1',
+        type: 'text',
+        x: 10,
+        y: 20,
+        width: 100,
+        height: 50,
+        properties: { content: 'test' },
+      });
+      useEditorStore.setState({ template: t });
+    }
+
+    it('pastes into same band with new IDs', () => {
+      setupWithElement();
+      useEditorStore.getState().setSelection('el1', 'band1', 'sec1');
+      useEditorStore.getState().copySelection();
+      useEditorStore.getState().pasteClipboard();
+      const state = useEditorStore.getState();
+      const els = state.template.sections[0].bands[0].elements;
+      expect(els).toHaveLength(2);
+      expect(els[1].id).not.toBe('el1'); // new ID
+      expect(els[1].x).toBe(10); // same position
+      expect(els[1].y).toBe(20); // same position
+      expect(state.selectedElementIds).toEqual([els[1].id]);
+    });
+
+    it('pastes into different band when band is selected', () => {
+      setupWithElement();
+      useEditorStore.getState().setSelection('el1', 'band1', 'sec1');
+      useEditorStore.getState().copySelection();
+      // Select target band
+      useEditorStore.getState().setSelection(null, 'band2', 'sec1');
+      useEditorStore.getState().pasteClipboard();
+      const state = useEditorStore.getState();
+      expect(state.template.sections[0].bands[0].elements).toHaveLength(1);
+      expect(state.template.sections[0].bands[1].elements).toHaveLength(1);
+      expect(state.selectedBandId).toBe('band2');
+    });
+
+    it('is a no-op when clipboard is empty', () => {
+      setupWithElement();
+      const before = useEditorStore.getState().template;
+      useEditorStore.getState().pasteClipboard();
+      expect(useEditorStore.getState().template).toBe(before);
+    });
+  });
+
+  describe('duplicateSelection', () => {
+    function setupWithElement() {
+      let t = createTemplate();
+      t = addSection(t, { id: 'sec1', bands: [] });
+      t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+      t = addElement(t, 'band1', {
+        id: 'el1',
+        type: 'text',
+        x: 10,
+        y: 20,
+        width: 100,
+        height: 50,
+        properties: { content: 'test' },
+      });
+      useEditorStore.setState({ template: t });
+    }
+
+    it('duplicates element with new ID at same position', () => {
+      setupWithElement();
+      useEditorStore.getState().setSelection('el1', 'band1', 'sec1');
+      useEditorStore.getState().duplicateSelection();
+      const state = useEditorStore.getState();
+      const els = state.template.sections[0].bands[0].elements;
+      expect(els).toHaveLength(2);
+      expect(els[1].id).not.toBe('el1');
+      expect(els[1].x).toBe(10);
+      expect(els[1].y).toBe(20);
+      expect(state.selectedElementIds).toEqual([els[1].id]);
+    });
+
+    it('is a no-op when nothing selected', () => {
+      setupWithElement();
+      const before = useEditorStore.getState().template;
+      useEditorStore.getState().duplicateSelection();
+      expect(useEditorStore.getState().template).toBe(before);
+    });
+  });
+
+  describe('selectAllInBand', () => {
+    it('selects all top-level elements in the active band', () => {
+      let t = createTemplate();
+      t = addSection(t, { id: 'sec1', bands: [] });
+      t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+      t = addElement(t, 'band1', {
+        id: 'el1',
+        type: 'text',
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 30,
+        properties: { content: 'A' },
+      });
+      t = addElement(t, 'band1', {
+        id: 'el2',
+        type: 'text',
+        x: 0,
+        y: 30,
+        width: 100,
+        height: 30,
+        properties: { content: 'B' },
+      });
+      useEditorStore.setState({ template: t, selectedBandId: 'band1', selectedSectionId: 'sec1' });
+      useEditorStore.getState().selectAllInBand();
+      expect(useEditorStore.getState().selectedElementIds).toEqual(['el1', 'el2']);
+    });
+
+    it('is a no-op when no band is selected', () => {
+      useEditorStore.getState().selectAllInBand();
+      expect(useEditorStore.getState().selectedElementIds).toEqual([]);
+    });
+  });
+
+  describe('moveSelectedElements', () => {
+    function setupTwoElements() {
+      let t = createTemplate();
+      t = addSection(t, { id: 'sec1', bands: [] });
+      t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+      t = addElement(t, 'band1', {
+        id: 'el1',
+        type: 'text',
+        x: 10,
+        y: 20,
+        width: 100,
+        height: 50,
+        properties: { content: 'A' },
+      });
+      t = addElement(t, 'band1', {
+        id: 'el2',
+        type: 'text',
+        x: 50,
+        y: 60,
+        width: 100,
+        height: 50,
+        properties: { content: 'B' },
+      });
+      useEditorStore.setState({
+        template: t,
+        selectedElementIds: ['el1', 'el2'],
+        selectedBandId: 'band1',
+        selectedSectionId: 'sec1',
+      });
+    }
+
+    it('translates all selected elements by delta', () => {
+      setupTwoElements();
+      useEditorStore.getState().moveSelectedElements(5, -3);
+      const els = useEditorStore.getState().template.sections[0].bands[0].elements;
+      expect(els[0].x).toBe(15);
+      expect(els[0].y).toBe(17);
+      expect(els[1].x).toBe(55);
+      expect(els[1].y).toBe(57);
+    });
+
+    it('works with single selection', () => {
+      setupTwoElements();
+      useEditorStore.setState({ selectedElementIds: ['el1'] });
+      useEditorStore.getState().moveSelectedElements(10, 10);
+      const els = useEditorStore.getState().template.sections[0].bands[0].elements;
+      expect(els[0].x).toBe(20);
+      expect(els[0].y).toBe(30);
+      expect(els[1].x).toBe(50); // unchanged
+      expect(els[1].y).toBe(60);
+    });
+
+    it('is a no-op when nothing selected', () => {
+      setupTwoElements();
+      useEditorStore.setState({ selectedElementIds: [] });
+      const before = useEditorStore.getState().template;
+      useEditorStore.getState().moveSelectedElements(10, 10);
+      expect(useEditorStore.getState().template).toBe(before);
+    });
+  });
+
+  describe('resizeSelectedElements', () => {
+    function setupTwoElements() {
+      let t = createTemplate();
+      t = addSection(t, { id: 'sec1', bands: [] });
+      t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 200, elements: [] });
+      t = addElement(t, 'band1', {
+        id: 'el1',
+        type: 'text',
+        x: 10,
+        y: 20,
+        width: 100,
+        height: 50,
+        properties: { content: 'A' },
+      });
+      t = addElement(t, 'band1', {
+        id: 'el2',
+        type: 'text',
+        x: 50,
+        y: 60,
+        width: 80,
+        height: 30,
+        properties: { content: 'B' },
+      });
+      useEditorStore.setState({
+        template: t,
+        selectedElementIds: ['el1', 'el2'],
+        selectedBandId: 'band1',
+        selectedSectionId: 'sec1',
+      });
+    }
+
+    it('scales all selected elements proportionally', () => {
+      setupTwoElements();
+      // Scale 2x with no translation
+      useEditorStore.getState().resizeSelectedElements(0, 0, 2, 2);
+      const els = useEditorStore.getState().template.sections[0].bands[0].elements;
+      // el1: minX=10, relX=0 → x = 10+0+0*2 = 10, w = 200
+      expect(els[0].x).toBe(10);
+      expect(els[0].y).toBe(20);
+      expect(els[0].width).toBe(200);
+      expect(els[0].height).toBe(100);
+      // el2: relX=50-10=40 → x = 10+0+40*2 = 90, w = 160
+      expect(els[1].x).toBe(90);
+      expect(els[1].y).toBe(100);
+      expect(els[1].width).toBe(160);
+      expect(els[1].height).toBe(60);
+    });
+
+    it('translates the bounding box origin', () => {
+      setupTwoElements();
+      // Shift right by 5, scale 1x (no scaling)
+      useEditorStore.getState().resizeSelectedElements(5, 10, 1, 1);
+      const els = useEditorStore.getState().template.sections[0].bands[0].elements;
+      expect(els[0].x).toBe(15);
+      expect(els[0].y).toBe(30);
+      expect(els[1].x).toBe(55);
+      expect(els[1].y).toBe(70);
+    });
+
+    it('clamps width/height to minimum 1', () => {
+      setupTwoElements();
+      useEditorStore.getState().resizeSelectedElements(0, 0, 0.001, 0.001);
+      const els = useEditorStore.getState().template.sections[0].bands[0].elements;
+      expect(els[0].width).toBe(1);
+      expect(els[0].height).toBe(1);
+    });
+
+    it('is a no-op when nothing selected', () => {
+      setupTwoElements();
+      useEditorStore.setState({ selectedElementIds: [] });
+      const before = useEditorStore.getState().template;
+      useEditorStore.getState().resizeSelectedElements(10, 10, 2, 2);
+      expect(useEditorStore.getState().template).toBe(before);
+    });
+  });
+
+  describe('deleteSelectedElements (multi)', () => {
+    it('deletes multiple selected elements', () => {
+      let t = createTemplate();
+      t = addSection(t, { id: 'sec1', bands: [] });
+      t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+      t = addElement(t, 'band1', {
+        id: 'el1',
+        type: 'text',
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 30,
+        properties: { content: 'A' },
+      });
+      t = addElement(t, 'band1', {
+        id: 'el2',
+        type: 'text',
+        x: 0,
+        y: 30,
+        width: 100,
+        height: 30,
+        properties: { content: 'B' },
+      });
+      t = addElement(t, 'band1', {
+        id: 'el3',
+        type: 'text',
+        x: 0,
+        y: 60,
+        width: 100,
+        height: 30,
+        properties: { content: 'C' },
+      });
+      useEditorStore.setState({
+        template: t,
+        selectedElementIds: ['el1', 'el3'],
+        selectedBandId: 'band1',
+        selectedSectionId: 'sec1',
+      });
+      useEditorStore.getState().deleteSelectedElements();
+      const state = useEditorStore.getState();
+      expect(state.template.sections[0].bands[0].elements).toHaveLength(1);
+      expect(state.template.sections[0].bands[0].elements[0].id).toBe('el2');
+      expect(state.selectedElementIds).toEqual([]);
     });
   });
 });

@@ -29,11 +29,14 @@ export function computeDropPosition(
 export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
   const [expanded, setExpanded] = useState(true);
   const isSelected = useEditorStore((s) => {
-    if (node.placeholder) return s.selectedBandId === node.id && s.selectedElementId === null;
-    if (node.kind === 'element') return s.selectedElementId === node.id;
-    if (node.kind === 'band') return s.selectedBandId === node.id && s.selectedElementId === null;
+    if (node.placeholder) return s.selectedBandId === node.id && s.selectedElementIds.length === 0;
+    if (node.kind === 'element') return s.selectedElementIds.includes(node.id);
+    if (node.kind === 'band')
+      return s.selectedBandId === node.id && s.selectedElementIds.length === 0;
     return (
-      s.selectedSectionId === node.id && s.selectedBandId === null && s.selectedElementId === null
+      s.selectedSectionId === node.id &&
+      s.selectedBandId === null &&
+      s.selectedElementIds.length === 0
     );
   });
   const setSelection = useEditorStore((s) => s.setSelection);
@@ -47,12 +50,19 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
   const indicatorPos =
     indicator != null && indicator.targetId === node.id ? indicator.position : null;
 
+  const toggleElementSelection = useEditorStore((s) => s.toggleElementSelection);
+
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (node.frameOwnerId) {
       setSelection(node.frameOwnerId, node.frameOwnerBandId ?? null, node.sectionId);
     } else if (node.kind === 'element') {
-      setSelection(node.id, node.bandId ?? null, node.sectionId);
+      const mod = e.metaKey || e.ctrlKey;
+      if (mod && node.bandId) {
+        toggleElementSelection(node.id, node.bandId, node.sectionId);
+      } else {
+        setSelection(node.id, node.bandId ?? null, node.sectionId);
+      }
     } else if (node.kind === 'band') {
       setSelection(null, node.id, node.sectionId);
     } else {
@@ -206,14 +216,14 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
           store.addElement(node.bandId, paletteType);
           // Reorder the newly added element to the correct position
           const newState = useEditorStore.getState();
-          if (newState.selectedElementId) {
+          if (newState.selectedElementIds[0]) {
             const band = newState.template.sections
               .flatMap((s) => s.bands)
               .find((b) => b.id === node.bandId);
             if (band) {
               const currentIndex = band.elements.length - 1;
               if (insertIndex !== currentIndex) {
-                store.reorderElement(newState.selectedElementId, insertIndex);
+                store.reorderElement(newState.selectedElementIds[0], insertIndex);
               }
             }
           }

@@ -88,7 +88,7 @@ describe('OutlinePanel', () => {
       zoom: 1.0,
       scrollX: 0,
       scrollY: 0,
-      selectedElementId: null,
+      selectedElementIds: [],
       selectedBandId: null,
       selectedSectionId: null,
     });
@@ -113,7 +113,7 @@ describe('OutlinePanel', () => {
     const state = useEditorStore.getState();
     expect(state.selectedSectionId).toBe('sec1');
     expect(state.selectedBandId).toBeNull();
-    expect(state.selectedElementId).toBeNull();
+    expect(state.selectedElementIds).toEqual([]);
   });
 
   it('click band node selects band and section', () => {
@@ -122,21 +122,21 @@ describe('OutlinePanel', () => {
     const state = useEditorStore.getState();
     expect(state.selectedBandId).toBe('band2');
     expect(state.selectedSectionId).toBe('sec1');
-    expect(state.selectedElementId).toBeNull();
+    expect(state.selectedElementIds).toEqual([]);
   });
 
   it('click element node selects element, band, and section', () => {
     render(<OutlinePanel />);
     fireEvent.click(screen.getByText('el-text'));
     const state = useEditorStore.getState();
-    expect(state.selectedElementId).toBe('el-text');
+    expect(state.selectedElementIds).toEqual(['el-text']);
     expect(state.selectedBandId).toBe('band2');
     expect(state.selectedSectionId).toBe('sec1');
   });
 
   it('selection highlight appears for selected node', () => {
     useEditorStore.setState({
-      selectedElementId: 'el-text',
+      selectedElementIds: ['el-text'],
       selectedBandId: 'band2',
       selectedSectionId: 'sec1',
     });
@@ -183,7 +183,7 @@ describe('OutlinePanel', () => {
     fireEvent.click(screen.getByText('frame-el1'));
     const state = useEditorStore.getState();
     // Should select the frame element, not the internal element
-    expect(state.selectedElementId).toBe('el-frame');
+    expect(state.selectedElementIds).toEqual(['el-frame']);
     expect(state.selectedBandId).toBe('band1');
     expect(state.selectedSectionId).toBe('sec1');
   });
@@ -286,7 +286,7 @@ describe('OutlinePanel', () => {
       const state = useEditorStore.getState();
       expect(state.selectedBandId).toBe('sec1::title');
       expect(state.selectedSectionId).toBe('sec1');
-      expect(state.selectedElementId).toBeNull();
+      expect(state.selectedElementIds).toEqual([]);
     });
 
     it('renders "+ Add Body" inline button for multi-band types', () => {

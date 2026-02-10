@@ -50,14 +50,19 @@ export function ElementRenderer({ element, styles, bandId, sectionId }: ElementR
   const Renderer = ELEMENT_RENDERERS[element.type] ?? UnknownElement;
   const isDragging = useRef(false);
 
-  const selectedElementId = useEditorStore((s) => s.selectedElementId);
-  const isSelected = selectedElementId === element.id;
+  const isSelected = useEditorStore((s) => s.selectedElementIds.includes(element.id));
 
   const handleClick = useCallback(
     (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
       if (isDragging.current) return;
       e.cancelBubble = true;
-      useEditorStore.getState().setSelection(element.id, bandId, sectionId);
+      const evt = e.evt;
+      const mod = 'metaKey' in evt && (evt.metaKey || evt.ctrlKey);
+      if (mod) {
+        useEditorStore.getState().toggleElementSelection(element.id, bandId, sectionId);
+      } else {
+        useEditorStore.getState().setSelection(element.id, bandId, sectionId);
+      }
     },
     [element.id, bandId, sectionId],
   );
@@ -73,13 +78,20 @@ export function ElementRenderer({ element, styles, bandId, sectionId }: ElementR
       const rot = element.rotation ?? 0;
       const newX = rot ? node.x() - element.width / 2 : node.x();
       const newY = rot ? node.y() - element.height / 2 : node.y();
-      useEditorStore.getState().updateElementPosition(element.id, newX, newY);
+      const dx = newX - element.x;
+      const dy = newY - element.y;
+      const store = useEditorStore.getState();
+      if (store.selectedElementIds.length > 1) {
+        store.moveSelectedElements(dx, dy);
+      } else {
+        store.updateElementPosition(element.id, newX, newY);
+      }
       // Reset isDragging after a tick so the click handler doesn't fire
       setTimeout(() => {
         isDragging.current = false;
       }, 0);
     },
-    [element.id, element.rotation, element.width, element.height],
+    [element.id, element.x, element.y, element.rotation, element.width, element.height],
   );
 
   const handleMouseEnter = useCallback((e: KonvaEventObject<MouseEvent>) => {
