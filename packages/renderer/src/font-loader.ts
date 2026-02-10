@@ -1,5 +1,4 @@
-import { readFile } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
+import { readFileBytes } from '@jsonpdf/plugins';
 
 /** Default fetch timeout in milliseconds (30 seconds). */
 const FETCH_TIMEOUT_MS = 30_000;
@@ -8,8 +7,7 @@ const FETCH_TIMEOUT_MS = 30_000;
  * Load font bytes from a source path or URL.
  *
  * - HTTP/HTTPS URLs are fetched via fetch() with a 30s timeout
- * - file:// URLs are converted to paths via fileURLToPath
- * - All other strings are treated as file paths
+ * - file:// URLs and local paths are handled by the platform-specific readFileBytes
  */
 export async function loadFontBytes(src: string): Promise<Uint8Array> {
   if (src.startsWith('http://') || src.startsWith('https://')) {
@@ -28,7 +26,5 @@ export async function loadFontBytes(src: string): Promise<Uint8Array> {
     }
   }
 
-  // Convert file:// URLs to paths
-  const filePath = src.startsWith('file://') ? fileURLToPath(src) : src;
-  return readFile(filePath);
+  return readFileBytes(src);
 }

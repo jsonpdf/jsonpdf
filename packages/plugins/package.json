@@ -9,6 +9,38 @@
       "import": "./dist/index.js"
     }
   },
+  "imports": {
+    "#platform/fs": {
+      "browser": {
+        "types": "./dist/platform/fs.browser.d.ts",
+        "default": "./dist/platform/fs.browser.js"
+      },
+      "default": {
+        "types": "./dist/platform/fs.d.ts",
+        "default": "./dist/platform/fs.js"
+      }
+    },
+    "#platform/svg-rasterizer": {
+      "browser": {
+        "types": "./dist/platform/svg-rasterizer.browser.d.ts",
+        "default": "./dist/platform/svg-rasterizer.browser.js"
+      },
+      "default": {
+        "types": "./dist/platform/svg-rasterizer.d.ts",
+        "default": "./dist/platform/svg-rasterizer.js"
+      }
+    },
+    "#platform/init": {
+      "browser": {
+        "types": "./dist/platform/init.browser.d.ts",
+        "default": "./dist/platform/init.browser.js"
+      },
+      "default": {
+        "types": "./dist/platform/init.d.ts",
+        "default": "./dist/platform/init.js"
+      }
+    }
+  },
   "files": [
     "dist"
   ],
@@ -19,6 +51,7 @@
   "dependencies": {
     "@jsonpdf/core": "workspace:*",
     "@resvg/resvg-js": "^2.6.2",
+    "@resvg/resvg-wasm": "^2.6.2",
     "bwip-js": "^4.8.0",
     "pdf-lib": "^1.17.1",
     "vega": "^6.2.0",

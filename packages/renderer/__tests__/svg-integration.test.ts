@@ -10,7 +10,7 @@ const TINY_SVG =
 const VIEWBOX_SVG =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100"><circle cx="100" cy="50" r="40" fill="blue"/></svg>';
 
-const SVG_BASE64 = Buffer.from(TINY_SVG).toString('base64');
+const SVG_BASE64 = btoa(TINY_SVG);
 const SVG_DATA_URI = `data:image/svg+xml;base64,${SVG_BASE64}`;
 
 // Minimal 1x1 PNG as data URI
@@ -41,7 +41,7 @@ describe('SVG integration with renderer', () => {
   });
 
   it('renders SVG with viewBox-only dimensions', async () => {
-    const viewBoxDataUri = `data:image/svg+xml;base64,${Buffer.from(VIEWBOX_SVG).toString('base64')}`;
+    const viewBoxDataUri = `data:image/svg+xml;base64,${btoa(VIEWBOX_SVG)}`;
 
     let t = createTemplate({ name: 'ViewBox SVG' });
     t = addSection(t, { id: 'sec1', bands: [] });

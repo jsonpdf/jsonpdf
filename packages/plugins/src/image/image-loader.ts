@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { readFileBytes } from '#platform/fs';
 import type { PDFDocument } from 'pdf-lib';
 import type { EmbeddedImage, ImageCache } from '../types.js';
 import { isSvgBytes, rasterizeSvg } from './svg-rasterizer.js';
@@ -65,7 +65,7 @@ export async function loadImageBytes(src: string): Promise<LoadedImage> {
     }
   } else {
     // File path
-    bytes = await readFile(src);
+    bytes = await readFileBytes(src);
   }
 
   // SVG: rasterize to PNG before embedding

@@ -1,4 +1,4 @@
-import { Resvg } from '@resvg/resvg-js';
+import { Resvg } from '#platform/svg-rasterizer';
 
 /** Default scale factor for SVG rasterization (2x for HiDPI). */
 export const DEFAULT_SVG_SCALE = 2;
