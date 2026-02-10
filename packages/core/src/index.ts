@@ -28,6 +28,8 @@ export { templateSchema } from './schema.js';
 
 // Validation
 export { validateTemplateSchema, validateWithSchema } from './validation.js';
+export { makeExpressionAware, buildPluginAwareTemplateSchema } from './expression-schema.js';
+export type { PluginSchemaEntry } from './expression-schema.js';
 
 // Utilities
 export { parseColor, toHex, isGradient, type RGB } from './utils/colors.js';

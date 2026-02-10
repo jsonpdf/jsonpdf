@@ -2,6 +2,7 @@ import { Ajv2020 } from 'ajv/dist/2020.js';
 import type { ErrorObject } from 'ajv/dist/2020.js';
 import { templateSchema } from './schema.js';
 import type { ValidationResult, JSONSchema } from './types.js';
+import { buildPluginAwareTemplateSchema, type PluginSchemaEntry } from './expression-schema.js';
 
 type ValidateFunction = ReturnType<Ajv2020['compile']>;
 
@@ -31,7 +32,14 @@ function mapErrors(errors: ErrorObject[] | null | undefined): ValidationResult['
 }
 
 /** Validate data against the template JSON Schema. */
-export function validateTemplateSchema(data: unknown): ValidationResult {
+export function validateTemplateSchema(
+  data: unknown,
+  pluginSchemas?: readonly PluginSchemaEntry[],
+): ValidationResult {
+  if (pluginSchemas?.length) {
+    const augmented = buildPluginAwareTemplateSchema(pluginSchemas);
+    return validateWithSchema(augmented, data);
+  }
   const validate = getTemplateValidator();
   const valid = validate(data);
   if (valid) {

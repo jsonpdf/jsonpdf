@@ -140,6 +140,9 @@ importers:
       '@jsonpdf/core':
         specifier: workspace:*
         version: link:../core
+      '@jsonpdf/plugins':
+        specifier: workspace:*
+        version: link:../plugins
       '@jsonpdf/renderer':
         specifier: workspace:*
         version: link:../renderer

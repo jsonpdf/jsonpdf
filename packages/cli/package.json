@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@jsonpdf/core": "workspace:*",
+    "@jsonpdf/plugins": "workspace:*",
     "@jsonpdf/template": "workspace:*",
     "@jsonpdf/renderer": "workspace:*",
     "chalk": "^5.4.0",

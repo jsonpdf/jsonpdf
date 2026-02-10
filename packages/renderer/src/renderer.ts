@@ -10,6 +10,7 @@ import {
 import fontkit from '@pdf-lib/fontkit';
 import type { Band, Element, RichContent, Section, Style, Template } from '@jsonpdf/core';
 import { parseColor, isGradient, validateTemplateSchema } from '@jsonpdf/core';
+import type { PluginSchemaEntry } from '@jsonpdf/core';
 import type { FontMap, ImageCache, RenderContext } from '@jsonpdf/plugins';
 import {
   PluginRegistry,
@@ -536,6 +537,17 @@ async function renderElementAtPosition(
   }
 }
 
+/** Memoize plugin schema list per registry so buildPluginAwareTemplateSchema cache hits. */
+const registrySchemaCache = new WeakMap<PluginRegistry, readonly PluginSchemaEntry[]>();
+function getPluginSchemas(registry: PluginRegistry): readonly PluginSchemaEntry[] {
+  let schemas = registrySchemaCache.get(registry);
+  if (!schemas) {
+    schemas = registry.getAll().map((p) => ({ type: p.type, propsSchema: p.propsSchema }));
+    registrySchemaCache.set(registry, schemas);
+  }
+  return schemas;
+}
+
 /** Create a default plugin registry with all built-in plugins. */
 function createDefaultRegistry(): PluginRegistry {
   const registry = new PluginRegistry();
@@ -557,21 +569,22 @@ export async function renderPdf(
   template: Template,
   options?: RenderOptions,
 ): Promise<RenderResult> {
-  // 1. Validate template schema
+  // 1. Set up plugin registry (needed for schema validation)
+  const registry = options?.registry ?? createDefaultRegistry();
+
+  // 2. Validate template schema (including plugin property schemas)
   if (!options?.skipValidation) {
-    const validation = validateTemplateSchema(template);
+    const pluginSchemas = getPluginSchemas(registry);
+    const validation = validateTemplateSchema(template, pluginSchemas);
     if (!validation.valid) {
       const messages = validation.errors.map((e) => `  ${e.path}: ${e.message}`).join('\n');
       throw new Error(`Template validation failed:\n${messages}`);
     }
   }
 
-  // 2. Validate data against dataSchema
+  // 3. Validate data against dataSchema
   const data = options?.data ?? {};
   validateData(data, template.dataSchema);
-
-  // 3. Set up plugin registry
-  const registry = options?.registry ?? createDefaultRegistry();
 
   // 4. Create PDF document
   const doc = await PDFDocument.create();
