@@ -3,8 +3,13 @@ import { Group, Rect } from 'react-konva';
 import type { ComponentType } from 'react';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { Element, Style } from '@jsonpdf/core';
+import { findBand } from '@jsonpdf/template';
 import { useEditorStore } from '../store';
 import { resolveElementStyle } from '../style';
+import type { SnapTargets } from '../snap/snap';
+import { collectSnapTargets, snapPosition } from '../snap/snap';
+import { useGuideStore } from '../snap/guide-store';
+import { useBandGeometry } from '../snap/band-context';
 import { TextElement } from './elements/TextElement';
 import { ImageElement } from './elements/ImageElement';
 import { LineElement } from './elements/LineElement';
@@ -49,6 +54,9 @@ export function ElementRenderer({ element, styles, bandId, sectionId }: ElementR
   const style = resolveElementStyle(element, styles);
   const Renderer = ELEMENT_RENDERERS[element.type] ?? UnknownElement;
   const isDragging = useRef(false);
+  const snapTargetsRef = useRef<SnapTargets | null>(null);
+
+  const { contentWidth, bandHeight, sectionIndex } = useBandGeometry();
 
   const isSelected = useEditorStore((s) => s.selectedElementIds.includes(element.id));
 
@@ -69,10 +77,98 @@ export function ElementRenderer({ element, styles, bandId, sectionId }: ElementR
 
   const handleDragStart = useCallback(() => {
     isDragging.current = true;
-  }, []);
+
+    // Cache snap targets once at drag start — they don't change during drag
+    const store = useEditorStore.getState();
+    const bandResult = findBand(store.template, bandId);
+    if (bandResult) {
+      snapTargetsRef.current = collectSnapTargets(
+        bandResult.band.elements,
+        store.selectedElementIds,
+        contentWidth,
+        bandHeight,
+      );
+    }
+  }, [bandId, contentWidth, bandHeight]);
+
+  const handleDragMove = useCallback(
+    (e: KonvaEventObject<DragEvent>) => {
+      const rot = element.rotation ?? 0;
+      if (rot) return;
+
+      // Skip snapping when Alt is held
+      if (e.evt.altKey) {
+        useGuideStore.getState().clearGuides();
+        return;
+      }
+
+      const targets = snapTargetsRef.current;
+      if (!targets) return;
+
+      const node = e.target;
+
+      if (useEditorStore.getState().selectedElementIds.length > 1) {
+        // Multi-select: compute bounding box of all selected elements
+        const store = useEditorStore.getState();
+        const bandResult = findBand(store.template, bandId);
+        if (!bandResult) return;
+        const siblings = bandResult.band.elements;
+
+        let minX = Infinity;
+        let minY = Infinity;
+        let maxX = -Infinity;
+        let maxY = -Infinity;
+        for (const id of store.selectedElementIds) {
+          for (const el of siblings) {
+            if (el.id === id) {
+              minX = Math.min(minX, el.x);
+              minY = Math.min(minY, el.y);
+              maxX = Math.max(maxX, el.x + el.width);
+              maxY = Math.max(maxY, el.y + el.height);
+            }
+          }
+        }
+        // Compute the delta from original position to current dragged position
+        const dragX = node.x();
+        const dragY = node.y();
+        const dx = dragX - element.x;
+        const dy = dragY - element.y;
+        const bboxX = minX + dx;
+        const bboxY = minY + dy;
+        const bboxW = maxX - minX;
+        const bboxH = maxY - minY;
+
+        const result = snapPosition(bboxX, bboxY, bboxW, bboxH, targets);
+        const snapDx = result.x - bboxX;
+        const snapDy = result.y - bboxY;
+        node.x(dragX + snapDx);
+        node.y(dragY + snapDy);
+        useGuideStore.getState().setGuides(result.guides, bandId, sectionIndex);
+      } else {
+        const dragX = node.x();
+        const dragY = node.y();
+        const result = snapPosition(dragX, dragY, element.width, element.height, targets);
+        node.x(result.x);
+        node.y(result.y);
+        useGuideStore.getState().setGuides(result.guides, bandId, sectionIndex);
+      }
+    },
+    [
+      element.id,
+      element.x,
+      element.y,
+      element.width,
+      element.height,
+      element.rotation,
+      bandId,
+      sectionIndex,
+    ],
+  );
 
   const handleDragEnd = useCallback(
     (e: KonvaEventObject<DragEvent>) => {
+      useGuideStore.getState().clearGuides();
+      snapTargetsRef.current = null;
       const node = e.target;
       // When rotated, the Group's x/y is the rotation center — subtract offset to get top-left
       const rot = element.rotation ?? 0;
@@ -125,6 +221,7 @@ export function ElementRenderer({ element, styles, bandId, sectionId }: ElementR
       onClick={handleClick}
       onTap={handleClick}
       onDragStart={handleDragStart}
+      onDragMove={handleDragMove}
       onDragEnd={handleDragEnd}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

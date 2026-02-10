@@ -67,6 +67,7 @@ export function PageRenderer({ page, x, y, styles }: PageRendererProps) {
             contentWidth={contentWidth}
             styles={styles}
             sectionId={page.sectionId}
+            sectionIndex={page.sectionIndex}
           />
         ))}
       </Group>
