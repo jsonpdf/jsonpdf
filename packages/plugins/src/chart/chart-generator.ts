@@ -1,6 +1,7 @@
 import * as vl from 'vega-lite';
 import * as vega from 'vega';
 import { rasterizeSvg } from '../image/svg-rasterizer.js';
+import { uint8ArrayToBase64 } from '../platform/base64.js';
 import type { ChartProps } from './chart-types.js';
 
 /** Cache for generated chart PNG data URIs. */
@@ -86,6 +87,6 @@ async function generateChartUncached(
   const { pngBytes } = rasterizeSvg(svgString, scale);
 
   // Step 4: Convert to data URI
-  const base64 = Buffer.from(pngBytes).toString('base64');
+  const base64 = uint8ArrayToBase64(pngBytes);
   return `data:image/png;base64,${base64}`;
 }

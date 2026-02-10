@@ -1,6 +1,8 @@
 import BwipJs from 'bwip-js';
 import type { BarcodeProps } from './barcode-types.js';
 import { TWO_D_FORMATS } from './barcode-types.js';
+import { rasterizeSvg } from '../image/svg-rasterizer.js';
+import { uint8ArrayToBase64 } from '../platform/base64.js';
 
 /** Cache for generated barcode data URIs, keyed by deterministic option string. */
 export type BarcodeCache = Map<string, Promise<string>>;
@@ -51,14 +53,19 @@ export function generateBarcode(props: BarcodeProps, cache: BarcodeCache): Promi
     return existing;
   }
 
-  const promise = generateBarcodeUncached(props);
+  let promise: Promise<string>;
+  try {
+    promise = Promise.resolve(generateBarcodeUncached(props));
+  } catch (err) {
+    promise = Promise.reject(err as Error);
+  }
   // Remove from cache on failure so retries can succeed
   promise.catch(() => cache.delete(key));
   cache.set(key, promise);
   return promise;
 }
 
-async function generateBarcodeUncached(props: BarcodeProps): Promise<string> {
+function generateBarcodeUncached(props: BarcodeProps): string {
   const options: BwipJs.RenderOptions = {
     bcid: props.format,
     text: props.value,
@@ -82,9 +89,9 @@ async function generateBarcodeUncached(props: BarcodeProps): Promise<string> {
     }
   }
 
-  let pngBuffer: Buffer;
+  let svgString: string;
   try {
-    pngBuffer = await BwipJs.toBuffer(options);
+    svgString = BwipJs.toSVG(options);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     throw new Error(
@@ -92,6 +99,7 @@ async function generateBarcodeUncached(props: BarcodeProps): Promise<string> {
     );
   }
 
-  const base64 = pngBuffer.toString('base64');
+  const { pngBytes } = rasterizeSvg(svgString, 1);
+  const base64 = uint8ArrayToBase64(pngBytes);
   return `data:image/png;base64,${base64}`;
 }

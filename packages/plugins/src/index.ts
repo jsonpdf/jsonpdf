@@ -74,3 +74,8 @@ export type { ChartCache } from './chart/chart-generator.js';
 // Frame plugin
 export { framePlugin } from './frame/frame-plugin.js';
 export { type FrameProps } from './frame/frame-types.js';
+
+// Platform utilities
+export { readFileBytes } from '#platform/fs';
+export { uint8ArrayToBase64 } from './platform/base64.js';
+export { initBrowser } from '#platform/init';

@@ -11,7 +11,7 @@ const TINY_PNG_BASE64 =
 // Minimal SVG for testing
 const TINY_SVG =
   '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="50"><rect width="100" height="50" fill="red"/></svg>';
-const TINY_SVG_BASE64 = Buffer.from(TINY_SVG).toString('base64');
+const TINY_SVG_BASE64 = btoa(TINY_SVG);
 
 // Minimal JPEG (smallest valid JFIF)
 const TINY_JPEG_BASE64 =
