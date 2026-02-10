@@ -1,4 +1,12 @@
 import { Resvg } from '#platform/svg-rasterizer';
+import { getFontBuffers } from '../platform/font-store.js';
+
+/** Extends the Node resvg font options with the WASM-only `fontBuffers` field. */
+interface FontOptionsWithBuffers {
+  fontBuffers: Uint8Array[];
+  loadSystemFonts: boolean;
+  defaultFontFamily: string;
+}
 
 /** Default scale factor for SVG rasterization (2x for HiDPI). */
 export const DEFAULT_SVG_SCALE = 2;
@@ -76,9 +84,21 @@ export function rasterizeSvg(
   scale: number = DEFAULT_SVG_SCALE,
 ): { pngBytes: Uint8Array; width: number; height: number } {
   try {
+    const buffers = getFontBuffers();
+    // When font buffers are provided (browser), pass them to Resvg so <text>
+    // elements render correctly. The `fontBuffers` property exists on the WASM
+    // variant's types (CustomFontsOptions) but not the Node variant's, hence
+    // the FontOptionsWithBuffers assertion.
     const resvg = new Resvg(svg, {
       fitTo: { mode: 'zoom', value: scale },
       logLevel: 'off',
+      ...(buffers.length > 0 && {
+        font: {
+          fontBuffers: buffers,
+          loadSystemFonts: false,
+          defaultFontFamily: 'sans-serif',
+        } as FontOptionsWithBuffers,
+      }),
     });
 
     // Intrinsic dimensions (before scale) — used by computeFitDimensions
