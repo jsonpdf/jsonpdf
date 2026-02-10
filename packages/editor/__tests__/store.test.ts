@@ -12,6 +12,7 @@ describe('useEditorStore', () => {
       selectedElementId: null,
       selectedBandId: null,
       selectedSectionId: null,
+      activeTab: 'editor',
     });
   });
 
@@ -60,6 +61,17 @@ describe('useEditorStore', () => {
     expect(state.selectedElementId).toBe('el1');
     expect(state.selectedBandId).toBe('band1');
     expect(state.selectedSectionId).toBe('sec1');
+  });
+
+  it('activeTab defaults to editor', () => {
+    expect(useEditorStore.getState().activeTab).toBe('editor');
+  });
+
+  it('setActiveTab switches tabs', () => {
+    useEditorStore.getState().setActiveTab('preview');
+    expect(useEditorStore.getState().activeTab).toBe('preview');
+    useEditorStore.getState().setActiveTab('editor');
+    expect(useEditorStore.getState().activeTab).toBe('editor');
   });
 
   it('setSelection clears with null', () => {

@@ -13,3 +13,10 @@ export { TemplateCanvas, CANVAS_PADDING } from './canvas/TemplateCanvas';
 // Layout utilities
 export { computeDesignLayout } from './layout';
 export type { DesignPage, DesignBand } from './layout';
+
+// Preview
+export { PreviewLayout } from './components/preview/preview-layout';
+export { PdfViewer } from './components/preview/pdf-viewer';
+export { DataEditor } from './components/preview/data-editor';
+export { usePdfPreview } from './hooks/use-pdf-preview';
+export type { PdfPreviewState } from './hooks/use-pdf-preview';

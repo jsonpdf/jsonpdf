@@ -18,6 +18,8 @@ export default defineConfig({
         'konva',
         'react-konva',
         'zustand',
+        '@monaco-editor/react',
+        'monaco-editor',
         /^@jsonpdf\//,
       ],
     },

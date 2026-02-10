@@ -1,0 +1,67 @@
+.layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+  min-width: 300px;
+  border-right: 1px solid var(--jp-color-border);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--jp-toolbar-height);
+  padding: 0 var(--jp-space-md);
+  border-bottom: 1px solid var(--jp-color-border);
+  background: var(--jp-color-surface);
+}
+
+.label {
+  font-size: var(--jp-font-size-sm);
+  font-weight: 600;
+  color: var(--jp-color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.renderBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 var(--jp-space-lg);
+  border: none;
+  border-radius: 4px;
+  background: var(--jp-color-accent);
+  color: #ffffff;
+  cursor: pointer;
+  font-size: var(--jp-font-size-sm);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.renderBtn:hover {
+  opacity: 0.9;
+}
+
+.renderBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.editorWrapper {
+  flex: 1;
+  overflow: hidden;
+}
+
+.right {
+  flex: 1;
+  overflow: hidden;
+}
