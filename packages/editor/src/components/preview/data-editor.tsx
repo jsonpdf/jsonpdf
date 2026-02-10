@@ -1,6 +1,5 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import Editor, { type OnMount } from '@monaco-editor/react';
-import type { editor } from 'monaco-editor';
 import styles from './preview-layout.module.css';
 
 interface DataEditorProps {
@@ -10,24 +9,27 @@ interface DataEditorProps {
 }
 
 export function DataEditor({ value, onChange, dataSchema }: DataEditorProps) {
-  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<Parameters<OnMount>[1] | null>(null);
 
-  const handleMount: OnMount = (ed, monaco) => {
-    editorRef.current = ed;
-    monacoRef.current = monaco;
+  const handleMount: OnMount = useCallback(
+    (_ed, monaco) => {
+      monacoRef.current = monaco;
 
-    monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
-      validate: true,
-      schemas: [
-        {
-          uri: 'jsonpdf://data-schema',
-          fileMatch: ['*'],
-          schema: dataSchema ?? {},
-        },
-      ],
-    });
-  };
+      // NOTE: setDiagnosticsOptions applies globally to all Monaco JSON models.
+      // If multiple editors with different schemas coexist, they would conflict.
+      monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+        validate: true,
+        schemas: [
+          {
+            uri: 'jsonpdf://data-schema',
+            fileMatch: ['*'],
+            schema: dataSchema ?? {},
+          },
+        ],
+      });
+    },
+    [dataSchema],
+  );
 
   useEffect(() => {
     if (monacoRef.current) {

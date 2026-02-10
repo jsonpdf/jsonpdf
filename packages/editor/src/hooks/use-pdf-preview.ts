@@ -36,7 +36,8 @@ export function usePdfPreview() {
 
       try {
         const result = await renderPdf(template, { data });
-        const blob = new Blob([result.bytes.buffer as ArrayBuffer], { type: 'application/pdf' });
+        // Copy bytes to an owned ArrayBuffer — result.bytes may be a view over a larger buffer
+        const blob = new Blob([new Uint8Array(result.bytes)], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
         blobUrlRef.current = url;
         setState({ blobUrl: url, loading: false, error: null });

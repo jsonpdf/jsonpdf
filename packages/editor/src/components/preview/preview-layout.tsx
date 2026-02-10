@@ -8,6 +8,7 @@ import styles from './preview-layout.module.css';
 export function PreviewLayout() {
   const template = useEditorStore((s) => s.template);
   const [jsonText, setJsonText] = useState('{}');
+  const [parseError, setParseError] = useState<string | null>(null);
   const { blobUrl, loading, error, render } = usePdfPreview();
 
   const handleRender = useCallback(() => {
@@ -15,8 +16,10 @@ export function PreviewLayout() {
     try {
       data = JSON.parse(jsonText) as Record<string, unknown>;
     } catch {
+      setParseError('Invalid JSON — fix syntax errors before rendering');
       return;
     }
+    setParseError(null);
     void render(template, data);
   }, [jsonText, template, render]);
 
@@ -29,14 +32,10 @@ export function PreviewLayout() {
             Render
           </button>
         </div>
-        <DataEditor
-          value={jsonText}
-          onChange={setJsonText}
-          dataSchema={template.dataSchema as Record<string, unknown> | undefined}
-        />
+        <DataEditor value={jsonText} onChange={setJsonText} dataSchema={template.dataSchema} />
       </div>
       <div className={styles.right}>
-        <PdfViewer blobUrl={blobUrl} loading={loading} error={error} />
+        <PdfViewer blobUrl={blobUrl} loading={loading} error={parseError ?? error} />
       </div>
     </div>
   );

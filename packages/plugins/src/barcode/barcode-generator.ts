@@ -53,12 +53,15 @@ export function generateBarcode(props: BarcodeProps, cache: BarcodeCache): Promi
     return existing;
   }
 
-  let promise: Promise<string>;
-  try {
-    promise = Promise.resolve(generateBarcodeUncached(props));
-  } catch (err) {
-    promise = Promise.reject(err as Error);
-  }
+  // Wrap in a Promise constructor so synchronous throws become rejections
+  // without creating a transiently unhandled rejected promise.
+  const promise = new Promise<string>((resolve, reject) => {
+    try {
+      resolve(generateBarcodeUncached(props));
+    } catch (err) {
+      reject(err instanceof Error ? err : new Error(String(err)));
+    }
+  });
   // Remove from cache on failure so retries can succeed
   promise.catch(() => cache.delete(key));
   cache.set(key, promise);
