@@ -82,22 +82,24 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 
 ## Tech Stack
 
-| Library          | Purpose                                           |
-| ---------------- | ------------------------------------------------- |
-| TypeScript       | Type safety across all packages                   |
-| pnpm workspaces  | Monorepo management                               |
-| Vitest           | Testing                                           |
-| pdf-lib          | PDF generation (pure JS, works in browser + Node) |
-| @pdf-lib/fontkit | Font embedding and subsetting                     |
-| liquidjs         | Template expressions, filters, conditionals       |
-| ajv              | JSON Schema validation                            |
-| @resvg/resvg-js  | SVG rasterization for embedding in PDFs           |
-| fontsource       | Open source font loading                          |
-| commander        | CLI argument parsing                              |
-| chalk            | CLI terminal styling                              |
-| bwip-js          | Barcode and QR code generation                    |
-| React + Konva    | Editor canvas and UI                              |
-| vega-lite        | Chart rendering                                   |
+| Library           | Purpose                                           |
+| ----------------- | ------------------------------------------------- |
+| TypeScript        | Type safety across all packages                   |
+| pnpm workspaces   | Monorepo management                               |
+| Vitest            | Testing                                           |
+| pdf-lib           | PDF generation (pure JS, works in browser + Node) |
+| @pdf-lib/fontkit  | Font embedding and subsetting                     |
+| liquidjs          | Template expressions, filters, conditionals       |
+| ajv               | JSON Schema validation                            |
+| @resvg/resvg-js   | SVG rasterization for embedding in PDFs (Node)    |
+| @resvg/resvg-wasm | SVG rasterization for browser environments        |
+| fontsource        | Open source font loading                          |
+| commander         | CLI argument parsing                              |
+| chalk             | CLI terminal styling                              |
+| bwip-js           | Barcode and QR code generation                    |
+| React + Konva     | Editor canvas and UI                              |
+| Monaco Editor     | JSON data editor in preview panel                 |
+| vega-lite         | Chart rendering                                   |
 
 ## Implementation Roadmap
 
@@ -202,7 +204,7 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 - [x] Section management: add, delete, drag-and-drop reorder (kind-isolated from element drags)
 - [x] Band management: add, delete, drag-and-drop reorder (same-type siblings only)
 - [x] Template import/export (JSON)
-- [ ] Live PDF preview
+- [x] Live PDF preview (Monaco JSON data editor + browser renderer + iframe viewer)
 
 ### Phase 10: Editor Full
 
