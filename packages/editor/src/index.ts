@@ -14,6 +14,11 @@ export { TemplateCanvas, CANVAS_PADDING } from './canvas/TemplateCanvas';
 export { computeDesignLayout } from './layout';
 export type { DesignPage, DesignBand } from './layout';
 
+// Code
+export { CodeLayout } from './components/code/code-layout';
+export { TemplateEditor } from './components/code/template-editor';
+export type { TemplateEditorHandle } from './components/code/template-editor';
+
 // Preview
 export { PreviewLayout } from './components/preview/preview-layout';
 export { PdfViewer } from './components/preview/pdf-viewer';

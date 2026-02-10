@@ -79,6 +79,8 @@ describe('useEditorStore', () => {
   });
 
   it('setActiveTab switches tabs', () => {
+    useEditorStore.getState().setActiveTab('code');
+    expect(useEditorStore.getState().activeTab).toBe('code');
     useEditorStore.getState().setActiveTab('preview');
     expect(useEditorStore.getState().activeTab).toBe('preview');
     useEditorStore.getState().setActiveTab('editor');

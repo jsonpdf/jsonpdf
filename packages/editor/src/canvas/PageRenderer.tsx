@@ -2,15 +2,7 @@ import { Group, Rect, Line } from 'react-konva';
 import type { Style } from '@jsonpdf/core';
 import type { DesignPage } from '../layout';
 import { BandRenderer } from './BandRenderer';
-
-/** Page shadow offset and color. */
-const SHADOW_OFFSET = 3;
-const SHADOW_COLOR = 'rgba(0, 0, 0, 0.15)';
-
-/** Margin guide appearance. */
-const MARGIN_DASH = [4, 4];
-const MARGIN_COLOR = '#c0c0c0';
-const MARGIN_WIDTH = 0.5;
+import { SHADOW_OFFSET, SHADOW_COLOR, MARGIN_DASH, MARGIN_COLOR, MARGIN_WIDTH } from './constants';
 
 interface PageRendererProps {
   page: DesignPage;

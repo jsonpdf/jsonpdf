@@ -3,6 +3,7 @@ import styles from './bottom-tab-bar.module.css';
 
 const TABS = [
   { id: 'editor', label: 'Editor' },
+  { id: 'code', label: 'Code' },
   { id: 'preview', label: 'Preview' },
 ] as const;
 
