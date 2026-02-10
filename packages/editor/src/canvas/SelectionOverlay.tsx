@@ -2,6 +2,9 @@ import { useCallback } from 'react';
 import { Group, Rect } from 'react-konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { SelectionGeometry } from '../hooks/useSelectionGeometry';
+import type { SnapTargets } from '../snap/snap';
+import { snapSize } from '../snap/snap';
+import { useGuideStore } from '../snap/guide-store';
 
 /** Visual constants. */
 const OUTLINE_COLOR = '#2563eb';
@@ -41,13 +44,24 @@ const HANDLES: HandleDef[] = [
   { position: 'w', fx: 0, fy: 0.5 },
 ];
 
+export interface SnapInfo {
+  targets: SnapTargets;
+  /** Stage-to-band-local X offset: bandLocalX = stageX - stageOffsetX. */
+  stageOffsetX: number;
+  /** Stage-to-band-local Y offset: bandLocalY = stageY - stageOffsetY. */
+  stageOffsetY: number;
+  bandId: string;
+  sectionIndex: number;
+}
+
 interface SelectionOverlayProps {
   geometry: SelectionGeometry;
   zoom: number;
   onResizeEnd: (x: number, y: number, width: number, height: number) => void;
+  snapInfo: SnapInfo | null;
 }
 
-export function SelectionOverlay({ geometry, zoom, onResizeEnd }: SelectionOverlayProps) {
+export function SelectionOverlay({ geometry, zoom, onResizeEnd, snapInfo }: SelectionOverlayProps) {
   const { x, y, width, height, rotation } = geometry;
   const strokeWidth = 1.5 / zoom;
   const handleSize = HANDLE_SIZE / zoom;
@@ -81,6 +95,7 @@ export function SelectionOverlay({ geometry, zoom, onResizeEnd }: SelectionOverl
             handleSize={handleSize}
             strokeWidth={strokeWidth}
             onResizeEnd={onResizeEnd}
+            snapInfo={snapInfo}
           />
         ))}
     </Group>
@@ -98,6 +113,7 @@ interface ResizeHandleProps {
   handleSize: number;
   strokeWidth: number;
   onResizeEnd: (x: number, y: number, width: number, height: number) => void;
+  snapInfo: SnapInfo | null;
 }
 
 function ResizeHandle({
@@ -111,13 +127,79 @@ function ResizeHandle({
   handleSize,
   strokeWidth,
   onResizeEnd,
+  snapInfo,
 }: ResizeHandleProps) {
   const half = handleSize / 2;
   const hx = boundsX + boundsWidth * fx - half;
   const hy = boundsY + boundsHeight * fy - half;
 
+  const handleDragMove = useCallback(
+    (e: KonvaEventObject<DragEvent>) => {
+      if (!snapInfo || e.evt.altKey) {
+        useGuideStore.getState().clearGuides();
+        return;
+      }
+
+      const node = e.target;
+      const dx = node.x() - hx;
+      const dy = node.y() - hy;
+
+      // Compute current stage-coord bounds from handle delta
+      let newX = boundsX;
+      let newY = boundsY;
+      let newW = boundsWidth;
+      let newH = boundsHeight;
+
+      if (position.includes('w')) {
+        newX = boundsX + dx;
+        newW = boundsWidth - dx;
+      } else if (position.includes('e')) {
+        newW = boundsWidth + dx;
+      }
+      if (position.includes('n')) {
+        newY = boundsY + dy;
+        newH = boundsHeight - dy;
+      } else if (position.includes('s')) {
+        newH = boundsHeight + dy;
+      }
+
+      // Convert to band-local coords for snapping
+      const localX = newX - snapInfo.stageOffsetX;
+      const localY = newY - snapInfo.stageOffsetY;
+
+      const snapped = snapSize(localX, localY, newW, newH, position, snapInfo.targets);
+
+      // Compute the snap deltas
+      const snapDx = snapped.x - localX;
+      const snapDy = snapped.y - localY;
+      const snapDw = snapped.width - newW;
+      const snapDh = snapped.height - newH;
+
+      // Adjust the handle node position to reflect snap
+      // The handle position determines which direction to adjust
+      if (snapDx !== 0 || snapDw !== 0) {
+        if (position.includes('w')) {
+          node.x(node.x() + snapDx);
+        } else if (position.includes('e')) {
+          node.x(node.x() + snapDw);
+        }
+      }
+      if (snapDy !== 0 || snapDh !== 0) {
+        if (position.includes('n')) {
+          node.y(node.y() + snapDy);
+        } else if (position.includes('s')) {
+          node.y(node.y() + snapDh);
+        }
+      }
+
+      useGuideStore.getState().setGuides(snapped.guides, snapInfo.bandId, snapInfo.sectionIndex);
+    },
+    [position, boundsX, boundsY, boundsWidth, boundsHeight, hx, hy, snapInfo],
+  );
+
   const handleDragEnd = useCallback(
     (e: KonvaEventObject<DragEvent>) => {
+      useGuideStore.getState().clearGuides();
       const node = e.target;
       const dx = node.x() - hx;
       const dy = node.y() - hy;
@@ -193,6 +275,7 @@ function ResizeHandle({
       stroke={HANDLE_STROKE}
       strokeWidth={strokeWidth}
       draggable
+      onDragMove={handleDragMove}
       onDragEnd={handleDragEnd}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

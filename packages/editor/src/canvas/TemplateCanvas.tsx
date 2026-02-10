@@ -1,12 +1,15 @@
 import { useMemo, useCallback } from 'react';
 import { Stage, Layer } from 'react-konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { findElement } from '@jsonpdf/template';
+import { findBand, findElement } from '@jsonpdf/template';
 import { useEditorStore } from '../store';
 import { computeDesignLayout } from '../layout';
 import { useSelectionGeometry } from '../hooks/useSelectionGeometry';
+import { collectSnapTargets } from '../snap/snap';
 import { PageRenderer } from './PageRenderer';
 import { SelectionOverlay } from './SelectionOverlay';
+import type { SnapInfo } from './SelectionOverlay';
+import { AlignmentGuides } from './AlignmentGuides';
 
 /** Gap between pages and padding around the canvas (in points). */
 export const PAGE_GAP = 40;
@@ -20,6 +23,7 @@ export function TemplateCanvas({ viewportWidth }: TemplateCanvasProps) {
   const template = useEditorStore((s) => s.template);
   const zoom = useEditorStore((s) => s.zoom);
   const selectedElementIds = useEditorStore((s) => s.selectedElementIds);
+  const selectedBandId = useEditorStore((s) => s.selectedBandId);
 
   const pages = useMemo(() => computeDesignLayout(template), [template]);
 
@@ -58,6 +62,41 @@ export function TemplateCanvas({ viewportWidth }: TemplateCanvasProps) {
     pageXOffsets,
     pageYOffsets,
   );
+
+  // Compute snap info for resize handles
+  const snapInfo: SnapInfo | null = useMemo(() => {
+    if (!selectedBandId || selectedElementIds.length === 0) return null;
+
+    const bandResult = findBand(template, selectedBandId);
+    if (!bandResult) return null;
+
+    const { band, sectionIndex } = bandResult;
+    const page = pages[sectionIndex];
+
+    const { margins } = page.pageConfig;
+    const bandContentWidth = page.pageConfig.width - margins.left - margins.right;
+    const targets = collectSnapTargets(
+      band.elements,
+      selectedElementIds,
+      bandContentWidth,
+      band.height,
+    );
+
+    // Find the band's offsetY within the page
+    const designBand = page.bands.find((db) => db.band.id === selectedBandId);
+    if (!designBand) return null;
+
+    const stageOffsetX = pageXOffsets[sectionIndex] + margins.left;
+    const stageOffsetY = pageYOffsets[sectionIndex] + margins.top + designBand.offsetY;
+
+    return {
+      targets,
+      stageOffsetX,
+      stageOffsetY,
+      bandId: selectedBandId,
+      sectionIndex,
+    };
+  }, [template, selectedBandId, selectedElementIds, pages, pageXOffsets, pageYOffsets]);
 
   const handleStageClick = useCallback((e: KonvaEventObject<MouseEvent | TouchEvent>) => {
     // Deselect when clicking empty canvas
@@ -118,8 +157,15 @@ export function TemplateCanvas({ viewportWidth }: TemplateCanvasProps) {
             geometry={selectionGeometry}
             zoom={zoom}
             onResizeEnd={handleResizeEnd}
+            snapInfo={snapInfo}
           />
         )}
+        <AlignmentGuides
+          pages={pages}
+          pageXOffsets={pageXOffsets}
+          pageYOffsets={pageYOffsets}
+          zoom={zoom}
+        />
       </Layer>
     </Stage>
   );
