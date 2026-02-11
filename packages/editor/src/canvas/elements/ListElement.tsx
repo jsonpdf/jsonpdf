@@ -55,7 +55,7 @@ export function ListElement({ element, style }: ElementRendererChildProps) {
       width={element.width}
       height={element.height}
       text={text}
-      fontFamily={mapFontFamily(style.fontFamily ?? 'Helvetica')}
+      fontFamily={mapFontFamily(style.fontFamily as string)}
       fontSize={style.fontSize ?? 12}
       fill={style.color ?? '#000000'}
       lineHeight={style.lineHeight ?? 1.2}

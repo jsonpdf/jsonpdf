@@ -7,10 +7,12 @@ import { PreviewLayout } from './preview/preview-layout';
 import { CodeLayout } from './code/code-layout';
 import { useEditorStore } from '../store';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
+import { useFontFaceInjection } from '../hooks/use-font-face-injection';
 import styles from './EditorShell.module.css';
 
 export function EditorShell() {
   useKeyboardShortcuts();
+  useFontFaceInjection();
   const activeTab = useEditorStore((s) => s.activeTab);
 
   return (

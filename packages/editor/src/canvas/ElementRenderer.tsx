@@ -28,7 +28,8 @@ interface ElementRendererProps {
 }
 
 export function ElementRenderer({ element, styles, bandId, sectionId }: ElementRendererProps) {
-  const style = resolveElementStyle(element, styles);
+  const defaultStyle = useEditorStore((s) => s.template.defaultStyle);
+  const style = resolveElementStyle(element, styles, defaultStyle);
   const Renderer = ELEMENT_RENDERERS[element.type] ?? UnknownElement;
   const isDragging = useRef(false);
   const snapTargetsRef = useRef<SnapTargets | null>(null);
