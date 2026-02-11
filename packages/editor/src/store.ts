@@ -727,7 +727,6 @@ export const useEditorStore = create<EditorState>(
         selectedBandId: null,
         selectedSectionId: null,
         previewDataText: defaultDataText(template),
-        activeTab: 'editor',
       });
       return { success: true };
     },
