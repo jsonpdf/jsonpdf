@@ -16,25 +16,189 @@
     "type": "object",
     "properties": {
       "company": {
-        "type": "string"
+        "type": "string",
+        "default": "Horizon Dynamics LLC"
       },
       "period": {
-        "type": "string"
+        "type": "string",
+        "default": "Fiscal Year Ending December 31, 2025"
       },
       "documentId": {
-        "type": "number"
+        "type": "number",
+        "default": 63
       },
       "incomeRows": {
         "type": "array",
         "items": {
           "type": "object"
-        }
+        },
+        "default": [
+          {
+            "code": "4000",
+            "account": "Consulting Revenue",
+            "fy2024": "$5,200,000",
+            "fy2023": "$4,600,000"
+          },
+          {
+            "code": "4100",
+            "account": "Product Sales",
+            "fy2024": "$2,750,000",
+            "fy2023": "$2,300,000"
+          },
+          {
+            "code": "4200",
+            "account": "Maintenance Contracts",
+            "fy2024": "$1,480,000",
+            "fy2023": "$1,250,000"
+          },
+          {
+            "code": "",
+            "account": "TOTAL REVENUE",
+            "fy2024": "$9,430,000",
+            "fy2023": "$8,150,000"
+          },
+          {
+            "code": "",
+            "account": "",
+            "fy2024": "",
+            "fy2023": ""
+          },
+          {
+            "code": "5000",
+            "account": "Cost of Services",
+            "fy2024": "$3,100,000",
+            "fy2023": "$2,800,000"
+          },
+          {
+            "code": "5100",
+            "account": "Research & Development",
+            "fy2024": "$1,560,000",
+            "fy2023": "$1,400,000"
+          },
+          {
+            "code": "5200",
+            "account": "Sales & Marketing",
+            "fy2024": "$980,000",
+            "fy2023": "$850,000"
+          },
+          {
+            "code": "5300",
+            "account": "General & Administrative",
+            "fy2024": "$720,000",
+            "fy2023": "$650,000"
+          },
+          {
+            "code": "",
+            "account": "TOTAL EXPENSES",
+            "fy2024": "$6,360,000",
+            "fy2023": "$5,700,000"
+          },
+          {
+            "code": "",
+            "account": "",
+            "fy2024": "",
+            "fy2023": ""
+          },
+          {
+            "code": "",
+            "account": "NET INCOME",
+            "fy2024": "$3,070,000",
+            "fy2023": "$2,450,000"
+          }
+        ]
       },
       "balanceRows": {
         "type": "array",
         "items": {
           "type": "object"
-        }
+        },
+        "default": [
+          {
+            "code": "",
+            "account": "ASSETS",
+            "amount": ""
+          },
+          {
+            "code": "1000",
+            "account": "Cash & Equivalents",
+            "amount": "$4,150,000"
+          },
+          {
+            "code": "1100",
+            "account": "Accounts Receivable",
+            "amount": "$2,280,000"
+          },
+          {
+            "code": "1200",
+            "account": "Property & Equipment",
+            "amount": "$3,100,000"
+          },
+          {
+            "code": "",
+            "account": "TOTAL ASSETS",
+            "amount": "$9,530,000"
+          },
+          {
+            "code": "",
+            "account": "",
+            "amount": ""
+          },
+          {
+            "code": "",
+            "account": "LIABILITIES",
+            "amount": ""
+          },
+          {
+            "code": "2000",
+            "account": "Accounts Payable",
+            "amount": "$1,380,000"
+          },
+          {
+            "code": "2100",
+            "account": "Long-Term Debt",
+            "amount": "$2,600,000"
+          },
+          {
+            "code": "",
+            "account": "TOTAL LIABILITIES",
+            "amount": "$3,980,000"
+          },
+          {
+            "code": "",
+            "account": "",
+            "amount": ""
+          },
+          {
+            "code": "",
+            "account": "EQUITY",
+            "amount": ""
+          },
+          {
+            "code": "3000",
+            "account": "Common Stock",
+            "amount": "$1,500,000"
+          },
+          {
+            "code": "3100",
+            "account": "Retained Earnings",
+            "amount": "$4,050,000"
+          },
+          {
+            "code": "",
+            "account": "TOTAL EQUITY",
+            "amount": "$5,550,000"
+          },
+          {
+            "code": "",
+            "account": "",
+            "amount": ""
+          },
+          {
+            "code": "",
+            "account": "TOTAL LIABILITIES & EQUITY",
+            "amount": "$9,530,000"
+          }
+        ]
       }
     }
   },

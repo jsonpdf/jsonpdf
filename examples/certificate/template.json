@@ -17,19 +17,24 @@
     "type": "object",
     "properties": {
       "recipientName": {
-        "type": "string"
+        "type": "string",
+        "default": "Jordan Rivera"
       },
       "courseName": {
-        "type": "string"
+        "type": "string",
+        "default": "Introduction to Machine Learning"
       },
       "date": {
-        "type": "string"
+        "type": "string",
+        "default": "March 8, 2026"
       },
       "certificateId": {
-        "type": "string"
+        "type": "string",
+        "default": "CERT-2026-01287"
       },
       "issuerName": {
-        "type": "string"
+        "type": "string",
+        "default": "Prof. Kenji Tanaka, Dean of Technology"
       }
     }
   },

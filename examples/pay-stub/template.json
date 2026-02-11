@@ -16,25 +16,32 @@
     "type": "object",
     "properties": {
       "companyName": {
-        "type": "string"
+        "type": "string",
+        "default": "Northwind Traders"
       },
       "companyAddress": {
-        "type": "string"
+        "type": "string",
+        "default": "350 Commerce Street, Suite 700, Seattle, WA 98101"
       },
       "employeeName": {
-        "type": "string"
+        "type": "string",
+        "default": "Daniel K. Ortega"
       },
       "employeeId": {
-        "type": "string"
+        "type": "string",
+        "default": "EMP-31052"
       },
       "department": {
-        "type": "string"
+        "type": "string",
+        "default": "Product Management"
       },
       "payPeriod": {
-        "type": "string"
+        "type": "string",
+        "default": "March 1 — March 15, 2026"
       },
       "payDate": {
-        "type": "string"
+        "type": "string",
+        "default": "March 20, 2026"
       },
       "earnings": {
         "type": "array",
@@ -57,7 +64,30 @@
               "type": "string"
             }
           }
-        }
+        },
+        "default": [
+          {
+            "description": "Regular Pay",
+            "hours": 80,
+            "rate": 55,
+            "amount": 4400,
+            "type": "regular"
+          },
+          {
+            "description": "Overtime (1.5x)",
+            "hours": 6,
+            "rate": 82.5,
+            "amount": 495,
+            "type": "overtime"
+          },
+          {
+            "description": "On-Call Stipend",
+            "hours": 0,
+            "rate": 0,
+            "amount": 250,
+            "type": "bonus"
+          }
+        ]
       },
       "deductions": {
         "type": "array",
@@ -74,25 +104,63 @@
               "type": "string"
             }
           }
-        }
+        },
+        "default": [
+          {
+            "description": "Federal Income Tax",
+            "amount": 772.75,
+            "type": "tax"
+          },
+          {
+            "description": "State Income Tax (WA)",
+            "amount": 0,
+            "type": "tax"
+          },
+          {
+            "description": "Social Security (6.2%)",
+            "amount": 318.99,
+            "type": "tax"
+          },
+          {
+            "description": "Medicare (1.45%)",
+            "amount": 74.6,
+            "type": "tax"
+          },
+          {
+            "description": "Health Insurance (HMO)",
+            "amount": 215,
+            "type": "benefit"
+          },
+          {
+            "description": "401(k) Contribution (6%)",
+            "amount": 308.7,
+            "type": "retirement"
+          }
+        ]
       },
       "grossPay": {
-        "type": "number"
+        "type": "number",
+        "default": 5145
       },
       "totalDeductions": {
-        "type": "number"
+        "type": "number",
+        "default": 1690.04
       },
       "netPay": {
-        "type": "number"
+        "type": "number",
+        "default": 3454.96
       },
       "ytdGross": {
-        "type": "number"
+        "type": "number",
+        "default": 25725
       },
       "ytdDeductions": {
-        "type": "number"
+        "type": "number",
+        "default": 8450.2
       },
       "ytdNet": {
-        "type": "number"
+        "type": "number",
+        "default": 17274.8
       }
     }
   },

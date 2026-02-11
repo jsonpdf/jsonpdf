@@ -16,25 +16,109 @@
     "type": "object",
     "properties": {
       "dashboardTitle": {
-        "type": "string"
+        "type": "string",
+        "default": "Marketing Dashboard"
       },
       "dateRange": {
-        "type": "string"
+        "type": "string",
+        "default": "Q1 2026 (Jan — Mar)"
       },
       "generatedDate": {
-        "type": "string"
+        "type": "string",
+        "default": "April 5, 2026"
       },
       "kpis": {
-        "type": "array"
+        "type": "array",
+        "default": [
+          {
+            "label": "Campaign ROI",
+            "value": "340%",
+            "change": "+22%",
+            "positive": true
+          },
+          {
+            "label": "Lead Volume",
+            "value": "9,247",
+            "change": "+15.1%",
+            "positive": true
+          },
+          {
+            "label": "Cost per Lead",
+            "value": "$18.40",
+            "change": "-8.2%",
+            "positive": true
+          },
+          {
+            "label": "Bounce Rate",
+            "value": "42.1%",
+            "change": "+1.3%",
+            "positive": false
+          }
+        ]
       },
       "monthlySales": {
-        "type": "array"
+        "type": "array",
+        "default": [
+          {
+            "month": "Jan",
+            "revenue": 310000
+          },
+          {
+            "month": "Feb",
+            "revenue": 345000
+          },
+          {
+            "month": "Mar",
+            "revenue": 380000
+          }
+        ]
       },
       "categoryBreakdown": {
-        "type": "array"
+        "type": "array",
+        "default": [
+          {
+            "category": "Digital Ads",
+            "amount": 145000
+          },
+          {
+            "category": "Content",
+            "amount": 98000
+          },
+          {
+            "category": "Events",
+            "amount": 72000
+          },
+          {
+            "category": "Email",
+            "amount": 65000
+          }
+        ]
       },
       "recentTransactions": {
-        "type": "array"
+        "type": "array",
+        "default": [
+          {
+            "id": "TXN-7201",
+            "customer": "Vertex Labs",
+            "amount": "$18,200",
+            "status": "Completed",
+            "date": "Mar 28"
+          },
+          {
+            "id": "TXN-7200",
+            "customer": "Cascade Health",
+            "amount": "$9,850",
+            "status": "Completed",
+            "date": "Mar 27"
+          },
+          {
+            "id": "TXN-7199",
+            "customer": "NovaTech Inc",
+            "amount": "$14,300",
+            "status": "Pending",
+            "date": "Mar 26"
+          }
+        ]
       }
     }
   },

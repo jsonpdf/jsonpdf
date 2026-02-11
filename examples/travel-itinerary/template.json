@@ -16,19 +16,53 @@
     "type": "object",
     "properties": {
       "tripName": {
-        "type": "string"
+        "type": "string",
+        "default": "Kyoto Heritage Tour"
       },
       "dates": {
-        "type": "string"
+        "type": "string",
+        "default": "October 8 — 11, 2026"
       },
       "traveler": {
-        "type": "string"
+        "type": "string",
+        "default": "Lena Johansson"
       },
       "days": {
-        "type": "array"
+        "type": "array",
+        "default": [
+          {
+            "label": "Day 1",
+            "title": "Temples & Tea Houses",
+            "image": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='340' height='260'%3E%3Crect fill='%23DC2626' width='340' height='260' rx='8'/%3E%3Ctext x='170' y='120' text-anchor='middle' fill='white' font-size='22' font-family='sans-serif' font-weight='bold'%3EKinkaku-ji%3C/text%3E%3Ctext x='170' y='150' text-anchor='middle' fill='%23FECACA' font-size='14' font-family='sans-serif'%3EGolden Pavilion%3C/text%3E%3C/svg%3E",
+            "description": "Visit Kyoto's iconic golden temple and experience a traditional tea ceremony in the surrounding gardens.",
+            "activities": [
+              "Morning: Kinkaku-ji (Golden Pavilion) and garden walk",
+              "Midday: Matcha tea ceremony at a nearby tea house",
+              "Afternoon: Ryoan-ji rock garden and Zen meditation",
+              "Evening: Kaiseki dinner in Gion district"
+            ]
+          },
+          {
+            "label": "Day 2",
+            "title": "Bamboo Groves & Monkey Park",
+            "image": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='340' height='260'%3E%3Crect fill='%2316A34A' width='340' height='260' rx='8'/%3E%3Ctext x='170' y='120' text-anchor='middle' fill='white' font-size='22' font-family='sans-serif' font-weight='bold'%3EArashiyama%3C/text%3E%3Ctext x='170' y='150' text-anchor='middle' fill='%23BBF7D0' font-size='14' font-family='sans-serif'%3EBamboo Grove%3C/text%3E%3C/svg%3E",
+            "description": "Explore the enchanting bamboo forest of Arashiyama and visit the hilltop monkey park overlooking the city.",
+            "activities": [
+              "Morning: Arashiyama Bamboo Grove at sunrise",
+              "Midday: Tofu lunch at a riverside restaurant",
+              "Afternoon: Iwatayama Monkey Park hike",
+              "Evening: Togetsukyo Bridge sunset stroll"
+            ]
+          }
+        ]
       },
       "gallery": {
-        "type": "array"
+        "type": "array",
+        "default": [
+          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='150'%3E%3Crect fill='%23E11D48' width='260' height='150' rx='6'/%3E%3Ctext x='130' y='80' text-anchor='middle' fill='white' font-size='16' font-family='sans-serif'%3EFushimi Inari%3C/text%3E%3C/svg%3E",
+          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='150'%3E%3Crect fill='%232563EB' width='260' height='150' rx='6'/%3E%3Ctext x='130' y='80' text-anchor='middle' fill='white' font-size='16' font-family='sans-serif'%3ENijo Castle%3C/text%3E%3C/svg%3E",
+          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='150'%3E%3Crect fill='%237C3AED' width='260' height='150' rx='6'/%3E%3Ctext x='130' y='80' text-anchor='middle' fill='white' font-size='16' font-family='sans-serif'%3EPhilosopher Path%3C/text%3E%3C/svg%3E"
+        ]
       }
     }
   },
