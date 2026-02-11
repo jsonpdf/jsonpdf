@@ -61,8 +61,11 @@ export function Toolbar() {
 
     const reader = new FileReader();
     reader.onload = () => {
-      const result = useEditorStore.getState().importTemplate(reader.result as string);
-      if (!result.success) {
+      const store = useEditorStore.getState();
+      const result = store.importTemplate(reader.result as string);
+      if (result.success) {
+        store.setActiveTab('editor');
+      } else {
         alert(`Import failed:\n${result.error}`);
       }
     };
