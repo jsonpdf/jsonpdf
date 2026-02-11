@@ -1,0 +1,1 @@
+export { FontsPanel } from './FontsPanel';

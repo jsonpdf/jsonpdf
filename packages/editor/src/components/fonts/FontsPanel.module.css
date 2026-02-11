@@ -1,0 +1,172 @@
+.panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ---- Font list ---- */
+
+.listHeader {
+  font-weight: 600;
+  font-size: var(--jp-font-size-sm);
+  color: var(--jp-color-text-secondary);
+  padding: var(--jp-space-sm) var(--jp-space-md);
+  border-bottom: 1px solid var(--jp-color-border-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.listBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--jp-space-xs) 0;
+}
+
+.emptyState {
+  padding: var(--jp-space-lg) var(--jp-space-md);
+  text-align: center;
+  color: var(--jp-color-text-tertiary);
+  font-size: var(--jp-font-size-sm);
+}
+
+.familyGroup {
+  padding: var(--jp-space-xs) var(--jp-space-sm);
+}
+
+.familyName {
+  font-size: var(--jp-font-size-sm);
+  font-weight: 600;
+  color: var(--jp-color-text-primary);
+  padding: 2px 0;
+}
+
+.variantRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 0 2px var(--jp-space-md);
+}
+
+.variantLabel {
+  font-size: var(--jp-font-size-sm);
+  color: var(--jp-color-text-secondary);
+}
+
+.deleteVariantBtn {
+  border: none;
+  background: none;
+  color: var(--jp-color-text-tertiary);
+  cursor: pointer;
+  font-size: var(--jp-font-size-md);
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.deleteVariantBtn:hover {
+  color: var(--jp-color-danger, #dc3545);
+}
+
+.addBtn {
+  display: block;
+  width: calc(100% - 2 * var(--jp-space-xs));
+  margin: var(--jp-space-xs);
+  padding: var(--jp-space-xs) var(--jp-space-sm);
+  border: 1px dashed var(--jp-color-border);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--jp-color-text-secondary);
+  font-size: var(--jp-font-size-sm);
+  cursor: pointer;
+  text-align: center;
+}
+
+.addBtn:hover {
+  background: var(--jp-color-surface-secondary);
+  border-color: var(--jp-color-accent);
+  color: var(--jp-color-accent);
+}
+
+.hiddenInput {
+  display: none;
+}
+
+/* ---- Add font form ---- */
+
+.formHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--jp-space-xs);
+  padding: var(--jp-space-sm) var(--jp-space-md);
+  border-bottom: 1px solid var(--jp-color-border-light);
+}
+
+.backBtn {
+  border: none;
+  background: none;
+  color: var(--jp-color-text-secondary);
+  cursor: pointer;
+  font-size: var(--jp-font-size-md);
+  padding: 0;
+  line-height: 1;
+}
+
+.backBtn:hover {
+  color: var(--jp-color-accent);
+}
+
+.headerTitle {
+  font-size: var(--jp-font-size-sm);
+  font-weight: 600;
+  color: var(--jp-color-text-primary);
+}
+
+.formBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--jp-space-sm) var(--jp-space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--jp-space-sm);
+}
+
+.fieldLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--jp-font-size-xs);
+  color: var(--jp-color-text-secondary);
+}
+
+.fieldInput,
+.fieldSelect {
+  padding: var(--jp-space-xs) var(--jp-space-sm);
+  border: 1px solid var(--jp-color-border);
+  border-radius: 3px;
+  background: var(--jp-color-surface);
+  color: var(--jp-color-text-primary);
+  font-size: var(--jp-font-size-sm);
+  font-family: var(--jp-font-family);
+}
+
+.fieldInput:focus,
+.fieldSelect:focus {
+  outline: none;
+  border-color: var(--jp-color-accent);
+}
+
+.confirmBtn {
+  padding: var(--jp-space-xs) var(--jp-space-sm);
+  border: 1px solid var(--jp-color-accent);
+  border-radius: 3px;
+  background: var(--jp-color-accent);
+  color: #fff;
+  font-size: var(--jp-font-size-sm);
+  cursor: pointer;
+  text-align: center;
+  margin-top: var(--jp-space-xs);
+}
+
+.confirmBtn:hover {
+  opacity: 0.9;
+}
