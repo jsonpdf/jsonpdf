@@ -1,4 +1,5 @@
 export { createTemplate } from './factory.js';
+export { DEFAULT_FONTS } from './default-fonts.js';
 export { validateTemplate } from './validation.js';
 export { migrateTemplate } from './migration.js';
 export {

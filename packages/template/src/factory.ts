@@ -1,4 +1,5 @@
 import type { Template, PageConfig } from '@jsonpdf/core';
+import { DEFAULT_FONTS } from './default-fonts.js';
 
 const DEFAULT_PAGE: PageConfig = {
   width: 612,
@@ -24,9 +25,10 @@ export function createTemplate(overrides?: Omit<Partial<Template>, 'version'>): 
     name: 'Untitled Template',
     page,
     dataSchema: { type: 'object', properties: {} },
+    defaultStyle: { fontFamily: 'Inter' },
     styles: {},
-    fonts: [],
     sections: [],
+    fonts: [...DEFAULT_FONTS],
     ...overrides,
     // version is always locked and page uses the merged value
     version: '1.0',

@@ -221,40 +221,40 @@ describe('getAllElementIds', () => {
 
 describe('findFont', () => {
   it('finds a font by family', () => {
-    let t = createTemplate();
-    t = addFont(t, { family: 'Inter', weight: 400, src: 'inter-400.woff2' });
-    t = addFont(t, { family: 'Roboto', weight: 400, src: 'roboto-400.woff2' });
+    let t = createTemplate({ fonts: [] });
+    t = addFont(t, { family: 'Inter', weight: 400, data: 'AAAA' });
+    t = addFont(t, { family: 'Roboto', weight: 400, data: 'BBBB' });
     const result = findFont(t, 'Inter');
     expect(result).toBeDefined();
     expect(result!.family).toBe('Inter');
   });
 
   it('finds a font by family and weight', () => {
-    let t = createTemplate();
-    t = addFont(t, { family: 'Inter', weight: 400, src: 'inter-400.woff2' });
-    t = addFont(t, { family: 'Inter', weight: 700, src: 'inter-700.woff2' });
+    let t = createTemplate({ fonts: [] });
+    t = addFont(t, { family: 'Inter', weight: 400, data: 'AAAA' });
+    t = addFont(t, { family: 'Inter', weight: 700, data: 'CCCC' });
     const result = findFont(t, 'Inter', 700);
     expect(result).toBeDefined();
     expect(result!.weight).toBe(700);
   });
 
   it('finds a font by family, weight, and style', () => {
-    let t = createTemplate();
-    t = addFont(t, { family: 'Inter', weight: 400, src: 'inter-400.woff2' });
-    t = addFont(t, { family: 'Inter', weight: 400, style: 'italic', src: 'inter-400i.woff2' });
+    let t = createTemplate({ fonts: [] });
+    t = addFont(t, { family: 'Inter', weight: 400, data: 'AAAA' });
+    t = addFont(t, { family: 'Inter', weight: 400, style: 'italic', data: 'DDDD' });
     const result = findFont(t, 'Inter', 400, 'italic');
     expect(result).toBeDefined();
     expect(result!.style).toBe('italic');
   });
 
   it('returns undefined for missing font', () => {
-    const t = createTemplate();
+    const t = createTemplate({ fonts: [] });
     expect(findFont(t, 'Nope')).toBeUndefined();
   });
 
   it('returns undefined when weight does not match', () => {
-    let t = createTemplate();
-    t = addFont(t, { family: 'Inter', weight: 400, src: 'inter-400.woff2' });
+    let t = createTemplate({ fonts: [] });
+    t = addFont(t, { family: 'Inter', weight: 400, data: 'AAAA' });
     expect(findFont(t, 'Inter', 700)).toBeUndefined();
   });
 });
