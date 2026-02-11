@@ -1,6 +1,10 @@
 import { useRef, useState, useEffect } from 'react';
+import { useEditorStore } from '../../store';
+import { useWheelZoom } from '../../hooks/use-wheel-zoom';
+import { usePan } from '../../hooks/use-pan';
 import { ReadOnlyCanvas, type CanvasItemClick } from '../../canvas/ReadOnlyCanvas';
-import styles from './read-only-viewport.module.css';
+import { CanvasToolbar } from '../canvas-toolbar';
+import shared from '../viewport-shared.module.css';
 
 interface ReadOnlyViewportProps {
   onItemClick?: (item: CanvasItemClick) => void;
@@ -9,6 +13,8 @@ interface ReadOnlyViewportProps {
 export function ReadOnlyViewport({ onItemClick }: ReadOnlyViewportProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [viewportWidth, setViewportWidth] = useState(0);
+
+  const activeTool = useEditorStore((s) => s.activeTool);
 
   useEffect(() => {
     const el = ref.current;
@@ -25,9 +31,20 @@ export function ReadOnlyViewport({ onItemClick }: ReadOnlyViewportProps) {
     };
   }, []);
 
+  useWheelZoom(ref);
+  const { isPanning, handleMouseDown } = usePan(ref);
+
+  let viewportClass = shared.viewport;
+  if (activeTool === 'pan') {
+    viewportClass += isPanning ? ` ${shared.grabbing}` : ` ${shared.grab}`;
+  }
+
   return (
-    <div ref={ref} className={styles.viewport}>
-      <ReadOnlyCanvas viewportWidth={viewportWidth} onItemClick={onItemClick} />
+    <div className={shared.wrapper}>
+      <div ref={ref} className={viewportClass} onMouseDown={handleMouseDown}>
+        <ReadOnlyCanvas viewportWidth={viewportWidth} onItemClick={onItemClick} />
+      </div>
+      <CanvasToolbar />
     </div>
   );
 }

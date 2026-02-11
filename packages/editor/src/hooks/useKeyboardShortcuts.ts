@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useEditorStore } from '../store';
+import type { Tool } from '../store';
 
 const NUDGE_SMALL = 1;
 const NUDGE_LARGE = 10;
@@ -11,6 +12,8 @@ function isInputFocused(): boolean {
 }
 
 export function useKeyboardShortcuts() {
+  const toolBeforeSpace = useRef<Tool | null>(null);
+
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if (isInputFocused()) return;
@@ -72,6 +75,29 @@ export function useKeyboardShortcuts() {
         return;
       }
 
+      // Tool shortcuts — only fire without modifiers
+      if (!mod && !e.shiftKey && !e.altKey) {
+        // V → select tool
+        if (e.key === 'v') {
+          state.setActiveTool('select');
+          return;
+        }
+
+        // H → pan tool
+        if (e.key === 'h') {
+          state.setActiveTool('pan');
+          return;
+        }
+
+        // Space held → temporary pan
+        if (e.key === ' ' && !e.repeat) {
+          e.preventDefault();
+          toolBeforeSpace.current = state.activeTool;
+          state.setActiveTool('pan');
+          return;
+        }
+      }
+
       if (state.selectedElementIds.length === 0) return;
 
       if (e.key === 'Delete' || e.key === 'Backspace') {
@@ -102,9 +128,19 @@ export function useKeyboardShortcuts() {
       }
     }
 
+    function handleKeyUp(e: KeyboardEvent) {
+      if (isInputFocused()) return;
+      if (e.key === ' ' && toolBeforeSpace.current !== null) {
+        useEditorStore.getState().setActiveTool(toolBeforeSpace.current);
+        toolBeforeSpace.current = null;
+      }
+    }
+
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
     };
   }, []);
 }

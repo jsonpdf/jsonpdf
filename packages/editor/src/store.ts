@@ -23,7 +23,10 @@ import {
   deepCloneWithNewIds,
 } from '@jsonpdf/template';
 import { createDefaultElement } from './constants/element-defaults';
+import { MIN_ZOOM, MAX_ZOOM } from './constants/zoom';
 import { temporal, type TemporalState } from './middleware/temporal';
+
+export type Tool = 'select' | 'pan';
 
 export interface EditorState extends TemporalState {
   template: Template;
@@ -34,8 +37,10 @@ export interface EditorState extends TemporalState {
   selectedBandId: string | null;
   selectedSectionId: string | null;
   clipboard: { elements: Element[]; sourceBandId: string } | null;
+  activeTool: Tool;
 
   setTemplate: (template: Template) => void;
+  setActiveTool: (tool: Tool) => void;
   setZoom: (zoom: number) => void;
   setScroll: (x: number, y: number) => void;
   setSelection: (
@@ -94,6 +99,7 @@ export const useEditorStore = create<EditorState>(
     selectedBandId: null,
     selectedSectionId: null,
     clipboard: null,
+    activeTool: 'select',
     activeTab: 'editor',
 
     _undoStack: [],
@@ -134,6 +140,9 @@ export const useEditorStore = create<EditorState>(
     canUndo: () => get()._undoStack.length > 0,
     canRedo: () => get()._redoStack.length > 0,
 
+    setActiveTool: (tool) => {
+      set({ activeTool: tool });
+    },
     setActiveTab: (tab) => {
       set({ activeTab: tab });
     },
@@ -141,7 +150,7 @@ export const useEditorStore = create<EditorState>(
       set({ template });
     },
     setZoom: (zoom) => {
-      set({ zoom: Math.max(0.1, Math.min(5.0, zoom)) });
+      set({ zoom: Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom)) });
     },
     setScroll: (scrollX, scrollY) => {
       set({ scrollX, scrollY });

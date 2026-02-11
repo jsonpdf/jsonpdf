@@ -5,7 +5,7 @@ export { EditorShell } from './components/EditorShell';
 
 // Store
 export { useEditorStore } from './store';
-export type { EditorState } from './store';
+export type { EditorState, Tool } from './store';
 
 // Canvas (advanced usage)
 export { TemplateCanvas, CANVAS_PADDING } from './canvas/TemplateCanvas';

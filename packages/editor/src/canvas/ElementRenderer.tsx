@@ -36,9 +36,11 @@ export function ElementRenderer({ element, styles, bandId, sectionId }: ElementR
   const { contentWidth, bandHeight, sectionIndex } = useBandGeometry();
 
   const isSelected = useEditorStore((s) => s.selectedElementIds.includes(element.id));
+  const activeTool = useEditorStore((s) => s.activeTool);
 
   const handleClick = useCallback(
     (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
+      if (useEditorStore.getState().activeTool !== 'select') return;
       if (isDragging.current) return;
       e.cancelBubble = true;
       const evt = e.evt;
@@ -168,6 +170,7 @@ export function ElementRenderer({ element, styles, bandId, sectionId }: ElementR
   );
 
   const handleMouseEnter = useCallback((e: KonvaEventObject<MouseEvent>) => {
+    if (useEditorStore.getState().activeTool !== 'select') return;
     const stage = e.target.getStage();
     if (stage) {
       stage.container().style.cursor = 'move';
@@ -175,6 +178,7 @@ export function ElementRenderer({ element, styles, bandId, sectionId }: ElementR
   }, []);
 
   const handleMouseLeave = useCallback((e: KonvaEventObject<MouseEvent>) => {
+    if (useEditorStore.getState().activeTool !== 'select') return;
     const stage = e.target.getStage();
     if (stage) {
       stage.container().style.cursor = 'default';
@@ -194,7 +198,7 @@ export function ElementRenderer({ element, styles, bandId, sectionId }: ElementR
       rotation={element.rotation ?? 0}
       offsetX={element.rotation ? element.width / 2 : 0}
       offsetY={element.rotation ? element.height / 2 : 0}
-      draggable={isSelected}
+      draggable={isSelected && activeTool === 'select'}
       onClick={handleClick}
       onTap={handleClick}
       onDragStart={handleDragStart}

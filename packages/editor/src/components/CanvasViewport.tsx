@@ -1,14 +1,20 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { useEditorStore } from '../store';
 import { computeDesignLayout } from '../layout';
+import { useWheelZoom } from '../hooks/use-wheel-zoom';
+import { usePan } from '../hooks/use-pan';
 import { DRAG_TYPE } from './ElementPalette';
 import { TemplateCanvas, CANVAS_PADDING, PAGE_GAP } from '../canvas/TemplateCanvas';
+import { CanvasToolbar } from './canvas-toolbar';
+import shared from './viewport-shared.module.css';
 import styles from './CanvasViewport.module.css';
 
 export function CanvasViewport() {
   const ref = useRef<HTMLDivElement>(null);
   const [viewportWidth, setViewportWidth] = useState(0);
   const [dropActive, setDropActive] = useState(false);
+
+  const activeTool = useEditorStore((s) => s.activeTool);
 
   useEffect(() => {
     const el = ref.current;
@@ -24,6 +30,9 @@ export function CanvasViewport() {
       ro.disconnect();
     };
   }, []);
+
+  useWheelZoom(ref);
+  const { isPanning, handleMouseDown } = usePan(ref);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     if (!e.dataTransfer.types.includes(DRAG_TYPE)) return;
@@ -91,17 +100,25 @@ export function CanvasViewport() {
     [pages, zoom, viewportWidth, addElement],
   );
 
-  const viewportClass = dropActive ? `${styles.viewport} ${styles.dropActive}` : styles.viewport;
+  let viewportClass = shared.viewport;
+  if (dropActive) viewportClass += ` ${styles.dropActive}`;
+  if (activeTool === 'pan') {
+    viewportClass += isPanning ? ` ${shared.grabbing}` : ` ${shared.grab}`;
+  }
 
   return (
-    <div
-      ref={ref}
-      className={viewportClass}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-    >
-      <TemplateCanvas viewportWidth={viewportWidth} />
+    <div className={shared.wrapper}>
+      <div
+        ref={ref}
+        className={viewportClass}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        onMouseDown={handleMouseDown}
+      >
+        <TemplateCanvas viewportWidth={viewportWidth} />
+      </div>
+      <CanvasToolbar />
     </div>
   );
 }

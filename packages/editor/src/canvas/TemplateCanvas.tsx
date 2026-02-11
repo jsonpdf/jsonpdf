@@ -99,6 +99,8 @@ export function TemplateCanvas({ viewportWidth }: TemplateCanvasProps) {
   }, [template, selectedBandId, selectedElementIds, pages, pageXOffsets, pageYOffsets]);
 
   const handleStageClick = useCallback((e: KonvaEventObject<MouseEvent | TouchEvent>) => {
+    // Only deselect in select mode
+    if (useEditorStore.getState().activeTool !== 'select') return;
     // Deselect when clicking empty canvas
     if (e.target === e.target.getStage()) {
       useEditorStore.getState().setSelection(null);
