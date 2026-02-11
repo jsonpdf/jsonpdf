@@ -4,6 +4,7 @@ import { initCommand } from './commands/init.js';
 import { validateCommand } from './commands/validate.js';
 import { renderCommand } from './commands/render.js';
 import { sampleDataCommand } from './commands/sample-data.js';
+import { editorCommand } from './commands/editor.js';
 import { CliError } from './utils.js';
 
 export function createProgram(): Command {
@@ -39,6 +40,13 @@ export function createProgram(): Command {
     .option('-o, --output <file>', 'Output JSON file (default: stdout)')
     .option('--array-length <n>', 'Number of sample array items', '3')
     .action(sampleDataCommand);
+
+  program
+    .command('editor')
+    .description('Launch the visual template editor')
+    .argument('[template]', 'Template JSON file to open')
+    .option('-p, --port <port>', 'Dev server port', '5173')
+    .action(editorCommand);
 
   return program;
 }
