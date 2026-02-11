@@ -20,11 +20,17 @@
     "typecheck": "tsc --build --noEmit"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.1.1",
     "@jsonpdf/core": "workspace:*",
+    "@jsonpdf/editor": "workspace:*",
     "@jsonpdf/plugins": "workspace:*",
     "@jsonpdf/template": "workspace:*",
     "@jsonpdf/renderer": "workspace:*",
+    "@resvg/resvg-wasm": "^2.6.2",
     "chalk": "^5.4.0",
-    "commander": "^13.0.0"
+    "commander": "^13.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "vite": "^6.0.0"
   }
 }
