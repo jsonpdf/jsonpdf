@@ -1,20 +1,34 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import type { PageConfig } from '@jsonpdf/core';
 import { useEditorStore } from '../../store';
 import { PropertyGroup, NumberField, TextField } from '../fields';
+import { StyleFields } from '../styles/StyleFields';
 import styles from './Panel.module.css';
 
 export function TemplatePanel() {
   const name = useEditorStore((s) => s.template.name);
   const description = useEditorStore((s) => s.template.description);
   const page = useEditorStore((s) => s.template.page);
+  const defaultStyle = useEditorStore((s) => s.template.defaultStyle);
+  const fonts = useEditorStore((s) => s.template.fonts);
   const updateTemplateProps = useEditorStore((s) => s.updateTemplateProps);
+
+  const fontFamilies = useMemo(() => [...new Set(fonts.map((f) => f.family))], [fonts]);
 
   const handlePageChange = useCallback(
     (updates: Partial<PageConfig>) => {
       updateTemplateProps({ page: updates });
     },
     [updateTemplateProps],
+  );
+
+  const handleDefaultStyleChange = useCallback(
+    (key: string, value: unknown) => {
+      updateTemplateProps({
+        defaultStyle: { ...defaultStyle, [key]: value } as typeof defaultStyle,
+      });
+    },
+    [defaultStyle, updateTemplateProps],
   );
 
   return (
@@ -89,6 +103,13 @@ export function TemplatePanel() {
           min={0}
         />
       </PropertyGroup>
+
+      <div className={styles.panelHeader}>Default Style</div>
+      <StyleFields
+        values={defaultStyle}
+        onChange={handleDefaultStyleChange}
+        fontFamilies={fontFamilies}
+      />
     </div>
   );
 }

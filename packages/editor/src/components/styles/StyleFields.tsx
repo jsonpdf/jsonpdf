@@ -28,19 +28,32 @@ const TEXT_ALIGN_OPTIONS = [
 interface StyleFieldsProps {
   values: Partial<Style>;
   onChange: (key: string, value: unknown) => void;
+  /** When provided, renders font family as a dropdown instead of a text field. */
+  fontFamilies?: string[];
 }
 
-export function StyleFields({ values, onChange }: StyleFieldsProps) {
+export function StyleFields({ values, onChange, fontFamilies }: StyleFieldsProps) {
   return (
     <>
       <PropertyGroup label="Typography">
-        <TextField
-          label="Font"
-          value={values.fontFamily}
-          onChange={(v) => {
-            onChange('fontFamily', v);
-          }}
-        />
+        {fontFamilies ? (
+          <SelectField
+            label="Font"
+            value={values.fontFamily}
+            onChange={(v) => {
+              onChange('fontFamily', v);
+            }}
+            options={fontFamilies.map((f) => ({ value: f, label: f }))}
+          />
+        ) : (
+          <TextField
+            label="Font"
+            value={values.fontFamily}
+            onChange={(v) => {
+              onChange('fontFamily', v);
+            }}
+          />
+        )}
         <NumberField
           label="Size"
           value={values.fontSize}

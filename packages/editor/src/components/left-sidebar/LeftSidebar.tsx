@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { OutlinePanel } from '../outline';
 import { StylesPanel } from '../styles';
+import { FontsPanel } from '../fonts';
 import { DataPanel } from '../data-schema';
 import css from './LeftSidebar.module.css';
 
-type LeftTab = 'outline' | 'styles' | 'data';
+type LeftTab = 'outline' | 'styles' | 'fonts' | 'data';
 
 export function LeftSidebar() {
   const [activeTab, setActiveTab] = useState<LeftTab>('outline');
@@ -29,6 +30,14 @@ export function LeftSidebar() {
           Styles
         </button>
         <button
+          className={`${css.tab} ${activeTab === 'fonts' ? css.tabActive : ''}`}
+          onClick={() => {
+            setActiveTab('fonts');
+          }}
+        >
+          Fonts
+        </button>
+        <button
           className={`${css.tab} ${activeTab === 'data' ? css.tabActive : ''}`}
           onClick={() => {
             setActiveTab('data');
@@ -42,6 +51,8 @@ export function LeftSidebar() {
           <OutlinePanel />
         ) : activeTab === 'styles' ? (
           <StylesPanel />
+        ) : activeTab === 'fonts' ? (
+          <FontsPanel />
         ) : (
           <DataPanel />
         )}
