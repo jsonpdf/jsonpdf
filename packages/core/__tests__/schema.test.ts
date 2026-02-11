@@ -12,6 +12,7 @@ function validTemplate(): Template {
       margins: { top: 40, right: 40, bottom: 40, left: 40 },
     },
     dataSchema: { type: 'object' },
+    defaultStyle: { fontFamily: 'Inter' },
     styles: {},
     fonts: [],
     sections: [
@@ -117,7 +118,7 @@ describe('template schema validation', () => {
 
   it('accepts template with fonts', () => {
     const t = validTemplate();
-    t.fonts = [{ family: 'Inter', weight: 400, src: '@fontsource/inter/400.css' }];
+    t.fonts = [{ family: 'Inter', weight: 400, data: 'AAAA' }];
     const result = validateTemplateSchema(t);
     expect(result.valid).toBe(true);
   });

@@ -38,12 +38,14 @@ export interface Template {
   page: PageConfig;
   /** JSON Schema (draft 2020-12) describing the expected input data shape. */
   dataSchema: JSONSchema;
+  /** Default style applied as the base layer during style resolution. fontFamily is required. */
+  defaultStyle: Style & { fontFamily: string };
   /** Named style definitions that can be referenced by elements and styled runs. */
   styles: Record<string, Style>;
-  /** Custom font declarations with source paths or URLs. */
-  fonts: FontDeclaration[];
   /** Ordered list of document sections. */
   sections: Section[];
+  /** Custom font declarations with embedded base64 font data. */
+  fonts: FontDeclaration[];
 }
 
 // ---- Page ----
@@ -301,6 +303,6 @@ export interface FontDeclaration {
   weight?: number;
   /** Font style variant. */
   style?: 'normal' | 'italic';
-  /** Path or URL to the font file (.ttf, .otf, .woff). */
-  src: string;
+  /** Base64-encoded font file data (.ttf, .otf, .woff). */
+  data: string;
 }
