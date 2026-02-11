@@ -2,13 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useEditorStore } from '../store';
 import styles from './Toolbar.module.css';
 
-const ZOOM_STEP = 0.1;
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.userAgent);
 
 export function Toolbar() {
   const name = useEditorStore((s) => s.template.name);
-  const zoom = useEditorStore((s) => s.zoom);
-  const setZoom = useEditorStore((s) => s.setZoom);
   const undoLen = useEditorStore((s) => s._undoStack.length);
   const redoLen = useEditorStore((s) => s._redoStack.length);
   const undo = useEditorStore((s) => s.undo);
@@ -116,27 +113,6 @@ export function Toolbar() {
     <div className={styles.toolbar}>
       <div className={styles.titleRow}>
         <div className={styles.name}>{name}</div>
-        <div className={styles.zoomControls}>
-          <button
-            className={styles.zoomBtn}
-            onClick={() => {
-              setZoom(zoom - ZOOM_STEP);
-            }}
-            aria-label="Zoom out"
-          >
-            -
-          </button>
-          <span className={styles.zoomLabel}>{Math.round(zoom * 100)}%</span>
-          <button
-            className={styles.zoomBtn}
-            onClick={() => {
-              setZoom(zoom + ZOOM_STEP);
-            }}
-            aria-label="Zoom in"
-          >
-            +
-          </button>
-        </div>
       </div>
       <div className={styles.menuBar}>
         <div className={styles.menuContainer} ref={fileMenuRef}>

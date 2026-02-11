@@ -211,7 +211,7 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 - [x] Undo/redo
 - [x] Copy/paste, multi-select
 - [x] Alignment guides and snapping
-- [ ] Zoom and pan
+- [x] Zoom and pan
 - [ ] Style manager
 - [ ] Data schema editor with sample data generation
 - [ ] Template gallery / starter templates

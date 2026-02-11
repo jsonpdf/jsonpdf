@@ -1,9 +1,3 @@
-.viewport {
-  flex: 1;
-  overflow: auto;
-  background: var(--jp-color-canvas-bg);
-}
-
 .dropActive {
   outline: 2px dashed var(--jp-color-accent);
   outline-offset: -2px;

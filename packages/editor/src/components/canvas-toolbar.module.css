@@ -1,0 +1,83 @@
+.toolbar {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--jp-space-xs);
+  padding: var(--jp-space-xs);
+  border: 1px solid var(--jp-color-border);
+  border-radius: 8px;
+  background: var(--jp-color-surface);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.12);
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.toolBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: none;
+  color: var(--jp-color-text-secondary);
+  cursor: pointer;
+  padding: 0;
+}
+
+.toolBtn:hover {
+  background: var(--jp-color-surface-secondary);
+  color: var(--jp-color-text-primary);
+}
+
+.toolBtnActive {
+  background: var(--jp-color-accent-light);
+  color: var(--jp-color-accent);
+  border-color: var(--jp-color-accent);
+}
+
+.toolBtnActive:hover {
+  background: var(--jp-color-accent-light);
+}
+
+.separator {
+  width: 1px;
+  height: 20px;
+  background: var(--jp-color-border);
+  margin: 0 var(--jp-space-xs);
+}
+
+.zoomBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--jp-color-border);
+  border-radius: 4px;
+  background: var(--jp-color-surface);
+  color: var(--jp-color-text-primary);
+  cursor: pointer;
+  font-size: var(--jp-font-size-md);
+  line-height: 1;
+  padding: 0;
+}
+
+.zoomBtn:hover {
+  background: var(--jp-color-surface-secondary);
+}
+
+.zoomSelect {
+  font-size: var(--jp-font-size-sm);
+  color: var(--jp-color-text-secondary);
+  min-width: 48px;
+  text-align: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 2px 0;
+}
