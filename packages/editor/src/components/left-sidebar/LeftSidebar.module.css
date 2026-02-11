@@ -1,5 +1,5 @@
 .sidebar {
-  width: var(--jp-outline-width);
+  width: var(--jp-sidebar-width);
   border-right: 1px solid var(--jp-color-border);
   background: var(--jp-color-surface);
   flex-shrink: 0;

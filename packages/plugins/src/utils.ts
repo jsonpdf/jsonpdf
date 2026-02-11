@@ -3,7 +3,7 @@ import type { Style } from '@jsonpdf/core';
 import type { FontMap } from './types.js';
 import { fontKey } from './types.js';
 
-/** Resolve a font from the FontMap based on style properties. Falls back to first available font. */
+/** Resolve a font from the FontMap based on style properties. Falls back to same family, then first available. */
 export function getFont(fonts: FontMap, style: Style): PDFFont {
   if (!style.fontFamily) {
     throw new Error('fontFamily is missing — style was not resolved before calling getFont');
@@ -11,7 +11,12 @@ export function getFont(fonts: FontMap, style: Style): PDFFont {
   const key = fontKey(style.fontFamily, style.fontWeight ?? 'normal', style.fontStyle ?? 'normal');
   const found = fonts.get(key);
   if (found) return found;
-  // Fallback to first available font in the map (e.g. weight/style variant not embedded).
+  // Fallback: same family, any weight/style variant (case-insensitive)
+  const prefix = style.fontFamily.toLowerCase() + ':';
+  for (const [k, font] of fonts) {
+    if (k.toLowerCase().startsWith(prefix)) return font;
+  }
+  // Last resort: first available font in the map
   for (const font of fonts.values()) {
     return font;
   }

@@ -1,5 +1,7 @@
+import { useMemo } from 'react';
 import type { Style } from '@jsonpdf/core';
-import { PropertyGroup, NumberField, TextField, SelectField, ColorField } from '../fields';
+import { useEditorStore } from '../../store';
+import { PropertyGroup, NumberField, SelectField, ColorField } from '../fields';
 
 const FONT_WEIGHT_OPTIONS = [
   { value: 'normal', label: 'Normal' },
@@ -28,32 +30,23 @@ const TEXT_ALIGN_OPTIONS = [
 interface StyleFieldsProps {
   values: Partial<Style>;
   onChange: (key: string, value: unknown) => void;
-  /** When provided, renders font family as a dropdown instead of a text field. */
-  fontFamilies?: string[];
 }
 
-export function StyleFields({ values, onChange, fontFamilies }: StyleFieldsProps) {
+export function StyleFields({ values, onChange }: StyleFieldsProps) {
+  const fonts = useEditorStore((s) => s.template.fonts);
+  const fontFamilies = useMemo(() => [...new Set(fonts.map((f) => f.family))], [fonts]);
   return (
     <>
       <PropertyGroup label="Typography">
-        {fontFamilies ? (
-          <SelectField
-            label="Font"
-            value={values.fontFamily}
-            onChange={(v) => {
-              onChange('fontFamily', v);
-            }}
-            options={fontFamilies.map((f) => ({ value: f, label: f }))}
-          />
-        ) : (
-          <TextField
-            label="Font"
-            value={values.fontFamily}
-            onChange={(v) => {
-              onChange('fontFamily', v);
-            }}
-          />
-        )}
+        <SelectField
+          label="Font"
+          value={values.fontFamily}
+          onChange={(v) => {
+            onChange('fontFamily', v);
+          }}
+          options={fontFamilies.map((f) => ({ value: f, label: f }))}
+          allowEmpty
+        />
         <NumberField
           label="Size"
           value={values.fontSize}

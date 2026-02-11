@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import type { PageConfig } from '@jsonpdf/core';
 import { useEditorStore } from '../../store';
 import { PropertyGroup, NumberField, TextField } from '../fields';
@@ -10,10 +10,7 @@ export function TemplatePanel() {
   const description = useEditorStore((s) => s.template.description);
   const page = useEditorStore((s) => s.template.page);
   const defaultStyle = useEditorStore((s) => s.template.defaultStyle);
-  const fonts = useEditorStore((s) => s.template.fonts);
   const updateTemplateProps = useEditorStore((s) => s.updateTemplateProps);
-
-  const fontFamilies = useMemo(() => [...new Set(fonts.map((f) => f.family))], [fonts]);
 
   const handlePageChange = useCallback(
     (updates: Partial<PageConfig>) => {
@@ -105,11 +102,7 @@ export function TemplatePanel() {
       </PropertyGroup>
 
       <div className={styles.panelHeader}>Default Style</div>
-      <StyleFields
-        values={defaultStyle}
-        onChange={handleDefaultStyleChange}
-        fontFamilies={fontFamilies}
-      />
+      <StyleFields values={defaultStyle} onChange={handleDefaultStyleChange} />
     </div>
   );
 }
