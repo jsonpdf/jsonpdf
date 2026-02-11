@@ -2,8 +2,6 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { initBrowser } from '@jsonpdf/renderer';
 import { EditorShell } from '../src/components/EditorShell';
-import { useEditorStore } from '../src/store';
-import { buildSampleTemplate } from './sample-template';
 import interFontUrl from '@fontsource/inter/files/inter-latin-400-normal.woff2?url';
 import '../src/tokens.css';
 
@@ -17,9 +15,6 @@ async function boot() {
   } catch (err) {
     console.warn('Failed to initialize resvg WASM — PDF preview may not work:', err);
   }
-
-  // Load sample template into the store
-  useEditorStore.getState().setTemplate(buildSampleTemplate());
 
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
