@@ -16,25 +16,31 @@
     "type": "object",
     "properties": {
       "invoiceNumber": {
-        "type": "string"
+        "type": "string",
+        "default": "INV-2026-0101"
       },
       "date": {
-        "type": "string"
+        "type": "string",
+        "default": "March 1, 2026"
       },
       "dueDate": {
-        "type": "string"
+        "type": "string",
+        "default": "March 31, 2026"
       },
       "company": {
         "type": "object",
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "default": "Bright Pixel Studio"
           },
           "address": {
-            "type": "string"
+            "type": "string",
+            "default": "45 Creativity Lane, Floor 3, Austin, TX 78701"
           },
           "website": {
-            "type": "string"
+            "type": "string",
+            "default": "https://brightpixel.example.com"
           }
         }
       },
@@ -42,13 +48,16 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "default": "Summit Healthcare Group"
           },
           "address": {
-            "type": "string"
+            "type": "string",
+            "default": "900 Wellness Blvd, Suite 200, Denver, CO 80202"
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "default": "billing@summithc.example.com"
           }
         }
       },
@@ -70,19 +79,43 @@
               "type": "number"
             }
           }
-        }
+        },
+        "default": [
+          {
+            "description": "UX Audit — Mobile App",
+            "qty": 1,
+            "unitPrice": 4500,
+            "total": 4500
+          },
+          {
+            "description": "UI Design — Patient Portal (5 screens)",
+            "qty": 5,
+            "unitPrice": 1200,
+            "total": 6000
+          },
+          {
+            "description": "Brand Identity Package",
+            "qty": 1,
+            "unitPrice": 3800,
+            "total": 3800
+          }
+        ]
       },
       "subtotal": {
-        "type": "number"
+        "type": "number",
+        "default": 14300
       },
       "taxRate": {
-        "type": "number"
+        "type": "number",
+        "default": 8.25
       },
       "taxAmount": {
-        "type": "number"
+        "type": "number",
+        "default": 1179.75
       },
       "grandTotal": {
-        "type": "number"
+        "type": "number",
+        "default": 15479.75
       }
     }
   },

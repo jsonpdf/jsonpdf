@@ -19,19 +19,24 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "default": "Riverstone Books"
           },
           "address": {
-            "type": "string"
+            "type": "string",
+            "default": "88 Publisher Row"
           },
           "city": {
-            "type": "string"
+            "type": "string",
+            "default": "Nashville"
           },
           "state": {
-            "type": "string"
+            "type": "string",
+            "default": "TN"
           },
           "zip": {
-            "type": "string"
+            "type": "string",
+            "default": "37201"
           }
         }
       },
@@ -39,36 +44,46 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "default": "Elena Kowalski"
           },
           "address": {
-            "type": "string"
+            "type": "string",
+            "default": "1540 Maple Avenue, Unit 7"
           },
           "city": {
-            "type": "string"
+            "type": "string",
+            "default": "Minneapolis"
           },
           "state": {
-            "type": "string"
+            "type": "string",
+            "default": "MN"
           },
           "zip": {
-            "type": "string"
+            "type": "string",
+            "default": "55403"
           }
         }
       },
       "trackingNumber": {
-        "type": "string"
+        "type": "string",
+        "default": "1Z777BB20198765432"
       },
       "trackingUrl": {
-        "type": "string"
+        "type": "string",
+        "default": "https://track.example.com/1Z777BB20198765432"
       },
       "serviceType": {
-        "type": "string"
+        "type": "string",
+        "default": "GROUND"
       },
       "weight": {
-        "type": "string"
+        "type": "string",
+        "default": "1.8 lbs"
       },
       "fragile": {
-        "type": "boolean"
+        "type": "boolean",
+        "default": false
       }
     }
   },

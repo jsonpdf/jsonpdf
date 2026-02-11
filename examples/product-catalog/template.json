@@ -16,7 +16,8 @@
     "type": "object",
     "properties": {
       "catalogName": {
-        "type": "string"
+        "type": "string",
+        "default": "HomeEssentials Fall Collection 2026"
       },
       "products": {
         "type": "array",
@@ -51,7 +52,42 @@
               "type": "boolean"
             }
           }
-        }
+        },
+        "default": [
+          {
+            "name": "Cascade Ceramic Table Lamp",
+            "description": "Handcrafted ceramic lamp with a linen drum shade and walnut base. Three brightness settings with a touch-sensitive dimmer. Height 18 inches.",
+            "price": 89.99,
+            "originalPrice": 119.99,
+            "sku": "HE-LM-201",
+            "category": "Lighting",
+            "color": "#d97706",
+            "inStock": true,
+            "onSale": true
+          },
+          {
+            "name": "Loft Modular Bookshelf",
+            "description": "Configurable steel-and-oak bookshelf system with 6 adjustable shelves. Wall-mountable or freestanding. Each module is 36 inches wide.",
+            "price": 329,
+            "originalPrice": 329,
+            "sku": "HE-BK-415",
+            "category": "Storage",
+            "color": "#059669",
+            "inStock": true,
+            "onSale": false
+          },
+          {
+            "name": "Alpine Wool Throw Blanket",
+            "description": "Brushed merino wool throw in a herringbone weave. Machine washable, hypoallergenic, and sized generously at 50 by 70 inches.",
+            "price": 64,
+            "originalPrice": 64,
+            "sku": "HE-TX-087",
+            "category": "Textiles",
+            "color": "#7c3aed",
+            "inStock": false,
+            "onSale": false
+          }
+        ]
       }
     }
   },

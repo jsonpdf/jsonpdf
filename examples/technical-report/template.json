@@ -16,37 +16,76 @@
     "type": "object",
     "properties": {
       "reportTitle": {
-        "type": "string"
+        "type": "string",
+        "default": "API Performance Optimization Review"
       },
       "subtitle": {
-        "type": "string"
+        "type": "string",
+        "default": "Latency Reduction and Throughput Analysis for Core Services"
       },
       "author": {
-        "type": "string"
+        "type": "string",
+        "default": "Samira Okonkwo"
       },
       "department": {
-        "type": "string"
+        "type": "string",
+        "default": "Platform Engineering"
       },
       "date": {
-        "type": "string"
+        "type": "string",
+        "default": "March 2026"
       },
       "documentId": {
-        "type": "string"
+        "type": "string",
+        "default": "TR-2026-0078"
       },
       "introText": {
-        "type": "string"
+        "type": "string",
+        "default": "This report documents the performance audit conducted on the core API gateway and its downstream microservices. Over a four-week period, the engineering team profiled request latency, identified bottlenecks in the serialization layer, and evaluated caching strategies. The audit covered 23 endpoints handling a combined throughput of 12,000 requests per second during peak hours."
       },
       "methodologySteps": {
-        "type": "array"
+        "type": "array",
+        "default": [
+          "Instrument all API endpoints with distributed tracing using OpenTelemetry",
+          "Establish baseline latency percentiles (p50, p95, p99) under simulated production load",
+          "Profile serialization and deserialization overhead across JSON, MessagePack, and Protobuf",
+          "Evaluate cache hit ratios and TTL strategies for frequently accessed resources",
+          "Conduct load tests at 1.5x and 2x peak traffic to identify degradation thresholds"
+        ]
       },
       "resultsText": {
-        "type": "string"
+        "type": "string",
+        "default": "Switching the internal serialization format from JSON to MessagePack reduced payload sizes by 35% and cut p95 latency from 220ms to 148ms. Adding a Redis cache layer for the three most frequently accessed endpoints improved throughput by 40% and reduced database load by 28%. Under 2x peak load, the optimized system maintained p99 latency below 300ms, compared to 850ms before optimization."
       },
       "conclusionText": {
-        "type": "string"
+        "type": "string",
+        "default": "The optimizations outlined in this report deliver measurable improvements to API responsiveness and system capacity. We recommend deploying the MessagePack serialization change in the next release cycle and expanding the caching layer to additional read-heavy endpoints. Ongoing monitoring with the new tracing infrastructure will enable the team to detect regressions early and maintain performance targets."
       },
       "appendixItems": {
-        "type": "array"
+        "type": "array",
+        "default": [
+          {
+            "id": "A-1",
+            "application": "User Service",
+            "category": "Cache",
+            "complexity": "Low",
+            "savings": "$24,000"
+          },
+          {
+            "id": "A-2",
+            "application": "Product Catalog",
+            "category": "Serialization",
+            "complexity": "Medium",
+            "savings": "$38,000"
+          },
+          {
+            "id": "A-3",
+            "application": "Search API",
+            "category": "Index Tuning",
+            "complexity": "High",
+            "savings": "$52,000"
+          }
+        ]
       }
     }
   },

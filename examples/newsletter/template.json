@@ -16,25 +16,31 @@
     "type": "object",
     "properties": {
       "newsletterName": {
-        "type": "string"
+        "type": "string",
+        "default": "The Design Observer"
       },
       "issueNumber": {
-        "type": "number"
+        "type": "number",
+        "default": 12
       },
       "issueDate": {
-        "type": "string"
+        "type": "string",
+        "default": "March 15, 2026"
       },
       "featured": {
         "type": "object",
         "properties": {
           "title": {
-            "type": "string"
+            "type": "string",
+            "default": "How Spatial Computing Is Reshaping Interface Design"
           },
           "author": {
-            "type": "string"
+            "type": "string",
+            "default": "Tomoko Hayashi"
           },
           "body": {
-            "type": "string"
+            "type": "string",
+            "default": "Spatial computing has moved beyond novelty into daily workflows, and interface designers are rethinking fundamental assumptions about layout, hierarchy, and interaction. Flat screens constrained us to two dimensions, but mixed-reality environments demand new approaches to depth, scale, and context-aware placement. Early adopters in architecture and healthcare report productivity gains of 25-40% when using spatially-aware tools compared to traditional monitor-based workflows. The challenge lies in creating interfaces that feel natural in three dimensions without overwhelming users with too many interactive surfaces. Design systems are evolving rapidly — emerging patterns include gaze-anchored menus, hand-tracked direct manipulation, and ambient information layers that fade based on user attention."
           }
         }
       },
@@ -42,13 +48,16 @@
         "type": "object",
         "properties": {
           "title": {
-            "type": "string"
+            "type": "string",
+            "default": "The Return of Serif Fonts in Digital Products"
           },
           "author": {
-            "type": "string"
+            "type": "string",
+            "default": "Leo Andersen"
           },
           "body": {
-            "type": "string"
+            "type": "string",
+            "default": "For over a decade, sans-serif typefaces dominated screens. But a growing number of apps and websites are embracing serifs for body text, driven by improvements in high-resolution displays and variable font technology. Studies now show that well-chosen serifs can improve reading speed by 12% on screens above 120 PPI. Brands like Notion, Medium, and several major banks have reintroduced serif options in their reading views. The trend reflects a broader shift toward warmth and personality in digital interfaces, moving away from the clinical minimalism that defined the 2010s."
           }
         }
       },
@@ -56,13 +65,16 @@
         "type": "object",
         "properties": {
           "title": {
-            "type": "string"
+            "type": "string",
+            "default": "Designing for Accessibility Beyond Compliance"
           },
           "author": {
-            "type": "string"
+            "type": "string",
+            "default": "Amara Osei"
           },
           "body": {
-            "type": "string"
+            "type": "string",
+            "default": "Meeting WCAG guidelines is a starting point, not a destination. Forward-thinking teams are discovering that designing for edge cases — low vision, motor impairments, cognitive load — produces better experiences for everyone. Contrast ratios, focus indicators, and semantic markup are table stakes. The next frontier includes adaptive interfaces that adjust complexity based on user behavior, voice-first navigation that works without a screen, and haptic feedback patterns that convey meaning through touch. Organizations that invest in inclusive design consistently report higher satisfaction scores across their entire user base."
           }
         }
       },
@@ -70,7 +82,12 @@
         "type": "array",
         "items": {
           "type": "string"
-        }
+        },
+        "default": [
+          "Variable fonts now account for 35% of all web font usage, up from 8% two years ago",
+          "The W3C published new guidelines for designing AI-generated content indicators in user interfaces",
+          "Figma announced native support for designing spatial interfaces with a built-in 3D viewport"
+        ]
       }
     }
   },

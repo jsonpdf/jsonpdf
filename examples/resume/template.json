@@ -16,34 +16,110 @@
     "type": "object",
     "properties": {
       "name": {
-        "type": "string"
+        "type": "string",
+        "default": "Marcus Rivera"
       },
       "email": {
-        "type": "string"
+        "type": "string",
+        "default": "marcus.rivera@example.com"
       },
       "phone": {
-        "type": "string"
+        "type": "string",
+        "default": "(312) 555-0847"
       },
       "location": {
-        "type": "string"
+        "type": "string",
+        "default": "Chicago, IL"
       },
       "website": {
-        "type": "string"
+        "type": "string",
+        "default": "https://marcusrivera.dev"
       },
       "summary": {
-        "type": "string"
+        "type": "string",
+        "default": "Full-stack product engineer with 6 years of experience turning ambiguous requirements into polished, performant applications. Skilled in React, Node.js, and cloud infrastructure. Track record of shipping features that drive measurable business impact while maintaining high code quality."
       },
       "jobs": {
-        "type": "array"
+        "type": "array",
+        "default": [
+          {
+            "title": "Product Engineer",
+            "company": "Luminary Health",
+            "location": "Chicago, IL",
+            "dates": "June 2023 — Present",
+            "responsibilities": [
+              "Designed and built a patient scheduling platform serving 200+ clinics, reducing no-show rates by 18%",
+              "Led front-end architecture migration from Angular to React, improving load time by 45%",
+              "Established component library with Storybook, adopted by three product teams across the organization"
+            ]
+          },
+          {
+            "title": "Software Engineer",
+            "company": "Greenfield Analytics",
+            "location": "Remote",
+            "dates": "August 2020 — May 2023",
+            "responsibilities": [
+              "Built interactive data visualization dashboards using D3.js and React, serving 5,000+ daily active users",
+              "Implemented server-side rendering pipeline that cut First Contentful Paint from 3.2s to 0.8s",
+              "Contributed to internal design system used across 4 products, ensuring consistent UX patterns"
+            ]
+          }
+        ]
       },
       "skills": {
-        "type": "array"
+        "type": "array",
+        "default": [
+          {
+            "content": "Languages",
+            "children": [
+              {
+                "content": "TypeScript, JavaScript, Python, SQL, Go"
+              }
+            ]
+          },
+          {
+            "content": "Front-End",
+            "children": [
+              {
+                "content": "React, Next.js, Tailwind CSS, D3.js, Storybook"
+              }
+            ]
+          },
+          {
+            "content": "Back-End & Cloud",
+            "children": [
+              {
+                "content": "Node.js, PostgreSQL, Redis, AWS, Docker"
+              }
+            ]
+          },
+          {
+            "content": "Practices",
+            "children": [
+              {
+                "content": "CI/CD, TDD, Agile/Scrum, Accessibility (WCAG 2.1)"
+              }
+            ]
+          }
+        ]
       },
       "achievements": {
-        "type": "array"
+        "type": "array",
+        "default": [
+          "Reduced patient scheduling friction by 18%, contributing to $2.1M annual revenue increase for Luminary Health",
+          "Open-source maintainer of react-chart-kit (1,200+ GitHub stars), a lightweight charting library",
+          "Speaker at React Chicago Meetup 2024 on \"Accessible Data Visualization Patterns\""
+        ]
       },
       "education": {
-        "type": "array"
+        "type": "array",
+        "default": [
+          {
+            "degree": "B.S. Computer Science",
+            "school": "University of Illinois at Chicago",
+            "year": "2020"
+          }
+        ]
       }
     }
   },

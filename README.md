@@ -214,7 +214,7 @@ jsonpdf render --watch -t template.json -d data.json -o output.pdf
 - [x] Zoom and pan
 - [x] Style manager
 - [x] Data schema editor with sample data generation
-- [ ] Template gallery / starter templates
+- [x] Template gallery / starter templates
 
 ## License
 

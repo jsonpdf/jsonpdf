@@ -16,40 +16,52 @@
     "type": "object",
     "properties": {
       "eventName": {
-        "type": "string"
+        "type": "string",
+        "default": "Autumn Jazz Festival 2026"
       },
       "venue": {
-        "type": "string"
+        "type": "string",
+        "default": "Lakewood Concert Hall"
       },
       "address": {
-        "type": "string"
+        "type": "string",
+        "default": "825 Lakeshore Boulevard, Chicago, IL 60611"
       },
       "date": {
-        "type": "string"
+        "type": "string",
+        "default": "OCT 10"
       },
       "time": {
-        "type": "string"
+        "type": "string",
+        "default": "8:30 PM"
       },
       "gate": {
-        "type": "string"
+        "type": "string",
+        "default": "D"
       },
       "seat": {
-        "type": "string"
+        "type": "string",
+        "default": "17"
       },
       "row": {
-        "type": "string"
+        "type": "string",
+        "default": "5"
       },
       "attendeeName": {
-        "type": "string"
+        "type": "string",
+        "default": "Priya Patel"
       },
       "ticketId": {
-        "type": "string"
+        "type": "string",
+        "default": "TKT-2026-AJF-008914"
       },
       "ticketUrl": {
-        "type": "string"
+        "type": "string",
+        "default": "https://tickets.example.com/verify/TKT-2026-AJF-008914"
       },
       "vip": {
-        "type": "boolean"
+        "type": "boolean",
+        "default": false
       }
     }
   },

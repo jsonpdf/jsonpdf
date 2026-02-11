@@ -16,10 +16,12 @@
     "type": "object",
     "properties": {
       "reportTitle": {
-        "type": "string"
+        "type": "string",
+        "default": "Q1 2026 Sales Report"
       },
       "dateRange": {
-        "type": "string"
+        "type": "string",
+        "default": "January 1, 2026 — March 31, 2026"
       },
       "departmentSummary": {
         "type": "array",
@@ -33,7 +35,21 @@
               "type": "number"
             }
           }
-        }
+        },
+        "default": [
+          {
+            "department": "Enterprise",
+            "revenue": 520000
+          },
+          {
+            "department": "Growth",
+            "revenue": 275000
+          },
+          {
+            "department": "SMB",
+            "revenue": 180000
+          }
+        ]
       },
       "employees": {
         "type": "array",
@@ -56,16 +72,56 @@
               "type": "number"
             }
           }
-        }
+        },
+        "default": [
+          {
+            "name": "Anika Johansson",
+            "department": "Enterprise",
+            "role": "Sr. Account Executive",
+            "sales": 168000,
+            "deals": 6
+          },
+          {
+            "name": "Rafael Mendoza",
+            "department": "Enterprise",
+            "role": "Account Executive",
+            "sales": 132000,
+            "deals": 9
+          },
+          {
+            "name": "Wei Zhang",
+            "department": "Growth",
+            "role": "Account Manager",
+            "sales": 95000,
+            "deals": 15
+          },
+          {
+            "name": "Fatima Al-Rashid",
+            "department": "Growth",
+            "role": "Account Manager",
+            "sales": 88000,
+            "deals": 13
+          },
+          {
+            "name": "Owen McCarthy",
+            "department": "SMB",
+            "role": "Sales Representative",
+            "sales": 61000,
+            "deals": 24
+          }
+        ]
       },
       "grandTotal": {
-        "type": "number"
+        "type": "number",
+        "default": 975000
       },
       "employeeCount": {
-        "type": "number"
+        "type": "number",
+        "default": 5
       },
       "avgDealSize": {
-        "type": "number"
+        "type": "number",
+        "default": 14552
       }
     }
   },
