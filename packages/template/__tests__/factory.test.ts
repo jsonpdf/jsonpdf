@@ -11,7 +11,14 @@ describe('createTemplate', () => {
     expect(t.page.margins).toEqual({ top: 40, right: 40, bottom: 40, left: 40 });
     expect(t.sections).toEqual([]);
     expect(t.styles).toEqual({});
-    expect(t.fonts).toEqual([]);
+    expect(t.defaultStyle).toEqual({ fontFamily: 'Inter' });
+    expect(t.fonts).toHaveLength(4);
+    expect(t.fonts.every((f) => f.family === 'Inter')).toBe(true);
+  });
+
+  it('allows overriding defaultStyle', () => {
+    const t = createTemplate({ defaultStyle: { fontFamily: 'Roboto' } });
+    expect(t.defaultStyle.fontFamily).toBe('Roboto');
   });
 
   it('applies name override', () => {
@@ -44,6 +51,11 @@ describe('createTemplate', () => {
       bands: [],
     });
     expect(t2.sections).toHaveLength(0);
+  });
+
+  it('allows overriding fonts to empty', () => {
+    const t = createTemplate({ fonts: [] });
+    expect(t.fonts).toHaveLength(0);
   });
 
   it('version is always 1.0 even if somehow forced', () => {

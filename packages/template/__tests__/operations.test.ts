@@ -161,15 +161,15 @@ describe('addStyle', () => {
 
 describe('addFont', () => {
   it('appends a font declaration', () => {
-    const t = createTemplate();
-    const result = addFont(t, { family: 'Inter', weight: 400, src: 'inter-400.woff2' });
+    const t = createTemplate({ fonts: [] });
+    const result = addFont(t, { family: 'Inter', weight: 400, data: 'AAAA' });
     expect(result.fonts).toHaveLength(1);
     expect(result.fonts[0]!.family).toBe('Inter');
   });
 
   it('does not mutate the original', () => {
-    const t = createTemplate();
-    addFont(t, { family: 'Inter', src: 'inter.woff2' });
+    const t = createTemplate({ fonts: [] });
+    addFont(t, { family: 'Inter', data: 'AAAA' });
     expect(t.fonts).toHaveLength(0);
   });
 });
@@ -471,25 +471,25 @@ describe('removeStyle', () => {
 
 describe('removeFont', () => {
   it('removes a font by family', () => {
-    let t = createTemplate();
-    t = addFont(t, { family: 'Inter', weight: 400, src: 'inter.woff2' });
-    t = addFont(t, { family: 'Roboto', weight: 400, src: 'roboto.woff2' });
+    let t = createTemplate({ fonts: [] });
+    t = addFont(t, { family: 'Inter', weight: 400, data: 'AAAA' });
+    t = addFont(t, { family: 'Roboto', weight: 400, data: 'BBBB' });
     const result = removeFont(t, 'Inter');
     expect(result.fonts).toHaveLength(1);
     expect(result.fonts[0]!.family).toBe('Roboto');
   });
 
   it('removes a font by family + weight', () => {
-    let t = createTemplate();
-    t = addFont(t, { family: 'Inter', weight: 400, src: 'inter-400.woff2' });
-    t = addFont(t, { family: 'Inter', weight: 700, src: 'inter-700.woff2' });
+    let t = createTemplate({ fonts: [] });
+    t = addFont(t, { family: 'Inter', weight: 400, data: 'AAAA' });
+    t = addFont(t, { family: 'Inter', weight: 700, data: 'CCCC' });
     const result = removeFont(t, 'Inter', 700);
     expect(result.fonts).toHaveLength(1);
     expect(result.fonts[0]!.weight).toBe(400);
   });
 
   it('throws for missing font', () => {
-    const t = createTemplate();
+    const t = createTemplate({ fonts: [] });
     expect(() => removeFont(t, 'Nope')).toThrow('Font "Nope" not found');
   });
 });

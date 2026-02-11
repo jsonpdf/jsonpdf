@@ -99,6 +99,209 @@ describe('validateTemplate', () => {
   });
 });
 
+describe('validateTemplate font-family checks', () => {
+  it('rejects undeclared fontFamily in named style', () => {
+    let t = createTemplate({ name: 'Test' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addStyle(t, 'heading', { fontFamily: 'Times' });
+
+    const result = validateTemplate(t);
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((e) => e.message.includes('Times'))).toBe(true);
+  });
+
+  it('accepts fontFamily when declared in fonts', () => {
+    const t = buildMinimalTemplate();
+    const result = validateTemplate(t);
+    expect(result.valid).toBe(true);
+  });
+
+  it('catches fontFamily in element styleOverrides', () => {
+    let t = createTemplate({ name: 'Test' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'el1',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 20,
+      properties: { content: 'test' },
+      styleOverrides: { fontFamily: 'Courier' },
+    });
+
+    const result = validateTemplate(t);
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((e) => e.message.includes('Courier'))).toBe(true);
+  });
+
+  it('catches fontFamily in conditionalStyles overrides', () => {
+    let t = createTemplate({ name: 'Test' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'el1',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 20,
+      properties: { content: 'test' },
+      conditionalStyles: [{ condition: 'true', styleOverrides: { fontFamily: 'Courier' } }],
+    });
+
+    const result = validateTemplate(t);
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((e) => e.message.includes('Courier'))).toBe(true);
+  });
+
+  it('catches fontFamily in StyledRun overrides', () => {
+    let t = createTemplate({ name: 'Test' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'el1',
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 20,
+      properties: {
+        content: [{ text: 'Normal' }, { text: 'Bold', styleOverrides: { fontFamily: 'Times' } }],
+      },
+    });
+
+    const result = validateTemplate(t);
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((e) => e.message.includes('Times'))).toBe(true);
+  });
+
+  it('catches fontFamily in nested child element styleOverrides', () => {
+    let t = createTemplate({ name: 'Test' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'container1',
+      type: 'container',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 100,
+      properties: {},
+      elements: [
+        {
+          id: 'child1',
+          type: 'text',
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 20,
+          properties: { content: 'nested' },
+          styleOverrides: { fontFamily: 'MissingFont' },
+        },
+      ],
+    });
+
+    const result = validateTemplate(t);
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((e) => e.message.includes('MissingFont'))).toBe(true);
+  });
+
+  it('detects duplicate IDs in nested child elements', () => {
+    let t = createTemplate({ name: 'Test' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'container1',
+      type: 'container',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 100,
+      properties: {},
+      elements: [
+        {
+          id: 'band1',
+          type: 'text',
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 20,
+          properties: { content: 'dup' },
+        },
+      ],
+    });
+
+    const result = validateTemplate(t);
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((e) => e.message.includes('Duplicate ID'))).toBe(true);
+  });
+
+  it('detects dangling style references in nested child elements', () => {
+    let t = createTemplate({ name: 'Test' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addElement(t, 'band1', {
+      id: 'container1',
+      type: 'container',
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 100,
+      properties: {},
+      elements: [
+        {
+          id: 'child1',
+          type: 'text',
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 20,
+          properties: { content: 'test' },
+          style: 'ghost',
+        },
+      ],
+    });
+
+    const result = validateTemplate(t);
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((e) => e.message.includes('not defined'))).toBe(true);
+  });
+
+  it('reports each undeclared family only once', () => {
+    let t = createTemplate({ name: 'Test' });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+    t = addStyle(t, 'a', { fontFamily: 'Courier' });
+    t = addStyle(t, 'b', { fontFamily: 'Courier' });
+
+    const result = validateTemplate(t);
+    expect(result.valid).toBe(false);
+    const courierErrors = result.errors.filter((e) => e.message.includes('Courier'));
+    expect(courierErrors).toHaveLength(1);
+  });
+});
+
+describe('validateTemplate defaultStyle checks', () => {
+  it('rejects undeclared fontFamily in defaultStyle', () => {
+    let t = createTemplate({ defaultStyle: { fontFamily: 'Nope' } });
+    t = addSection(t, { id: 'sec1', bands: [] });
+    t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+
+    const result = validateTemplate(t);
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((e) => e.message.includes('Nope'))).toBe(true);
+  });
+
+  it('accepts defaultStyle when fontFamily is declared', () => {
+    const t = buildMinimalTemplate();
+    const result = validateTemplate(t);
+    expect(result.valid).toBe(true);
+  });
+});
+
 describe('validateTemplate with pluginSchemas', () => {
   const textPluginSchema: PluginSchemaEntry = {
     type: 'text',
