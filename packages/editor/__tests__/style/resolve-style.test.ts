@@ -15,10 +15,12 @@ function makeElement(overrides: Partial<Element> = {}): Element {
   };
 }
 
+const defaultStyle: Style = { fontFamily: 'TestFont' };
+
 describe('resolveElementStyle', () => {
   it('returns default style for element with no style', () => {
-    const style = resolveElementStyle(makeElement(), {});
-    expect(style.fontFamily).toBe('Helvetica');
+    const style = resolveElementStyle(makeElement(), {}, defaultStyle);
+    expect(style.fontFamily).toBe('TestFont');
     expect(style.fontSize).toBe(12);
     expect(style.fontWeight).toBe('normal');
     expect(style.color).toBe('#000000');
@@ -30,10 +32,10 @@ describe('resolveElementStyle', () => {
     const styles: Record<string, Style> = {
       heading: { fontSize: 24, fontWeight: 'bold' },
     };
-    const style = resolveElementStyle(makeElement({ style: 'heading' }), styles);
+    const style = resolveElementStyle(makeElement({ style: 'heading' }), styles, defaultStyle);
     expect(style.fontSize).toBe(24);
     expect(style.fontWeight).toBe('bold');
-    expect(style.fontFamily).toBe('Helvetica'); // default preserved
+    expect(style.fontFamily).toBe('TestFont'); // default preserved
   });
 
   it('applies style overrides on top of named style', () => {
@@ -44,7 +46,7 @@ describe('resolveElementStyle', () => {
       style: 'heading',
       styleOverrides: { color: '#ff0000' },
     });
-    const style = resolveElementStyle(el, styles);
+    const style = resolveElementStyle(el, styles, defaultStyle);
     expect(style.fontSize).toBe(24);
     expect(style.fontWeight).toBe('bold');
     expect(style.color).toBe('#ff0000'); // overridden
@@ -52,15 +54,15 @@ describe('resolveElementStyle', () => {
 
   it('applies overrides without named style', () => {
     const el = makeElement({ styleOverrides: { fontSize: 18 } });
-    const style = resolveElementStyle(el, {});
+    const style = resolveElementStyle(el, {}, defaultStyle);
     expect(style.fontSize).toBe(18);
-    expect(style.fontFamily).toBe('Helvetica'); // default
+    expect(style.fontFamily).toBe('TestFont'); // default
   });
 
   it('handles missing named style gracefully', () => {
     const el = makeElement({ style: 'nonexistent' });
-    const style = resolveElementStyle(el, {});
-    expect(style.fontFamily).toBe('Helvetica');
+    const style = resolveElementStyle(el, {}, defaultStyle);
+    expect(style.fontFamily).toBe('TestFont');
     expect(style.fontSize).toBe(12);
   });
 });

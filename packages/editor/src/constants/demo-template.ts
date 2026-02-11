@@ -1,4 +1,5 @@
 import type { Template } from '@jsonpdf/core';
+import { DEFAULT_FONTS } from '@jsonpdf/template';
 
 /**
  * Invoice demo template shown when the editor first loads.
@@ -255,6 +256,7 @@ export const DEMO_TEMPLATE: Template = {
       grandTotal: { type: 'number', default: 88139.57 },
     },
   },
+  defaultStyle: { fontFamily: 'Inter' },
   styles: {
     'company-name': {
       fontSize: 20,
@@ -341,7 +343,7 @@ export const DEMO_TEMPLATE: Template = {
       color: '#2563eb',
     },
   },
-  fonts: [],
+  fonts: [...DEFAULT_FONTS],
   sections: [
     {
       id: 'invoice',

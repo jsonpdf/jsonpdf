@@ -231,7 +231,8 @@ interface ReadOnlyElementProps {
 }
 
 function ReadOnlyElement({ element, styles, onItemClick }: ReadOnlyElementProps) {
-  const style = resolveElementStyle(element, styles);
+  const defaultStyle = useEditorStore((s) => s.template.defaultStyle);
+  const style = resolveElementStyle(element, styles, defaultStyle);
 
   const handleClick = useCallback(
     (e: KonvaEventObject<MouseEvent | TouchEvent>) => {

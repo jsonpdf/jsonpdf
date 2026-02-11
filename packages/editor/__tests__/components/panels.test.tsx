@@ -9,7 +9,7 @@ afterEach(cleanup);
 
 function buildTestTemplate() {
   let t = createTemplate({ name: 'Test Template' });
-  t = addStyle(t, 'heading', { fontFamily: 'Helvetica', fontSize: 24 });
+  t = addStyle(t, 'heading', { fontFamily: 'Inter', fontSize: 24 });
   t = addSection(t, { id: 'sec1', name: 'Main', bands: [] });
   t = addBand(t, 'sec1', { id: 'band1', type: 'detail', height: 100, elements: [] });
   t = addElement(t, 'band1', {

@@ -21,7 +21,7 @@ export function TextElement({ element, style }: ElementRendererChildProps) {
       width={element.width}
       height={element.height}
       text={content}
-      fontFamily={mapFontFamily(style.fontFamily ?? 'Helvetica')}
+      fontFamily={mapFontFamily(style.fontFamily as string)}
       fontSize={style.fontSize ?? 12}
       fontStyle={
         `${style.fontWeight === 'bold' ? 'bold' : ''} ${style.fontStyle === 'italic' ? 'italic' : ''}`.trim() ||
