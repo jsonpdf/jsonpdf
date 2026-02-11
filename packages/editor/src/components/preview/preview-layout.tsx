@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useEditorStore } from '../../store';
+import { buildDefaultData } from '@jsonpdf/template';
 import { usePdfPreview } from '../../hooks/use-pdf-preview';
 import { DataEditor } from './data-editor';
 import { PdfViewer } from './pdf-viewer';
@@ -7,9 +8,15 @@ import styles from './preview-layout.module.css';
 
 export function PreviewLayout() {
   const template = useEditorStore((s) => s.template);
-  const [jsonText, setJsonText] = useState('{}');
+  const jsonText = useEditorStore((s) => s.previewDataText);
+  const setJsonText = useEditorStore((s) => s.setPreviewDataText);
   const [parseError, setParseError] = useState<string | null>(null);
   const { blobUrl, loading, error, render } = usePdfPreview();
+
+  const handleDefault = useCallback(() => {
+    const data = buildDefaultData(template.dataSchema);
+    setJsonText(JSON.stringify(data, null, 2));
+  }, [template.dataSchema, setJsonText]);
 
   const handleRender = useCallback(() => {
     let data: Record<string, unknown>;
@@ -28,9 +35,14 @@ export function PreviewLayout() {
       <div className={styles.left}>
         <div className={styles.toolbar}>
           <span className={styles.label}>Data</span>
-          <button className={styles.renderBtn} onClick={handleRender} disabled={loading}>
-            Render
-          </button>
+          <div className={styles.toolbarActions}>
+            <button className={styles.defaultBtn} onClick={handleDefault}>
+              Default
+            </button>
+            <button className={styles.renderBtn} onClick={handleRender} disabled={loading}>
+              Render
+            </button>
+          </div>
         </div>
         <DataEditor value={jsonText} onChange={setJsonText} dataSchema={template.dataSchema} />
       </div>

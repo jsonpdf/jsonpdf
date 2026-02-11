@@ -64,3 +64,17 @@ export function validateWithSchema(schema: JSONSchema, data: unknown): Validatio
   }
   return { valid: false, errors: mapErrors(validate.errors) };
 }
+
+/**
+ * Return a deep copy of `data` with `default` values from the schema filled in
+ * for any missing properties. Uses AJV's `useDefaults` option.
+ */
+export function applySchemaDefaults(
+  schema: JSONSchema,
+  data: Record<string, unknown>,
+): Record<string, unknown> {
+  const cloned = structuredClone(data);
+  const ajv = new Ajv2020({ useDefaults: true });
+  ajv.compile(schema)(cloned);
+  return cloned;
+}

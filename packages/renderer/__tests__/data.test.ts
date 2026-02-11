@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateData, resolveDotPath, buildScope } from '../src/data.js';
+import { validateData, applySchemaDefaults, resolveDotPath, buildScope } from '../src/data.js';
 
 describe('validateData', () => {
   it('passes for valid data against schema', () => {
@@ -42,6 +42,71 @@ describe('validateData', () => {
     };
     expect(() => validateData({ invoice: { total: 100 } }, schema)).not.toThrow();
     expect(() => validateData({ invoice: {} }, schema)).toThrow('Data validation failed');
+  });
+});
+
+describe('applySchemaDefaults', () => {
+  it('fills in missing properties with default values', () => {
+    const schema = {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        status: { type: 'string', default: 'active' },
+      },
+    };
+    const result = applySchemaDefaults({ name: 'Test' }, schema);
+    expect(result.name).toBe('Test');
+    expect(result.status).toBe('active');
+  });
+
+  it('does not override provided values', () => {
+    const schema = {
+      type: 'object',
+      properties: {
+        status: { type: 'string', default: 'active' },
+      },
+    };
+    const result = applySchemaDefaults({ status: 'inactive' }, schema);
+    expect(result.status).toBe('inactive');
+  });
+
+  it('fills nested object defaults', () => {
+    const schema = {
+      type: 'object',
+      properties: {
+        config: {
+          type: 'object',
+          properties: {
+            color: { type: 'string', default: 'blue' },
+          },
+          default: {},
+        },
+      },
+    };
+    const result = applySchemaDefaults({}, schema);
+    expect(result.config).toEqual({ color: 'blue' });
+  });
+
+  it('does not mutate the original data', () => {
+    const schema = {
+      type: 'object',
+      properties: {
+        status: { type: 'string', default: 'active' },
+      },
+    };
+    const original = { name: 'Test' };
+    applySchemaDefaults(original, schema);
+    expect(original).toEqual({ name: 'Test' });
+  });
+
+  it('returns data unchanged for empty schema', () => {
+    const data = { foo: 'bar' };
+    expect(applySchemaDefaults(data, {})).toEqual(data);
+  });
+
+  it('returns data unchanged for bare { type: "object" } schema', () => {
+    const data = { foo: 'bar' };
+    expect(applySchemaDefaults(data, { type: 'object' })).toEqual(data);
   });
 });
 

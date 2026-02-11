@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateSampleData } from '../src/sample-data.js';
+import { generateSampleData, buildDefaultData } from '../src/sample-data.js';
 
 describe('generateSampleData', () => {
   it('generates an empty object from empty schema', () => {
@@ -146,6 +146,39 @@ describe('generateSampleData', () => {
     ]);
   });
 
+  it('uses default value when present', () => {
+    const schema = {
+      type: 'object',
+      properties: {
+        status: { type: 'string', default: 'pending' },
+        count: { type: 'integer', default: 42 },
+        active: { type: 'boolean', default: false },
+      },
+    };
+    const result = generateSampleData(schema) as Record<string, unknown>;
+    expect(result.status).toBe('pending');
+    expect(result.count).toBe(42);
+    expect(result.active).toBe(false);
+  });
+
+  it('prefers const over default', () => {
+    const schema = { const: 'fixed', default: 'fallback' };
+    expect(generateSampleData(schema)).toBe('fixed');
+  });
+
+  it('prefers enum over default', () => {
+    const schema = { type: 'string', enum: ['a', 'b'], default: 'c' };
+    expect(generateSampleData(schema)).toBe('a');
+  });
+
+  it('prefers default over oneOf', () => {
+    const schema = {
+      default: 'my-default',
+      oneOf: [{ type: 'string' }, { type: 'number' }],
+    };
+    expect(generateSampleData(schema)).toBe('my-default');
+  });
+
   it('handles const values', () => {
     const schema = {
       type: 'object',
@@ -221,5 +254,86 @@ describe('generateSampleData', () => {
       ],
       total: 1,
     });
+  });
+});
+
+describe('buildDefaultData', () => {
+  it('returns null for scalar types without defaults', () => {
+    expect(buildDefaultData({ type: 'string' })).toBeNull();
+    expect(buildDefaultData({ type: 'number' })).toBeNull();
+    expect(buildDefaultData({ type: 'boolean' })).toBeNull();
+  });
+
+  it('uses default value when present', () => {
+    expect(buildDefaultData({ type: 'string', default: 'hello' })).toBe('hello');
+    expect(buildDefaultData({ type: 'number', default: 42 })).toBe(42);
+    expect(buildDefaultData({ type: 'boolean', default: false })).toBe(false);
+  });
+
+  it('uses const value', () => {
+    expect(buildDefaultData({ const: 'fixed' })).toBe('fixed');
+  });
+
+  it('uses first enum value', () => {
+    expect(buildDefaultData({ type: 'string', enum: ['a', 'b'] })).toBe('a');
+  });
+
+  it('builds object with null for properties without defaults', () => {
+    const schema = {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        age: { type: 'integer' },
+      },
+    };
+    expect(buildDefaultData(schema)).toEqual({ name: null, age: null });
+  });
+
+  it('builds object mixing defaults and nulls', () => {
+    const schema = {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        status: { type: 'string', default: 'active' },
+        count: { type: 'integer', default: 0 },
+      },
+    };
+    expect(buildDefaultData(schema)).toEqual({
+      name: null,
+      status: 'active',
+      count: 0,
+    });
+  });
+
+  it('builds nested objects', () => {
+    const schema = {
+      type: 'object',
+      properties: {
+        address: {
+          type: 'object',
+          properties: {
+            city: { type: 'string', default: 'New York' },
+            zip: { type: 'string' },
+          },
+        },
+      },
+    };
+    expect(buildDefaultData(schema)).toEqual({
+      address: { city: 'New York', zip: null },
+    });
+  });
+
+  it('returns empty array for array types', () => {
+    const schema = {
+      type: 'object',
+      properties: {
+        tags: { type: 'array', items: { type: 'string' } },
+      },
+    };
+    expect(buildDefaultData(schema)).toEqual({ tags: [] });
+  });
+
+  it('returns empty object for object without properties', () => {
+    expect(buildDefaultData({ type: 'object' })).toEqual({});
   });
 });

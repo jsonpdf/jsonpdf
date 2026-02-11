@@ -1,5 +1,15 @@
 import { create } from 'zustand';
-import type { Template, Element, Band, BandType, Section, PageConfig, Style } from '@jsonpdf/core';
+import type {
+  Template,
+  Element,
+  Band,
+  BandType,
+  Section,
+  PageConfig,
+  Style,
+  JSONSchema,
+} from '@jsonpdf/core';
+import type { SchemaPropertyType } from '@jsonpdf/template';
 import { generateId } from '@jsonpdf/core';
 import {
   createTemplate,
@@ -25,6 +35,12 @@ import {
   findBand,
   findElement,
   deepCloneWithNewIds,
+  addSchemaProperty as addSchemaPropertyOp,
+  updateSchemaProperty as updateSchemaPropertyOp,
+  removeSchemaProperty as removeSchemaPropertyOp,
+  renameSchemaProperty as renameSchemaPropertyOp,
+  toggleSchemaRequired as toggleSchemaRequiredOp,
+  createDefaultPropertySchema,
 } from '@jsonpdf/template';
 import { createDefaultElement } from './constants/element-defaults';
 import { MIN_ZOOM, MAX_ZOOM } from './constants/zoom';
@@ -91,6 +107,16 @@ export interface EditorState extends TemporalState {
   updateStyleProps: (name: string, updates: Partial<Style>) => void;
   removeStyleByName: (name: string) => void;
   renameStyleByName: (oldName: string, newName: string) => void;
+
+  selectedSchemaPath: string | null;
+  previewDataText: string;
+  setSelectedSchemaPath: (path: string | null) => void;
+  setPreviewDataText: (text: string) => void;
+  addSchemaProperty: (parentPath: string, name: string, type: SchemaPropertyType) => void;
+  updateSchemaPropertySchema: (path: string, updates: JSONSchema) => void;
+  removeSchemaProperty: (path: string) => void;
+  renameSchemaProperty: (path: string, newName: string) => void;
+  toggleSchemaRequired: (path: string) => void;
 }
 
 /** Normalize setSelection input: null → [], string → [string], string[] → as-is. */
@@ -113,6 +139,8 @@ export const useEditorStore = create<EditorState>(
     activeTool: 'select',
     activeTab: 'editor',
     selectedStyleName: null,
+    selectedSchemaPath: null,
+    previewDataText: '{}',
 
     _undoStack: [],
     _redoStack: [],
@@ -131,6 +159,7 @@ export const useEditorStore = create<EditorState>(
         selectedBandId: null,
         selectedSectionId: null,
         selectedStyleName: null,
+        selectedSchemaPath: null,
       });
       set({ _isUndoRedoInProgress: false });
     },
@@ -148,6 +177,7 @@ export const useEditorStore = create<EditorState>(
         selectedBandId: null,
         selectedSectionId: null,
         selectedStyleName: null,
+        selectedSchemaPath: null,
       });
       set({ _isUndoRedoInProgress: false });
     },
@@ -571,6 +601,86 @@ export const useEditorStore = create<EditorState>(
             selectedStyleName:
               state.selectedStyleName === oldName ? newName : state.selectedStyleName,
           };
+        } catch {
+          return state;
+        }
+      });
+    },
+    setSelectedSchemaPath: (path) => {
+      set({ selectedSchemaPath: path });
+    },
+    setPreviewDataText: (text) => {
+      set({ previewDataText: text });
+    },
+    addSchemaProperty: (parentPath, name, type) => {
+      set((state) => {
+        try {
+          const propSchema = createDefaultPropertySchema(type);
+          const newSchema = addSchemaPropertyOp(
+            state.template.dataSchema,
+            parentPath,
+            name,
+            propSchema,
+          );
+          return { template: updateTemplate(state.template, { dataSchema: newSchema }) };
+        } catch {
+          return state;
+        }
+      });
+    },
+    updateSchemaPropertySchema: (path, updates) => {
+      set((state) => {
+        try {
+          const newSchema = updateSchemaPropertyOp(state.template.dataSchema, path, updates);
+          return { template: updateTemplate(state.template, { dataSchema: newSchema }) };
+        } catch {
+          return state;
+        }
+      });
+    },
+    removeSchemaProperty: (path) => {
+      set((state) => {
+        try {
+          const newSchema = removeSchemaPropertyOp(state.template.dataSchema, path);
+          return {
+            template: updateTemplate(state.template, { dataSchema: newSchema }),
+            selectedSchemaPath: state.selectedSchemaPath === path ? null : state.selectedSchemaPath,
+          };
+        } catch {
+          return state;
+        }
+      });
+    },
+    renameSchemaProperty: (path, newName) => {
+      set((state) => {
+        try {
+          const newSchema = renameSchemaPropertyOp(state.template.dataSchema, path, newName);
+          // Update selectedSchemaPath if the renamed property (or a descendant) is selected
+          let newPath = state.selectedSchemaPath;
+          if (newPath) {
+            const lastDot = path.lastIndexOf('.');
+            const renamedPath =
+              lastDot === -1 ? newName : `${path.substring(0, lastDot)}.${newName}`;
+            if (newPath === path) {
+              newPath = renamedPath;
+            } else if (newPath.startsWith(`${path}.`)) {
+              newPath = renamedPath + newPath.substring(path.length);
+            }
+          }
+          return {
+            template: updateTemplate(state.template, { dataSchema: newSchema }),
+            selectedSchemaPath: newPath,
+          };
+        } catch {
+          return state;
+        }
+      });
+    },
+    toggleSchemaRequired: (path) => {
+      set((state) => {
+        try {
+          const newSchema = toggleSchemaRequiredOp(state.template.dataSchema, path);
+          return { template: updateTemplate(state.template, { dataSchema: newSchema }) };
         } catch {
           return state;
         }

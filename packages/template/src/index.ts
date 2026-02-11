@@ -45,4 +45,16 @@ export {
   type FindBandResult,
   type FindElementResult,
 } from './queries.js';
-export { generateSampleData, type SampleDataOptions } from './sample-data.js';
+export { generateSampleData, buildDefaultData, type SampleDataOptions } from './sample-data.js';
+export {
+  listSchemaProperties,
+  getSchemaAtPath,
+  addSchemaProperty,
+  updateSchemaProperty,
+  removeSchemaProperty,
+  renameSchemaProperty,
+  toggleSchemaRequired,
+  createDefaultPropertySchema,
+  type SchemaPropertyType,
+  type SchemaPropertyInfo,
+} from './schema-ops.js';
