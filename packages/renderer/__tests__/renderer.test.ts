@@ -836,7 +836,7 @@ describe('renderPdf: gradient fills', () => {
 describe('renderPdf: _bookmarks TOC data source', () => {
   it('renders TOC section that iterates over _bookmarks', async () => {
     let t = createTemplate();
-    t = addStyle(t, 'default', { fontFamily: 'Helvetica', fontSize: 10 });
+    t = addStyle(t, 'default', { fontFamily: 'Inter', fontSize: 10 });
 
     // TOC section
     t = addSection(t, { id: 'toc', bands: [] });

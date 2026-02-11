@@ -1,7 +1,7 @@
 import type { Style, Element, PaddingValue } from '@jsonpdf/core';
 
-const DEFAULT_STYLE: Style = {
-  fontFamily: 'Helvetica',
+/** Non-font style defaults. fontFamily comes from template.defaultStyle. */
+export const STYLE_DEFAULTS: Style = {
   fontSize: 12,
   fontWeight: 'normal',
   fontStyle: 'normal',
@@ -10,19 +10,28 @@ const DEFAULT_STYLE: Style = {
   lineHeight: 1.2,
 };
 
-/** Resolve the effective style for an element: defaults → named → overrides. */
-export function resolveElementStyle(element: Element, styles: Record<string, Style>): Style {
+/** Resolve the effective style for an element: STYLE_DEFAULTS → defaultStyle → named → overrides. */
+export function resolveElementStyle(
+  element: Element,
+  styles: Record<string, Style>,
+  defaultStyle: Style,
+): Style {
   const namedStyle = element.style ? styles[element.style] : undefined;
   return {
-    ...DEFAULT_STYLE,
+    ...STYLE_DEFAULTS,
+    ...defaultStyle,
     ...(namedStyle ?? {}),
     ...(element.styleOverrides ?? {}),
   };
 }
 
 /** Resolve a named style with defaults applied. */
-export function resolveNamedStyle(name: string, styles: Record<string, Style>): Style {
-  return { ...DEFAULT_STYLE, ...(styles[name] ?? {}) };
+export function resolveNamedStyle(
+  name: string,
+  styles: Record<string, Style>,
+  defaultStyle: Style,
+): Style {
+  return { ...STYLE_DEFAULTS, ...defaultStyle, ...(styles[name] ?? {}) };
 }
 
 /** Normalize padding to four-sided object form. Negative values are clamped to 0. */

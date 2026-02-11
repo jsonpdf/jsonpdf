@@ -31,23 +31,6 @@ const EXAMPLES: ExampleSpec[] = [
   { name: 'travel-itinerary', expectedPages: 2 },
 ];
 
-/**
- * Resolve relative font paths in a template to absolute paths
- * so the renderer can find them regardless of cwd.
- */
-function resolveFontPaths(template: Template, exampleDir: string): void {
-  for (const font of template.fonts ?? []) {
-    if (
-      font.src &&
-      !font.src.startsWith('/') &&
-      !font.src.startsWith('http') &&
-      !font.src.startsWith('data:')
-    ) {
-      font.src = resolve(exampleDir, font.src);
-    }
-  }
-}
-
 describe('example rendering', () => {
   for (const { name, expectedPages } of EXAMPLES) {
     it(`renders ${name} (${expectedPages} page${expectedPages > 1 ? 's' : ''})`, async () => {
@@ -57,8 +40,6 @@ describe('example rendering', () => {
 
       const template: Template = JSON.parse(templateJson) as Template;
       const data = JSON.parse(dataJson) as Record<string, unknown>;
-
-      resolveFontPaths(template, dir);
 
       const result = await renderPdf(template, { data });
 

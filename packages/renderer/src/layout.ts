@@ -87,6 +87,7 @@ interface FrameMeasureCtx {
 function createFrameMeasureBands(
   fonts: FontMap,
   styles: Record<string, Style>,
+  defaultStyle: Style,
   getPlugin: (type: string) => Plugin,
   pdfDoc: PDFDocument,
   imageCache: ImageCache,
@@ -101,6 +102,7 @@ function createFrameMeasureBands(
         instance.band,
         fonts,
         styles,
+        defaultStyle,
         getPlugin,
         pdfDoc,
         imageCache,
@@ -119,6 +121,7 @@ function createFrameMeasureBands(
 function createLayoutMeasureChild(
   fonts: FontMap,
   styles: Record<string, Style>,
+  defaultStyle: Style,
   getPlugin: (type: string) => Plugin,
   pdfDoc: PDFDocument,
   imageCache: ImageCache,
@@ -131,12 +134,20 @@ function createLayoutMeasureChild(
     }
     const plugin = getPlugin(childEl.type);
     const props = plugin.resolveProps(childEl.properties);
-    const measureCtx = createMeasureContext(childEl, fonts, styles, pdfDoc, imageCache);
+    const measureCtx = createMeasureContext(
+      childEl,
+      fonts,
+      styles,
+      defaultStyle,
+      pdfDoc,
+      imageCache,
+    );
     if (childEl.elements?.length) {
       measureCtx.children = childEl.elements;
       measureCtx.measureChild = createLayoutMeasureChild(
         fonts,
         styles,
+        defaultStyle,
         getPlugin,
         pdfDoc,
         imageCache,
@@ -149,6 +160,7 @@ function createLayoutMeasureChild(
       measureCtx.measureBands = createFrameMeasureBands(
         fonts,
         styles,
+        defaultStyle,
         getPlugin,
         pdfDoc,
         imageCache,
@@ -164,6 +176,7 @@ async function measureBand(
   band: Band,
   fonts: FontMap,
   styles: Record<string, Style>,
+  defaultStyle: Style,
   getPlugin: (type: string) => Plugin,
   pdfDoc: PDFDocument,
   imageCache: ImageCache,
@@ -184,13 +197,21 @@ async function measureBand(
           `Invalid properties for ${element.type} element "${element.id}": ${messages}`,
         );
       }
-      const measureCtx = createMeasureContext(element, fonts, styles, pdfDoc, imageCache);
+      const measureCtx = createMeasureContext(
+        element,
+        fonts,
+        styles,
+        defaultStyle,
+        pdfDoc,
+        imageCache,
+      );
       // Provide child measurement for container elements
       if (element.elements?.length) {
         measureCtx.children = element.elements;
         measureCtx.measureChild = createLayoutMeasureChild(
           fonts,
           styles,
+          defaultStyle,
           getPlugin,
           pdfDoc,
           imageCache,
@@ -203,6 +224,7 @@ async function measureBand(
         measureCtx.measureBands = createFrameMeasureBands(
           fonts,
           styles,
+          defaultStyle,
           getPlugin,
           pdfDoc,
           imageCache,
@@ -213,7 +235,7 @@ async function measureBand(
       // measured.height is the content height (within padding-adjusted space).
       // Store the total element height (content + padding) so createRenderContext
       // can correctly subtract padding without double-counting.
-      const padding = normalizePadding(resolveElementStyle(element, styles).padding);
+      const padding = normalizePadding(resolveElementStyle(element, styles, defaultStyle).padding);
       const totalElementHeight = measured.height + padding.top + padding.bottom;
       elementHeights.set(element.id, totalElementHeight);
       const elementBottom = element.y + totalElementHeight;
@@ -230,6 +252,7 @@ async function measureBandList(
   bands: Band[],
   fonts: FontMap,
   styles: Record<string, Style>,
+  defaultStyle: Style,
   getPlugin: (type: string) => Plugin,
   pdfDoc: PDFDocument,
   imageCache: ImageCache,
@@ -238,7 +261,16 @@ async function measureBandList(
   const measurements: BandMeasurement[] = [];
   let total = 0;
   for (const band of bands) {
-    const result = await measureBand(band, fonts, styles, getPlugin, pdfDoc, imageCache, fCtx);
+    const result = await measureBand(
+      band,
+      fonts,
+      styles,
+      defaultStyle,
+      getPlugin,
+      pdfDoc,
+      imageCache,
+      fCtx,
+    );
     measurements.push(result);
     total += result.height;
   }
@@ -301,6 +333,7 @@ export async function layoutTemplate(
 ): Promise<LayoutResult> {
   const allPages: LayoutPage[] = [];
   let globalPageIndex = 0;
+  const { defaultStyle } = template;
 
   for (const [sectionIndex, section] of template.sections.entries()) {
     const pageConfig = mergePageConfig(template.page, section.page);
@@ -318,6 +351,7 @@ export async function layoutTemplate(
       pageConfig,
       expanded,
       template.styles,
+      defaultStyle,
       fonts,
       getPlugin,
       globalPageIndex,
@@ -376,6 +410,7 @@ async function layoutSection(
   pageConfig: PageConfig,
   expanded: ExpandedSection,
   styles: Record<string, Style>,
+  defaultStyle: Style,
   fonts: FontMap,
   getPlugin: (type: string) => Plugin,
   globalPageOffset: number,
@@ -393,6 +428,7 @@ async function layoutSection(
     expanded.pageHeaderBands,
     fonts,
     styles,
+    defaultStyle,
     getPlugin,
     pdfDoc,
     imageCache,
@@ -402,6 +438,7 @@ async function layoutSection(
     expanded.pageFooterBands,
     fonts,
     styles,
+    defaultStyle,
     getPlugin,
     pdfDoc,
     imageCache,
@@ -411,6 +448,7 @@ async function layoutSection(
     expanded.lastPageFooterBands,
     fonts,
     styles,
+    defaultStyle,
     getPlugin,
     pdfDoc,
     imageCache,
@@ -420,6 +458,7 @@ async function layoutSection(
     expanded.columnHeaderBands,
     fonts,
     styles,
+    defaultStyle,
     getPlugin,
     pdfDoc,
     imageCache,
@@ -429,6 +468,7 @@ async function layoutSection(
     expanded.columnFooterBands,
     fonts,
     styles,
+    defaultStyle,
     getPlugin,
     pdfDoc,
     imageCache,
@@ -438,6 +478,7 @@ async function layoutSection(
     expanded.backgroundBands,
     fonts,
     styles,
+    defaultStyle,
     getPlugin,
     pdfDoc,
     imageCache,
@@ -664,10 +705,17 @@ async function layoutSection(
     if (!plugin.canSplit || !plugin.split) return null;
 
     const props = plugin.resolveProps(element.properties);
-    const measureCtx = createMeasureContext(element, fonts, styles, pdfDoc, imageCache);
+    const measureCtx = createMeasureContext(
+      element,
+      fonts,
+      styles,
+      defaultStyle,
+      pdfDoc,
+      imageCache,
+    );
 
     // Account for element's Y offset within the band and padding
-    const elPadding = normalizePadding(resolveElementStyle(element, styles).padding);
+    const elPadding = normalizePadding(resolveElementStyle(element, styles, defaultStyle).padding);
     const availableForContent = availableHeight - element.y - elPadding.top - elPadding.bottom;
 
     if (availableForContent <= 0) return null;
@@ -714,6 +762,7 @@ async function layoutSection(
       instance.band,
       fonts,
       styles,
+      defaultStyle,
       getPlugin,
       pdfDoc,
       imageCache,
@@ -741,6 +790,7 @@ async function layoutSection(
           splitResult.fitBand,
           fonts,
           styles,
+          defaultStyle,
           getPlugin,
           pdfDoc,
           imageCache,
@@ -850,6 +900,7 @@ async function layoutSection(
         instance.band,
         fonts,
         styles,
+        defaultStyle,
         getPlugin,
         pdfDoc,
         imageCache,
@@ -889,6 +940,7 @@ async function layoutSection(
             splitResult.fitBand,
             fonts,
             styles,
+            defaultStyle,
             getPlugin,
             pdfDoc,
             imageCache,
@@ -998,6 +1050,7 @@ async function layoutSection(
         instance.band,
         fonts,
         styles,
+        defaultStyle,
         getPlugin,
         pdfDoc,
         imageCache,

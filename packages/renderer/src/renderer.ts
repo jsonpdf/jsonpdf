@@ -62,6 +62,7 @@ interface RenderEnv {
   registry: PluginRegistry;
   fonts: FontMap;
   styles: Record<string, Style>;
+  defaultStyle: Style;
   doc: PDFDocument;
   imageCache: ImageCache;
   anchorPageMap?: Map<string, PDFPage>;
@@ -117,6 +118,7 @@ async function measureBandForFrame(
         element,
         env.fonts,
         env.styles,
+        env.defaultStyle,
         env.doc,
         env.imageCache,
       );
@@ -128,7 +130,9 @@ async function measureBandForFrame(
         measureCtx.measureBands = createRenderMeasureBands(env, scope);
       }
       const measured = await plugin.measure(props, measureCtx);
-      const padding = normalizePadding(resolveElementStyle(element, env.styles).padding);
+      const padding = normalizePadding(
+        resolveElementStyle(element, env.styles, env.defaultStyle).padding,
+      );
       const totalElementHeight = measured.height + padding.top + padding.bottom;
       elementHeights.set(element.id, totalElementHeight);
       const elementBottom = element.y + totalElementHeight;
@@ -161,6 +165,7 @@ function createMeasureChildCallback(
       childEl,
       env.fonts,
       env.styles,
+      env.defaultStyle,
       env.doc,
       env.imageCache,
     );
@@ -397,7 +402,7 @@ async function renderElementAtPosition(
   }
 
   // 5. Compute style and padding
-  const elementStyle = resolveElementStyle(effectiveElement, env.styles);
+  const elementStyle = resolveElementStyle(effectiveElement, env.styles, env.defaultStyle);
   const padding = normalizePadding(elementStyle.padding);
   const height = measuredHeight ?? effectiveElement.height;
 
@@ -406,7 +411,7 @@ async function renderElementAtPosition(
     fonts: env.fonts,
     availableWidth: effectiveElement.width - padding.left - padding.right,
     availableHeight: height - padding.top - padding.bottom,
-    resolveStyle: (name: string) => resolveNamedStyle(name, env.styles),
+    resolveStyle: (name: string) => resolveNamedStyle(name, env.styles, env.defaultStyle),
     elementStyle,
     pdfDoc: env.doc,
     imageCache: env.imageCache,
@@ -444,6 +449,7 @@ async function renderElementAtPosition(
         childEl,
         env.fonts,
         env.styles,
+        env.defaultStyle,
         env.doc,
         env.imageCache,
       );
@@ -455,7 +461,9 @@ async function renderElementAtPosition(
         childMeasureCtx.measureBands = createRenderMeasureBands(env, scope);
       }
       const measured = await childPlugin.measure(childProps, childMeasureCtx);
-      const childPadding = normalizePadding(resolveElementStyle(childEl, env.styles).padding);
+      const childPadding = normalizePadding(
+        resolveElementStyle(childEl, env.styles, env.defaultStyle).padding,
+      );
       const childMeasuredHeight = measured.height + childPadding.top + childPadding.bottom;
 
       await renderElementAtPosition(
@@ -678,6 +686,7 @@ export async function renderPdf(
     registry,
     fonts,
     styles: template.styles,
+    defaultStyle: template.defaultStyle,
     doc,
     imageCache,
     anchorPageMap,
@@ -797,16 +806,13 @@ export async function renderPdf(
       }
 
       // Measure footnote height and position just above the footer
-      const defaultStyle: Style = {
-        fontFamily: 'Helvetica',
-        fontSize: 12,
-      };
+      const footnoteStyle: Style = { ...env.defaultStyle, fontSize: 12 };
       const marginLeft = pageConfig.margins.left;
       const contentWidth = pageConfig.width - pageConfig.margins.left - pageConfig.margins.right;
-      const fnHeight = measureFootnoteHeight(pageFootnotes, defaultStyle, env.fonts, contentWidth);
+      const fnHeight = measureFootnoteHeight(pageFootnotes, footnoteStyle, env.fonts, contentWidth);
       const fnY = footerTopY + fnHeight;
 
-      renderFootnotes(page, pageFootnotes, marginLeft, fnY, contentWidth, defaultStyle, env.fonts);
+      renderFootnotes(page, pageFootnotes, marginLeft, fnY, contentWidth, footnoteStyle, env.fonts);
     }
   }
 
