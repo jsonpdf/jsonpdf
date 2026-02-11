@@ -32,7 +32,16 @@ const columnModeValues = ['tile', 'flow'] as const;
 export const templateSchema: JSONSchema = {
   $schema: 'https://json-schema.org/draft/2020-12/schema',
   type: 'object',
-  required: ['version', 'name', 'page', 'dataSchema', 'styles', 'fonts', 'sections'],
+  required: [
+    'version',
+    'name',
+    'page',
+    'dataSchema',
+    'defaultStyle',
+    'styles',
+    'fonts',
+    'sections',
+  ],
   additionalProperties: false,
   properties: {
     version: { const: '1.0' },
@@ -42,18 +51,21 @@ export const templateSchema: JSONSchema = {
     license: { type: 'string' },
     page: { $ref: '#/$defs/PageConfig' },
     dataSchema: { type: 'object' },
+    defaultStyle: {
+      allOf: [{ $ref: '#/$defs/Style' }, { type: 'object', required: ['fontFamily'] }],
+    },
     styles: {
       type: 'object',
       additionalProperties: { $ref: '#/$defs/Style' },
-    },
-    fonts: {
-      type: 'array',
-      items: { $ref: '#/$defs/FontDeclaration' },
     },
     sections: {
       type: 'array',
       minItems: 1,
       items: { $ref: '#/$defs/Section' },
+    },
+    fonts: {
+      type: 'array',
+      items: { $ref: '#/$defs/FontDeclaration' },
     },
   },
   $defs: {
@@ -270,13 +282,13 @@ export const templateSchema: JSONSchema = {
     },
     FontDeclaration: {
       type: 'object',
-      required: ['family', 'src'],
+      required: ['family', 'data'],
       additionalProperties: false,
       properties: {
         family: { type: 'string', minLength: 1 },
         weight: { type: 'number' },
         style: { type: 'string', enum: [...fontStyleValues] },
-        src: { type: 'string', minLength: 1 },
+        data: { type: 'string', minLength: 1 },
       },
     },
   },

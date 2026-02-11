@@ -169,6 +169,7 @@ describe('buildPluginAwareTemplateSchema', () => {
         margins: { top: 36, right: 36, bottom: 36, left: 36 },
       },
       dataSchema: {},
+      defaultStyle: { fontFamily: 'Inter' },
       styles: {},
       fonts: [],
       sections: [
