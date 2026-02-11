@@ -7,8 +7,8 @@
 .left {
   display: flex;
   flex-direction: column;
-  width: 50%;
-  min-width: 300px;
+  width: 33.333%;
+  min-width: 280px;
   border-right: 1px solid var(--jp-color-border);
 }
 
