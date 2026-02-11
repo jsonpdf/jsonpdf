@@ -27,7 +27,7 @@ export type {
 export { templateSchema } from './schema.js';
 
 // Validation
-export { validateTemplateSchema, validateWithSchema } from './validation.js';
+export { validateTemplateSchema, validateWithSchema, applySchemaDefaults } from './validation.js';
 export { makeExpressionAware, buildPluginAwareTemplateSchema } from './expression-schema.js';
 export type { PluginSchemaEntry } from './expression-schema.js';
 

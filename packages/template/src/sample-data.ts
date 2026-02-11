@@ -14,6 +14,36 @@ export function generateSampleData(schema: JSONSchema, options?: SampleDataOptio
   return generate(schema, 'value', arrayLength);
 }
 
+/**
+ * Build a data object from a JSON Schema using `default` values where present
+ * and `null` for properties that have no default. Useful for pre-populating
+ * a data editor so that every key is visible.
+ */
+export function buildDefaultData(schema: JSONSchema): unknown {
+  if ('const' in schema) return schema['const'];
+  if ('default' in schema) return schema['default'];
+  if (Array.isArray(schema['enum']) && schema['enum'].length > 0) return schema['enum'][0];
+
+  const type = schema['type'] as string | undefined;
+
+  if (type === 'object') {
+    const result: Record<string, unknown> = {};
+    const properties = schema['properties'] as Record<string, JSONSchema> | undefined;
+    if (properties) {
+      for (const [key, propSchema] of Object.entries(properties)) {
+        result[key] = buildDefaultData(propSchema);
+      }
+    }
+    return result;
+  }
+
+  if (type === 'array') {
+    return [];
+  }
+
+  return null;
+}
+
 function generate(schema: JSONSchema, pathHint: string, arrayLength: number): unknown {
   // const takes precedence
   if ('const' in schema) {
@@ -23,6 +53,11 @@ function generate(schema: JSONSchema, pathHint: string, arrayLength: number): un
   // enum — pick first value
   if (Array.isArray(schema['enum']) && schema['enum'].length > 0) {
     return schema['enum'][0];
+  }
+
+  // default — use the declared default value
+  if ('default' in schema) {
+    return schema['default'];
   }
 
   // oneOf / anyOf — generate from first option

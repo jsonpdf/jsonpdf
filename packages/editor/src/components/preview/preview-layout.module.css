@@ -30,6 +30,34 @@
   letter-spacing: 0.05em;
 }
 
+.toolbarActions {
+  display: flex;
+  align-items: center;
+  gap: var(--jp-space-xs);
+}
+
+.defaultBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 var(--jp-space-md);
+  border: 1px solid var(--jp-color-border);
+  border-radius: 4px;
+  background: var(--jp-color-surface);
+  color: var(--jp-color-text-secondary);
+  cursor: pointer;
+  font-size: var(--jp-font-size-sm);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.defaultBtn:hover {
+  border-color: var(--jp-color-accent);
+  color: var(--jp-color-accent);
+}
+
 .renderBtn {
   display: flex;
   align-items: center;

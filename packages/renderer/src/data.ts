@@ -1,5 +1,5 @@
 import type { JSONSchema } from '@jsonpdf/core';
-import { validateWithSchema } from '@jsonpdf/core';
+import { validateWithSchema, applySchemaDefaults as coreApplyDefaults } from '@jsonpdf/core';
 
 /** Validate user data against a template's dataSchema. Throws on failure. */
 export function validateData(data: Record<string, unknown>, schema: JSONSchema): void {
@@ -13,6 +13,21 @@ export function validateData(data: Record<string, unknown>, schema: JSONSchema):
     const messages = result.errors.map((e) => `${e.path}: ${e.message}`).join('; ');
     throw new Error(`Data validation failed: ${messages}`);
   }
+}
+
+/**
+ * Return a copy of `data` with `default` values from the schema filled in
+ * for any missing properties. Uses AJV's `useDefaults` option.
+ */
+export function applySchemaDefaults(
+  data: Record<string, unknown>,
+  schema: JSONSchema,
+): Record<string, unknown> {
+  const keys = Object.keys(schema);
+  if (keys.length === 0) return data;
+  if (keys.length === 1 && schema['type'] === 'object') return data;
+
+  return coreApplyDefaults(schema, data);
 }
 
 /** Resolve a dot-separated path against a data object. */

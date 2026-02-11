@@ -32,7 +32,7 @@ import { layoutTemplate, mergePageConfig, MAX_CONTAINER_DEPTH } from './layout.j
 import { createMeasureContext } from './context.js';
 import { templateToPdf } from './coordinate.js';
 import { createExpressionEngine, type ExpressionEngine } from './expression.js';
-import { validateData } from './data.js';
+import { validateData, applySchemaDefaults } from './data.js';
 import { expandBands } from './band-expander.js';
 import { collectAnchors } from './anchors.js';
 import { buildPdfOutline, type BookmarkEntry } from './bookmarks.js';
@@ -582,9 +582,10 @@ export async function renderPdf(
     }
   }
 
-  // 3. Validate data against dataSchema
-  const data = options?.data ?? {};
+  // 3. Validate data against dataSchema and apply defaults
+  let data = options?.data ?? {};
   validateData(data, template.dataSchema);
+  data = applySchemaDefaults(data, template.dataSchema);
 
   // 4. Create PDF document
   const doc = await PDFDocument.create();
