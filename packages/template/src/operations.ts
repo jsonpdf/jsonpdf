@@ -5,6 +5,7 @@ import type {
   Band,
   Element,
   Style,
+  StyledRun,
   FontDeclaration,
 } from '@jsonpdf/core';
 import { generateId } from '@jsonpdf/core';
@@ -532,4 +533,101 @@ export function cloneElement(
     throw new Error(`Element "${elementId}" not found`);
   }
   return { ...template, sections };
+}
+
+// ---- RENAME operations ----
+
+/** Recursively rename style references in an element and its children. */
+function renameStyleInElement(el: Element, oldName: string, newName: string): Element {
+  let changed = false;
+  let style = el.style;
+  if (style === oldName) {
+    style = newName;
+    changed = true;
+  }
+
+  let conditionalStyles = el.conditionalStyles;
+  if (conditionalStyles) {
+    const orig = conditionalStyles;
+    const mapped = orig.map((cs) => {
+      if (cs.style === oldName) return { ...cs, style: newName };
+      return cs;
+    });
+    if (mapped.some((cs, i) => cs !== orig[i])) {
+      conditionalStyles = mapped;
+      changed = true;
+    }
+  }
+
+  let properties = el.properties;
+  const content = properties.content;
+  if (Array.isArray(content)) {
+    const runs = content as StyledRun[];
+    const mappedRuns = runs.map((run) => {
+      if (run.style === oldName) return { ...run, style: newName };
+      return run;
+    });
+    if (mappedRuns.some((r, i) => r !== runs[i])) {
+      properties = { ...properties, content: mappedRuns };
+      changed = true;
+    }
+  }
+
+  let elements = el.elements;
+  if (elements) {
+    const origElements = elements;
+    const mappedChildren = origElements.map((child) =>
+      renameStyleInElement(child, oldName, newName),
+    );
+    if (mappedChildren.some((c, i) => c !== origElements[i])) {
+      elements = mappedChildren;
+      changed = true;
+    }
+  }
+
+  const bands = properties.bands as Band[] | undefined;
+  if (Array.isArray(bands)) {
+    const origBands = bands;
+    const mappedBands = origBands.map((band) => {
+      const mappedElements = band.elements.map((child) =>
+        renameStyleInElement(child, oldName, newName),
+      );
+      if (mappedElements.some((c, i) => c !== band.elements[i])) {
+        return { ...band, elements: mappedElements };
+      }
+      return band;
+    });
+    if (mappedBands.some((b, i) => b !== origBands[i])) {
+      properties = { ...properties, bands: mappedBands };
+      changed = true;
+    }
+  }
+
+  if (!changed) return el;
+  return { ...el, style, conditionalStyles, properties, elements };
+}
+
+/** Rename a named style and update all references throughout the template. Returns a new template. */
+export function renameStyle(template: Template, oldName: string, newName: string): Template {
+  if (!Object.hasOwn(template.styles, oldName)) {
+    throw new Error(`Style "${oldName}" not found`);
+  }
+  if (oldName === newName) return template;
+  if (Object.hasOwn(template.styles, newName)) {
+    throw new Error(`Style "${newName}" already exists`);
+  }
+  const styles: Record<string, Style> = {};
+  for (const [key, value] of Object.entries(template.styles)) {
+    styles[key === oldName ? newName : key] = value;
+  }
+  const sections = template.sections.map((s) => {
+    const bands = s.bands.map((b) => {
+      const elements = b.elements.map((el) => renameStyleInElement(el, oldName, newName));
+      if (elements.some((e, i) => e !== b.elements[i])) return { ...b, elements };
+      return b;
+    });
+    if (bands.some((b, i) => b !== s.bands[i])) return { ...s, bands };
+    return s;
+  });
+  return { ...template, styles, sections };
 }

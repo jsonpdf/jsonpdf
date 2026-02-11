@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Template, Element, Band, BandType, Section, PageConfig } from '@jsonpdf/core';
+import type { Template, Element, Band, BandType, Section, PageConfig, Style } from '@jsonpdf/core';
 import { generateId } from '@jsonpdf/core';
 import {
   createTemplate,
@@ -18,6 +18,10 @@ import {
   reorderElement as reorderElementOp,
   moveElement as moveElementOp,
   moveSection as moveSectionOp,
+  addStyle as addStyleOp,
+  updateStyle as updateStyleOp,
+  removeStyle as removeStyleOp,
+  renameStyle as renameStyleOp,
   findBand,
   findElement,
   deepCloneWithNewIds,
@@ -80,6 +84,13 @@ export interface EditorState extends TemporalState {
   setActiveTab: (tab: 'editor' | 'code' | 'preview') => void;
   importTemplate: (json: string) => { success: true } | { success: false; error: string };
   exportTemplate: () => string;
+
+  selectedStyleName: string | null;
+  setSelectedStyleName: (name: string | null) => void;
+  addNewStyle: (name: string, style: Style) => void;
+  updateStyleProps: (name: string, updates: Partial<Style>) => void;
+  removeStyleByName: (name: string) => void;
+  renameStyleByName: (oldName: string, newName: string) => void;
 }
 
 /** Normalize setSelection input: null → [], string → [string], string[] → as-is. */
@@ -101,6 +112,7 @@ export const useEditorStore = create<EditorState>(
     clipboard: null,
     activeTool: 'select',
     activeTab: 'editor',
+    selectedStyleName: null,
 
     _undoStack: [],
     _redoStack: [],
@@ -118,6 +130,7 @@ export const useEditorStore = create<EditorState>(
         selectedElementIds: [],
         selectedBandId: null,
         selectedSectionId: null,
+        selectedStyleName: null,
       });
       set({ _isUndoRedoInProgress: false });
     },
@@ -134,6 +147,7 @@ export const useEditorStore = create<EditorState>(
         selectedElementIds: [],
         selectedBandId: null,
         selectedSectionId: null,
+        selectedStyleName: null,
       });
       set({ _isUndoRedoInProgress: false });
     },
@@ -510,6 +524,52 @@ export const useEditorStore = create<EditorState>(
             selectedElementIds: [element.id],
             selectedBandId: bandId,
             selectedSectionId: bandResult?.section.id ?? null,
+          };
+        } catch {
+          return state;
+        }
+      });
+    },
+    setSelectedStyleName: (name) => {
+      set({ selectedStyleName: name });
+    },
+    addNewStyle: (name, style) => {
+      set((state) => {
+        try {
+          return { template: addStyleOp(state.template, name, style) };
+        } catch {
+          return state;
+        }
+      });
+    },
+    updateStyleProps: (name, updates) => {
+      set((state) => {
+        try {
+          return { template: updateStyleOp(state.template, name, updates) };
+        } catch {
+          return state;
+        }
+      });
+    },
+    removeStyleByName: (name) => {
+      set((state) => {
+        try {
+          return {
+            template: removeStyleOp(state.template, name),
+            selectedStyleName: state.selectedStyleName === name ? null : state.selectedStyleName,
+          };
+        } catch {
+          return state;
+        }
+      });
+    },
+    renameStyleByName: (oldName, newName) => {
+      set((state) => {
+        try {
+          return {
+            template: renameStyleOp(state.template, oldName, newName),
+            selectedStyleName:
+              state.selectedStyleName === oldName ? newName : state.selectedStyleName,
           };
         } catch {
           return state;

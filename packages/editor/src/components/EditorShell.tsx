@@ -1,7 +1,7 @@
 import { Toolbar } from './Toolbar';
 import { CanvasViewport } from './CanvasViewport';
 import { Sidebar } from './Sidebar';
-import { OutlinePanel } from './outline';
+import { LeftSidebar } from './left-sidebar';
 import { BottomTabBar } from './bottom-tab-bar';
 import { PreviewLayout } from './preview/preview-layout';
 import { CodeLayout } from './code/code-layout';
@@ -19,7 +19,7 @@ export function EditorShell() {
       <div className={styles.content}>
         {activeTab === 'editor' ? (
           <div className={styles.main}>
-            <OutlinePanel />
+            <LeftSidebar />
             <CanvasViewport />
             <Sidebar />
           </div>

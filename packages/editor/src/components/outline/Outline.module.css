@@ -1,9 +1,6 @@
 .outlinePanel {
-  width: var(--jp-outline-width);
-  border-right: 1px solid var(--jp-color-border);
-  background: var(--jp-color-surface);
+  flex: 1;
   overflow-y: auto;
-  flex-shrink: 0;
 }
 
 .outlineHeader {
