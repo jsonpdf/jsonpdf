@@ -1,7 +1,8 @@
 import type { PDFDocument } from 'pdf-lib';
 import type { FontMap } from '@jsonpdf/plugins';
 import { fontKey } from '@jsonpdf/plugins';
-import type { Template, Style, StyledRun, FontDeclaration } from '@jsonpdf/core';
+import type { Template, Style, StyledRun, FontDeclaration, Element } from '@jsonpdf/core';
+import { resolveElementStyle } from './style-resolver.js';
 
 export interface FontSpec {
   family: string;
@@ -17,18 +18,23 @@ export function mapWeight(weight?: number): 'normal' | 'bold' {
 
 /**
  * Find a FontDeclaration that matches a given font spec.
- * Matches by family (case-insensitive) and weight/style.
+ * Tries exact match (family + weight + style) first, then falls back
+ * to any declaration with the same family name.
  */
 function findDeclaration(
   spec: FontSpec,
   declarations: FontDeclaration[],
 ): FontDeclaration | undefined {
-  return declarations.find((d) => {
-    const familyMatch = d.family.toLowerCase() === spec.family.toLowerCase();
+  const familyLower = spec.family.toLowerCase();
+  let familyFallback: FontDeclaration | undefined;
+  for (const d of declarations) {
+    if (d.family.toLowerCase() !== familyLower) continue;
     const weightMatch = mapWeight(d.weight) === spec.weight;
     const styleMatch = (d.style ?? 'normal') === spec.style;
-    return familyMatch && weightMatch && styleMatch;
-  });
+    if (weightMatch && styleMatch) return d;
+    familyFallback ??= d;
+  }
+  return familyFallback;
 }
 
 /**
@@ -98,38 +104,52 @@ export function collectFontSpecs(template: Template): FontSpec[] {
     addFromStyle(style);
   }
 
-  // Element style overrides + rich text content
+  // Walk elements recursively, computing the RESOLVED style for each
+  // so that cross-source font combinations (e.g. fontFamily from override +
+  // fontWeight from named style) are properly collected.
+  function walkElement(element: Element): void {
+    // Resolved style captures the full merge of defaults + named + overrides
+    addFromStyle(resolveElementStyle(element, template.styles, template.defaultStyle));
+
+    // Conditional style variations
+    if (element.conditionalStyles) {
+      for (const cs of element.conditionalStyles) {
+        const effective: Element = {
+          ...element,
+          style: cs.style ?? element.style,
+          styleOverrides: { ...(element.styleOverrides ?? {}), ...(cs.styleOverrides ?? {}) },
+        };
+        addFromStyle(resolveElementStyle(effective, template.styles, template.defaultStyle));
+      }
+    }
+
+    // Rich text StyledRun variations
+    const content = element.properties.content;
+    if (Array.isArray(content)) {
+      for (const run of content as StyledRun[]) {
+        if (run.styleOverrides || run.style) {
+          const effective: Element = {
+            ...element,
+            style: run.style ?? element.style,
+            styleOverrides: { ...(element.styleOverrides ?? {}), ...(run.styleOverrides ?? {}) },
+          };
+          addFromStyle(resolveElementStyle(effective, template.styles, template.defaultStyle));
+        }
+      }
+    }
+
+    // Recurse into nested elements (containers, frames)
+    if (element.elements) {
+      for (const child of element.elements) {
+        walkElement(child);
+      }
+    }
+  }
+
   for (const section of template.sections) {
     for (const band of section.bands) {
       for (const element of band.elements) {
-        if (element.styleOverrides) {
-          addFromStyle(element.styleOverrides);
-        }
-
-        // Scan conditional styles for font references
-        if (element.conditionalStyles) {
-          for (const cs of element.conditionalStyles) {
-            if (cs.styleOverrides) {
-              addFromStyle(cs.styleOverrides);
-            }
-            if (cs.style && cs.style in template.styles) {
-              addFromStyle(template.styles[cs.style]);
-            }
-          }
-        }
-
-        // Scan rich text content for font references in StyledRuns
-        const content = element.properties.content;
-        if (Array.isArray(content)) {
-          for (const run of content as StyledRun[]) {
-            if (run.styleOverrides) {
-              addFromStyle(run.styleOverrides);
-            }
-            if (run.style && run.style in template.styles) {
-              addFromStyle(template.styles[run.style]);
-            }
-          }
-        }
+        walkElement(element);
       }
     }
   }

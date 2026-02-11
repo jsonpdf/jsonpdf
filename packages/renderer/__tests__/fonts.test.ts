@@ -66,17 +66,17 @@ describe('embedFonts', () => {
     ).rejects.toThrow('No font declaration found');
   });
 
-  it('throws when weight does not match declaration', async () => {
+  it('falls back to same-family declaration when weight does not match', async () => {
     const doc = await PDFDocument.create();
     doc.registerFontkit(fontkit);
-    // Request bold, declaration has weight 400 (normal) → no match
-    await expect(
-      embedFonts(
-        doc,
-        [{ family: 'CustomBold', weight: 'bold', style: 'normal' }],
-        [{ family: 'CustomBold', weight: 400, style: 'normal', data: 'AAAA' }],
-      ),
-    ).rejects.toThrow('No font declaration found for "CustomBold:bold:normal"');
+    // Request bold Inter, only regular (weight 400) declared → same-family fallback
+    const fonts = await embedFonts(
+      doc,
+      [{ family: 'Inter', weight: 'bold', style: 'normal' }],
+      DEFAULT_FONTS,
+    );
+    expect(fonts.size).toBe(1);
+    expect(fonts.has(fontKey('Inter', 'bold', 'normal'))).toBe(true);
   });
 });
 
