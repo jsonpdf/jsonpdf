@@ -9,16 +9,17 @@ export function createMeasureContext(
   element: Element,
   fonts: FontMap,
   styles: Record<string, Style>,
+  defaultStyle: Style,
   pdfDoc: PDFDocument,
   imageCache: ImageCache,
 ): MeasureContext {
-  const elementStyle = resolveElementStyle(element, styles);
+  const elementStyle = resolveElementStyle(element, styles, defaultStyle);
   const padding = normalizePadding(elementStyle.padding);
   return {
     fonts,
     availableWidth: element.width - padding.left - padding.right,
     availableHeight: element.height - padding.top - padding.bottom,
-    resolveStyle: (name: string) => resolveNamedStyle(name, styles),
+    resolveStyle: (name: string) => resolveNamedStyle(name, styles, defaultStyle),
     elementStyle,
     pdfDoc,
     imageCache,
@@ -30,6 +31,7 @@ export function createRenderContext(
   element: Element,
   fonts: FontMap,
   styles: Record<string, Style>,
+  defaultStyle: Style,
   page: PDFPage,
   bandOffsetY: number,
   pageHeight: number,
@@ -39,7 +41,7 @@ export function createRenderContext(
   imageCache: ImageCache,
   measuredHeight?: number,
 ): RenderContext {
-  const elementStyle = resolveElementStyle(element, styles);
+  const elementStyle = resolveElementStyle(element, styles, defaultStyle);
   const padding = normalizePadding(elementStyle.padding);
   const { x, y } = templateToPdf(
     element.x,
@@ -53,7 +55,7 @@ export function createRenderContext(
     fonts,
     availableWidth: element.width - padding.left - padding.right,
     availableHeight: height - padding.top - padding.bottom,
-    resolveStyle: (name: string) => resolveNamedStyle(name, styles),
+    resolveStyle: (name: string) => resolveNamedStyle(name, styles, defaultStyle),
     elementStyle,
     pdfDoc,
     imageCache,

@@ -5,14 +5,13 @@ import { fontKey } from './types.js';
 
 /** Resolve a font from the FontMap based on style properties. Falls back to first available font. */
 export function getFont(fonts: FontMap, style: Style): PDFFont {
-  const key = fontKey(
-    style.fontFamily ?? 'Helvetica',
-    style.fontWeight ?? 'normal',
-    style.fontStyle ?? 'normal',
-  );
+  if (!style.fontFamily) {
+    throw new Error('fontFamily is missing — style was not resolved before calling getFont');
+  }
+  const key = fontKey(style.fontFamily, style.fontWeight ?? 'normal', style.fontStyle ?? 'normal');
   const found = fonts.get(key);
   if (found) return found;
-  // Fallback to first available font. FontMap always has at least the default Helvetica.
+  // Fallback to first available font in the map (e.g. weight/style variant not embedded).
   for (const font of fonts.values()) {
     return font;
   }
