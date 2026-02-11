@@ -29,6 +29,8 @@ export {
   cloneSection,
   cloneBand,
   cloneElement,
+  // Rename
+  renameStyle,
   // Utility
   deepCloneWithNewIds,
 } from './operations.js';

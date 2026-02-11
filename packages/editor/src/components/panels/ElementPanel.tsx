@@ -1,30 +1,14 @@
 import { useCallback, useMemo } from 'react';
 import type { Element, Style } from '@jsonpdf/core';
 import { useEditorStore } from '../../store';
-import { PropertyGroup, NumberField, TextField, SelectField, ColorField } from '../fields';
+import { PropertyGroup, NumberField, TextField, SelectField } from '../fields';
+import { StyleFields } from '../styles/StyleFields';
 import { TextProperties } from './element-props/TextProperties';
 import { ImageProperties } from './element-props/ImageProperties';
 import { LineProperties } from './element-props/LineProperties';
 import { ShapeProperties } from './element-props/ShapeProperties';
 import { ElementTypeProperties } from './element-props/CommonProperties';
 import styles from './Panel.module.css';
-
-const FONT_WEIGHT_OPTIONS = [
-  { value: 'normal', label: 'Normal' },
-  { value: 'bold', label: 'Bold' },
-];
-
-const FONT_STYLE_OPTIONS = [
-  { value: 'normal', label: 'Normal' },
-  { value: 'italic', label: 'Italic' },
-];
-
-const TEXT_ALIGN_OPTIONS = [
-  { value: 'left', label: 'Left' },
-  { value: 'center', label: 'Center' },
-  { value: 'right', label: 'Right' },
-  { value: 'justify', label: 'Justify' },
-];
 
 function elementTypeLabel(type: string): string {
   return type.charAt(0).toUpperCase() + type.slice(1);
@@ -152,116 +136,7 @@ export function ElementPanel({ element }: ElementPanelProps) {
       </PropertyGroup>
 
       {/* Style overrides */}
-      <PropertyGroup label="Style Overrides" defaultOpen={false}>
-        <TextField
-          label="Font"
-          value={overrides.fontFamily}
-          onChange={(v) => {
-            onStyleOverrideChange('fontFamily', v);
-          }}
-        />
-        <NumberField
-          label="Size"
-          value={overrides.fontSize}
-          onChange={(v) => {
-            onStyleOverrideChange('fontSize', v);
-          }}
-          min={1}
-        />
-        <SelectField
-          label="Weight"
-          value={overrides.fontWeight}
-          onChange={(v) => {
-            onStyleOverrideChange('fontWeight', v);
-          }}
-          options={FONT_WEIGHT_OPTIONS}
-          allowEmpty
-        />
-        <SelectField
-          label="Style"
-          value={overrides.fontStyle}
-          onChange={(v) => {
-            onStyleOverrideChange('fontStyle', v);
-          }}
-          options={FONT_STYLE_OPTIONS}
-          allowEmpty
-        />
-        <ColorField
-          label="Color"
-          value={overrides.color}
-          onChange={(v) => {
-            onStyleOverrideChange('color', v);
-          }}
-        />
-        <ColorField
-          label="Background"
-          value={
-            typeof overrides.backgroundColor === 'string' ? overrides.backgroundColor : undefined
-          }
-          onChange={(v) => {
-            onStyleOverrideChange('backgroundColor', v);
-          }}
-        />
-        <SelectField
-          label="Align"
-          value={overrides.textAlign}
-          onChange={(v) => {
-            onStyleOverrideChange('textAlign', v);
-          }}
-          options={TEXT_ALIGN_OPTIONS}
-          allowEmpty
-        />
-        <NumberField
-          label="Line H."
-          value={overrides.lineHeight}
-          onChange={(v) => {
-            onStyleOverrideChange('lineHeight', v);
-          }}
-          min={0.5}
-          step={0.1}
-        />
-        <NumberField
-          label="Opacity"
-          value={overrides.opacity}
-          onChange={(v) => {
-            onStyleOverrideChange('opacity', v);
-          }}
-          min={0}
-          max={1}
-          step={0.1}
-        />
-        <NumberField
-          label="Border W."
-          value={overrides.borderWidth}
-          onChange={(v) => {
-            onStyleOverrideChange('borderWidth', v);
-          }}
-          min={0}
-        />
-        <ColorField
-          label="Border C."
-          value={overrides.borderColor}
-          onChange={(v) => {
-            onStyleOverrideChange('borderColor', v);
-          }}
-        />
-        <NumberField
-          label="Radius"
-          value={overrides.borderRadius}
-          onChange={(v) => {
-            onStyleOverrideChange('borderRadius', v);
-          }}
-          min={0}
-        />
-        <NumberField
-          label="Padding"
-          value={typeof overrides.padding === 'number' ? overrides.padding : undefined}
-          onChange={(v) => {
-            onStyleOverrideChange('padding', v);
-          }}
-          min={0}
-        />
-      </PropertyGroup>
+      <StyleFields values={overrides} onChange={onStyleOverrideChange} />
     </div>
   );
 }

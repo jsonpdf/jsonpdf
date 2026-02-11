@@ -1,0 +1,189 @@
+.panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ---- Style list ---- */
+
+.listHeader {
+  font-weight: 600;
+  font-size: var(--jp-font-size-sm);
+  color: var(--jp-color-text-secondary);
+  padding: var(--jp-space-sm) var(--jp-space-md);
+  border-bottom: 1px solid var(--jp-color-border-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.listBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--jp-space-xs) 0;
+}
+
+.styleItem {
+  display: flex;
+  align-items: center;
+  gap: var(--jp-space-sm);
+  padding: 4px var(--jp-space-sm);
+  cursor: pointer;
+  border-radius: 3px;
+  margin: 0 var(--jp-space-xs);
+  user-select: none;
+}
+
+.styleItem:hover {
+  background: var(--jp-color-surface-secondary);
+}
+
+.styleItemSelected {
+  background: var(--jp-color-accent-light);
+}
+
+.styleItemSelected:hover {
+  background: var(--jp-color-accent-light);
+}
+
+.swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 3px;
+  border: 1px solid var(--jp-color-border-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.styleName {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--jp-font-size-sm);
+  color: var(--jp-color-text-primary);
+}
+
+.usageBadge {
+  font-size: var(--jp-font-size-xs);
+  color: var(--jp-color-text-tertiary);
+  flex-shrink: 0;
+}
+
+.addStyleBtn {
+  display: block;
+  width: calc(100% - 2 * var(--jp-space-xs));
+  margin: var(--jp-space-xs);
+  padding: var(--jp-space-xs) var(--jp-space-sm);
+  border: 1px dashed var(--jp-color-border);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--jp-color-text-secondary);
+  font-size: var(--jp-font-size-sm);
+  cursor: pointer;
+  text-align: center;
+}
+
+.addStyleBtn:hover {
+  background: var(--jp-color-surface-secondary);
+  border-color: var(--jp-color-accent);
+  color: var(--jp-color-accent);
+}
+
+.addInput {
+  display: block;
+  width: calc(100% - 2 * var(--jp-space-xs) - 2 * var(--jp-space-sm));
+  margin: var(--jp-space-xs);
+  padding: var(--jp-space-xs) var(--jp-space-sm);
+  border: 1px solid var(--jp-color-accent);
+  border-radius: 3px;
+  background: var(--jp-color-surface);
+  color: var(--jp-color-text-primary);
+  font-size: var(--jp-font-size-sm);
+  font-family: var(--jp-font-family);
+  outline: none;
+}
+
+/* ---- Style editor ---- */
+
+.editorHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--jp-space-xs);
+  padding: var(--jp-space-sm) var(--jp-space-md);
+  border-bottom: 1px solid var(--jp-color-border-light);
+}
+
+.backBtn {
+  border: none;
+  background: none;
+  color: var(--jp-color-text-secondary);
+  cursor: pointer;
+  font-size: var(--jp-font-size-md);
+  padding: 0;
+  line-height: 1;
+}
+
+.backBtn:hover {
+  color: var(--jp-color-accent);
+}
+
+.nameInput {
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  color: var(--jp-color-text-primary);
+  font-size: var(--jp-font-size-sm);
+  font-weight: 600;
+  font-family: var(--jp-font-family);
+  outline: none;
+  padding: 2px 0;
+}
+
+.nameInput:focus {
+  border-bottom-color: var(--jp-color-accent);
+}
+
+.editorBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--jp-space-sm) var(--jp-space-md);
+}
+
+.usageLabel {
+  font-size: var(--jp-font-size-xs);
+  color: var(--jp-color-text-tertiary);
+  padding: 0 0 var(--jp-space-sm) 0;
+}
+
+.deleteBtn {
+  display: block;
+  width: 100%;
+  margin-top: var(--jp-space-md);
+  padding: var(--jp-space-xs) var(--jp-space-sm);
+  border: 1px solid var(--jp-color-danger, #dc3545);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--jp-color-danger, #dc3545);
+  font-size: var(--jp-font-size-sm);
+  cursor: pointer;
+  text-align: center;
+}
+
+.deleteBtn:hover {
+  background: var(--jp-color-danger, #dc3545);
+  color: #fff;
+}
+
+.emptyState {
+  padding: var(--jp-space-lg) var(--jp-space-md);
+  text-align: center;
+  color: var(--jp-color-text-tertiary);
+  font-size: var(--jp-font-size-sm);
+}

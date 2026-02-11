@@ -242,9 +242,7 @@ describe('ElementPanel', () => {
 
   it('updates style overrides', () => {
     render(<Sidebar />);
-    // Expand style overrides group
-    fireEvent.click(screen.getByText('Style Overrides'));
-    // Find the font Size input — empty spinbutton whose parent contains "Size"
+    // StyleFields renders Typography group open by default with a "Size" number field
     const sizeInputs = screen.getAllByRole('spinbutton');
     const fontSizeInput = sizeInputs.find(
       (input) =>
