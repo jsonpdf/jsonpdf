@@ -7,6 +7,7 @@ import type {
   Section,
   PageConfig,
   Style,
+  FontDeclaration,
   JSONSchema,
 } from '@jsonpdf/core';
 import type { SchemaPropertyType } from '@jsonpdf/template';
@@ -32,6 +33,8 @@ import {
   updateStyle as updateStyleOp,
   removeStyle as removeStyleOp,
   renameStyle as renameStyleOp,
+  addFont as addFontOp,
+  removeFont as removeFontOp,
   findBand,
   findElement,
   deepCloneWithNewIds,
@@ -110,6 +113,9 @@ export interface EditorState extends TemporalState {
   updateStyleProps: (name: string, updates: Partial<Style>) => void;
   removeStyleByName: (name: string) => void;
   renameStyleByName: (oldName: string, newName: string) => void;
+
+  addFont: (font: FontDeclaration) => void;
+  removeFont: (family: string, weight?: number, fontStyle?: 'normal' | 'italic') => void;
 
   selectedSchemaPath: string | null;
   previewDataText: string;
@@ -608,6 +614,24 @@ export const useEditorStore = create<EditorState>(
             selectedStyleName:
               state.selectedStyleName === oldName ? newName : state.selectedStyleName,
           };
+        } catch {
+          return state;
+        }
+      });
+    },
+    addFont: (font) => {
+      set((state) => {
+        try {
+          return { template: addFontOp(state.template, font) };
+        } catch {
+          return state;
+        }
+      });
+    },
+    removeFont: (family, weight, fontStyle) => {
+      set((state) => {
+        try {
+          return { template: removeFontOp(state.template, family, weight, fontStyle) };
         } catch {
           return state;
         }
