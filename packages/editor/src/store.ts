@@ -41,8 +41,10 @@ import {
   renameSchemaProperty as renameSchemaPropertyOp,
   toggleSchemaRequired as toggleSchemaRequiredOp,
   createDefaultPropertySchema,
+  buildDefaultData,
 } from '@jsonpdf/template';
 import { createDefaultElement } from './constants/element-defaults';
+import { DEMO_TEMPLATE } from './constants/demo-template';
 import { MIN_ZOOM, MAX_ZOOM } from './constants/zoom';
 import { temporal, type TemporalState } from './middleware/temporal';
 
@@ -98,6 +100,7 @@ export interface EditorState extends TemporalState {
   addElement: (bandId: string, elementType: string, x?: number, y?: number) => void;
   activeTab: 'editor' | 'code' | 'preview';
   setActiveTab: (tab: 'editor' | 'code' | 'preview') => void;
+  newTemplate: () => void;
   importTemplate: (json: string) => { success: true } | { success: false; error: string };
   exportTemplate: () => string;
 
@@ -119,6 +122,10 @@ export interface EditorState extends TemporalState {
   toggleSchemaRequired: (path: string) => void;
 }
 
+function defaultDataText(template: Template): string {
+  return JSON.stringify(buildDefaultData(template.dataSchema), null, 2);
+}
+
 /** Normalize setSelection input: null → [], string → [string], string[] → as-is. */
 function normalizeIds(input: string[] | string | null): string[] {
   if (input === null) return [];
@@ -128,7 +135,7 @@ function normalizeIds(input: string[] | string | null): string[] {
 
 export const useEditorStore = create<EditorState>(
   temporal((set, get) => ({
-    template: createTemplate(),
+    template: DEMO_TEMPLATE,
     zoom: 1.0,
     scrollX: 0,
     scrollY: 0,
@@ -140,7 +147,7 @@ export const useEditorStore = create<EditorState>(
     activeTab: 'editor',
     selectedStyleName: null,
     selectedSchemaPath: null,
-    previewDataText: '{}',
+    previewDataText: defaultDataText(DEMO_TEMPLATE),
 
     _undoStack: [],
     _redoStack: [],
@@ -686,6 +693,21 @@ export const useEditorStore = create<EditorState>(
         }
       });
     },
+    newTemplate: () => {
+      const t = createTemplate();
+      set({
+        template: t,
+        selectedElementIds: [],
+        selectedBandId: null,
+        selectedSectionId: null,
+        selectedStyleName: null,
+        selectedSchemaPath: null,
+        previewDataText: defaultDataText(t),
+        activeTab: 'editor',
+        _undoStack: [],
+        _redoStack: [],
+      });
+    },
     importTemplate: (json) => {
       let parsed: unknown;
       try {
@@ -704,6 +726,8 @@ export const useEditorStore = create<EditorState>(
         selectedElementIds: [],
         selectedBandId: null,
         selectedSectionId: null,
+        previewDataText: defaultDataText(template),
+        activeTab: 'editor',
       });
       return { success: true };
     },

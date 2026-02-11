@@ -45,6 +45,11 @@ export function Toolbar() {
     setOpenMenu(openMenu === menu ? null : menu);
   };
 
+  const handleNew = () => {
+    closeMenu();
+    useEditorStore.getState().newTemplate();
+  };
+
   const handleOpen = () => {
     closeMenu();
     fileInputRef.current?.click();
@@ -128,6 +133,9 @@ export function Toolbar() {
           </button>
           {openMenu === 'file' && (
             <div className={styles.menu} role="menu">
+              <button className={styles.menuItem} role="menuitem" onClick={handleNew}>
+                New
+              </button>
               <button className={styles.menuItem} role="menuitem" onClick={handleOpen}>
                 Open
               </button>
