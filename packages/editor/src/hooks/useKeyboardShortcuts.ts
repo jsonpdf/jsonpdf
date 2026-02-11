@@ -89,11 +89,13 @@ export function useKeyboardShortcuts() {
           return;
         }
 
-        // Space held → temporary pan
-        if (e.key === ' ' && !e.repeat) {
+        // Space held → temporary pan (prevent default on repeats too to avoid scroll)
+        if (e.key === ' ') {
           e.preventDefault();
-          toolBeforeSpace.current = state.activeTool;
-          state.setActiveTool('pan');
+          if (!e.repeat) {
+            toolBeforeSpace.current = state.activeTool;
+            state.setActiveTool('pan');
+          }
           return;
         }
       }

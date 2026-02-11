@@ -98,6 +98,7 @@ function ReadOnlyPage({ page, x, y, styles, onItemClick }: ReadOnlyPageProps) {
 
   const handlePageClick = useCallback(
     (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
+      if (useEditorStore.getState().activeTool !== 'select') return;
       // Only fire for clicks on the page background itself
       if (e.target === e.currentTarget) {
         onItemClick?.({ kind: 'section', id: page.sectionId });
@@ -176,6 +177,7 @@ function ReadOnlyBand({ designBand, contentWidth, styles, onItemClick }: ReadOnl
 
   const handleBandClick = useCallback(
     (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
+      if (useEditorStore.getState().activeTool !== 'select') return;
       e.cancelBubble = true;
       onItemClick?.({ kind: 'band', id: band.id });
     },
@@ -233,6 +235,7 @@ function ReadOnlyElement({ element, styles, onItemClick }: ReadOnlyElementProps)
 
   const handleClick = useCallback(
     (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
+      if (useEditorStore.getState().activeTool !== 'select') return;
       e.cancelBubble = true;
       onItemClick?.({ kind: 'element', id: element.id });
     },
@@ -240,11 +243,13 @@ function ReadOnlyElement({ element, styles, onItemClick }: ReadOnlyElementProps)
   );
 
   const handleMouseEnter = useCallback((e: KonvaEventObject<MouseEvent>) => {
+    if (useEditorStore.getState().activeTool !== 'select') return;
     const stage = e.target.getStage();
     if (stage) stage.container().style.cursor = 'pointer';
   }, []);
 
   const handleMouseLeave = useCallback((e: KonvaEventObject<MouseEvent>) => {
+    if (useEditorStore.getState().activeTool !== 'select') return;
     const stage = e.target.getStage();
     if (stage) stage.container().style.cursor = 'default';
   }, []);
