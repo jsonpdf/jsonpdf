@@ -11,12 +11,7 @@ Shared foundation for the jsonpdf monorepo — TypeScript types, JSON Schema val
 ## Usage
 
 ```ts
-import {
-  type Template,
-  validateTemplateSchema,
-  parseColor,
-  mmToPoints,
-} from '@jsonpdf/core';
+import { type Template, validateTemplateSchema, parseColor, mmToPoints } from '@jsonpdf/core';
 ```
 
 ## Exports
@@ -24,8 +19,8 @@ import {
 | Category   | Exports                                                                                             |
 | ---------- | --------------------------------------------------------------------------------------------------- |
 | Types      | `Template`, `Section`, `Band`, `BandType`, `Element`, `Style`, `FontDeclaration`, `PageConfig`, ... |
-| Schema     | `templateSchema`, `validateTemplateSchema`, `validateWithSchema`, `applySchemaDefaults`              |
+| Schema     | `templateSchema`, `validateTemplateSchema`, `validateWithSchema`, `applySchemaDefaults`             |
 | Expression | `makeExpressionAware`, `buildPluginAwareTemplateSchema`                                             |
-| Colors     | `parseColor`, `toHex`, `isGradient`                                                                |
-| Units      | `mmToPoints`, `inchesToPoints`, `pointsToMm`, `pointsToInches`                                     |
+| Colors     | `parseColor`, `toHex`, `isGradient`                                                                 |
+| Units      | `mmToPoints`, `inchesToPoints`, `pointsToMm`, `pointsToInches`                                      |
 | IDs        | `generateId`                                                                                        |

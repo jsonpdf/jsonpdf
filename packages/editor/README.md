@@ -30,12 +30,12 @@ function App() {
 
 ## Exports
 
-| Category | Exports                                                    |
-| -------- | ---------------------------------------------------------- |
-| Main     | `EditorShell`, `EditorState`, `Tool`, `useEditorStore`     |
-| Canvas   | `TemplateCanvas`, `CANVAS_PADDING`                         |
-| Layout   | `computeDesignLayout`, `DesignPage`, `DesignBand`          |
-| Code     | `CodeLayout`, `TemplateEditor`, `TemplateEditorHandle`     |
+| Category | Exports                                                     |
+| -------- | ----------------------------------------------------------- |
+| Main     | `EditorShell`, `EditorState`, `Tool`, `useEditorStore`      |
+| Canvas   | `TemplateCanvas`, `CANVAS_PADDING`                          |
+| Layout   | `computeDesignLayout`, `DesignPage`, `DesignBand`           |
+| Code     | `CodeLayout`, `TemplateEditor`, `TemplateEditorHandle`      |
 | Preview  | `PreviewLayout`, `PdfViewer`, `DataEditor`, `usePdfPreview` |
 
 ## Tech stack

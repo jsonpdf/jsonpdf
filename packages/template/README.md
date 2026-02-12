@@ -31,17 +31,17 @@ template = addBand(template, template.sections[0].id, { type: 'detail' });
 
 ## Exports
 
-| Category    | Exports                                                                                                  |
-| ----------- | -------------------------------------------------------------------------------------------------------- |
-| Factory     | `createTemplate`                                                                                         |
-| Add         | `addSection`, `addBand`, `addElement`, `addStyle`, `addFont`                                             |
-| Update      | `updateSection`, `updateBand`, `updateElement`, `updateStyle`, `updateTemplate`                           |
-| Remove      | `removeSection`, `removeBand`, `removeElement`, `removeStyle`, `removeFont`                               |
-| Move        | `moveSection`, `moveBand`, `moveElement`, `reorderElement`                                                |
-| Clone       | `cloneSection`, `cloneBand`, `cloneElement`, `deepCloneWithNewIds`                                        |
-| Rename      | `renameStyle`                                                                                             |
-| Queries     | `findSection`, `findBand`, `findElement`, `findFont`, `getElementsByType`, `getAllBandIds`, `getAllElementIds` |
-| Validation  | `validateTemplate`, `migrateTemplate`                                                                     |
-| Sample data | `generateSampleData`, `buildDefaultData`                                                                  |
+| Category    | Exports                                                                                                                                                                                       |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Factory     | `createTemplate`                                                                                                                                                                              |
+| Add         | `addSection`, `addBand`, `addElement`, `addStyle`, `addFont`                                                                                                                                  |
+| Update      | `updateSection`, `updateBand`, `updateElement`, `updateStyle`, `updateTemplate`                                                                                                               |
+| Remove      | `removeSection`, `removeBand`, `removeElement`, `removeStyle`, `removeFont`                                                                                                                   |
+| Move        | `moveSection`, `moveBand`, `moveElement`, `reorderElement`                                                                                                                                    |
+| Clone       | `cloneSection`, `cloneBand`, `cloneElement`, `deepCloneWithNewIds`                                                                                                                            |
+| Rename      | `renameStyle`                                                                                                                                                                                 |
+| Queries     | `findSection`, `findBand`, `findElement`, `findFont`, `getElementsByType`, `getAllBandIds`, `getAllElementIds`                                                                                |
+| Validation  | `validateTemplate`, `migrateTemplate`                                                                                                                                                         |
+| Sample data | `generateSampleData`, `buildDefaultData`                                                                                                                                                      |
 | Schema ops  | `listSchemaProperties`, `getSchemaAtPath`, `addSchemaProperty`, `updateSchemaProperty`, `removeSchemaProperty`, `renameSchemaProperty`, `toggleSchemaRequired`, `createDefaultPropertySchema` |
-| Constants   | `DEFAULT_FONTS`                                                                                           |
+| Constants   | `DEFAULT_FONTS`                                                                                                                                                                               |

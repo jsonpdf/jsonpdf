@@ -44,14 +44,14 @@ const result = await renderPdf(template, data, {
 
 ## Exports
 
-| Category    | Exports                                                                     |
-| ----------- | --------------------------------------------------------------------------- |
-| Main        | `renderPdf`, `RenderOptions`, `RenderResult`                                |
-| Expressions | `createExpressionEngine`, `ExpressionEngine`                                |
-| Data        | `validateData`, `resolveDotPath`, `buildScope`                              |
-| Layout      | `mergePageConfig`, `LayoutBand`, `LayoutPage`, `LayoutResult`               |
-| Bands       | `BandInstance`, `ExpandedSection`                                           |
-| Fonts       | `embedFonts`, `collectFontSpecs`, `mapWeight`, `FontSpec`                   |
-| Bookmarks   | `collectAnchors`, `buildPdfOutline`, `BookmarkEntry`                        |
-| Columns     | `computeColumnLayout`, `ColumnLayout`                                       |
-| Platform    | `initBrowser` (re-exported from `@jsonpdf/plugins`)                         |
+| Category    | Exports                                                       |
+| ----------- | ------------------------------------------------------------- |
+| Main        | `renderPdf`, `RenderOptions`, `RenderResult`                  |
+| Expressions | `createExpressionEngine`, `ExpressionEngine`                  |
+| Data        | `validateData`, `resolveDotPath`, `buildScope`                |
+| Layout      | `mergePageConfig`, `LayoutBand`, `LayoutPage`, `LayoutResult` |
+| Bands       | `BandInstance`, `ExpandedSection`                             |
+| Fonts       | `embedFonts`, `collectFontSpecs`, `mapWeight`, `FontSpec`     |
+| Bookmarks   | `collectAnchors`, `buildPdfOutline`, `BookmarkEntry`          |
+| Columns     | `computeColumnLayout`, `ColumnLayout`                         |
+| Platform    | `initBrowser` (re-exported from `@jsonpdf/plugins`)           |
