@@ -20,7 +20,8 @@ export function Toolbar() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const fileMenuRef = useRef<HTMLDivElement>(null);
   const editMenuRef = useRef<HTMLDivElement>(null);
-  const [openMenu, setOpenMenu] = useState<'file' | 'edit' | null>(null);
+  const helpMenuRef = useRef<HTMLDivElement>(null);
+  const [openMenu, setOpenMenu] = useState<'file' | 'edit' | 'help' | null>(null);
 
   const closeMenu = useCallback(() => {
     setOpenMenu(null);
@@ -30,7 +31,11 @@ export function Toolbar() {
     if (!openMenu) return;
     const handleClick = (e: MouseEvent) => {
       const target = e.target as Node;
-      if (fileMenuRef.current?.contains(target) || editMenuRef.current?.contains(target)) {
+      if (
+        fileMenuRef.current?.contains(target) ||
+        editMenuRef.current?.contains(target) ||
+        helpMenuRef.current?.contains(target)
+      ) {
         return;
       }
       closeMenu();
@@ -41,7 +46,7 @@ export function Toolbar() {
     };
   }, [openMenu, closeMenu]);
 
-  const toggleMenu = (menu: 'file' | 'edit') => {
+  const toggleMenu = (menu: 'file' | 'edit' | 'help') => {
     setOpenMenu(openMenu === menu ? null : menu);
   };
 
@@ -227,6 +232,32 @@ export function Toolbar() {
                 <span>Select All</span>
                 <span className={styles.shortcutHint}>{isMac ? '\u2318A' : 'Ctrl+A'}</span>
               </button>
+            </div>
+          )}
+        </div>
+        <div className={styles.menuContainer} ref={helpMenuRef}>
+          <button
+            className={`${styles.menuBarBtn} ${openMenu === 'help' ? styles.menuBarBtnActive : ''}`}
+            onClick={() => {
+              toggleMenu('help');
+            }}
+            aria-haspopup="menu"
+            aria-expanded={openMenu === 'help'}
+          >
+            Help
+          </button>
+          {openMenu === 'help' && (
+            <div className={styles.menu} role="menu">
+              <a
+                className={styles.menuItem}
+                role="menuitem"
+                href="https://github.com/jsonpdf/jsonpdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={closeMenu}
+              >
+                GitHub
+              </a>
             </div>
           )}
         </div>
