@@ -1,7 +1,6 @@
 {
   "name": "@jsonpdf/plugins",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0-alpha.1",
   "type": "module",
   "exports": {
     ".": {
@@ -40,6 +39,9 @@
         "default": "./dist/platform/init.js"
       }
     }
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "files": [
     "dist"

@@ -6,13 +6,13 @@ PDF templates.
 ## Installation
 
 ```sh
-npm install -g @jsonpdf/cli
+npm install -g @jsonpdf/cli@alpha
 ```
 
 Or use without installing:
 
 ```sh
-npx @jsonpdf/cli <command>
+npx @jsonpdf/cli@alpha <command>
 ```
 
 ## jsonpdf init

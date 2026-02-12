@@ -8,7 +8,7 @@ required.
 Install the renderer and its dependencies:
 
 ```sh
-npm install @jsonpdf/renderer @jsonpdf/plugins @jsonpdf/core
+npm install @jsonpdf/renderer@alpha @jsonpdf/plugins@alpha @jsonpdf/core@alpha
 ```
 
 Render a template to PDF bytes:

@@ -9,7 +9,7 @@ and exploring the key features.
 Install the CLI globally:
 
 ```sh
-npm install -g @jsonpdf/cli
+npm install -g @jsonpdf/cli@alpha
 ```
 
 Verify the installation:
