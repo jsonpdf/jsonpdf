@@ -1,7 +1,6 @@
 {
   "name": "@jsonpdf/editor",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0-alpha.1",
   "type": "module",
   "exports": {
     ".": {
@@ -9,6 +8,9 @@
       "import": "./dist/index.js"
     },
     "./styles.css": "./dist/index.css"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "files": [
     "dist"

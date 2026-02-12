@@ -5,7 +5,7 @@ Command-line tool for creating, validating, and rendering jsonpdf templates.
 ## Installation
 
 ```bash
-pnpm add @jsonpdf/cli
+pnpm add @jsonpdf/cli@alpha
 ```
 
 ## Commands

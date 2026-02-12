@@ -13,7 +13,7 @@ JsonPDF lets you define PDF templates as JSON, bind them to data, and render pix
 Install the CLI globally:
 
 ```sh
-npm install -g @jsonpdf/cli
+npm install -g @jsonpdf/cli@alpha
 ```
 
 Scaffold a new template, then render it:

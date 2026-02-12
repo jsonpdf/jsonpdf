@@ -1,7 +1,6 @@
 {
   "name": "@jsonpdf/cli",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0-alpha.1",
   "type": "module",
   "bin": {
     "jsonpdf": "./dist/cli.js"
@@ -11,6 +10,9 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     }
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "files": [
     "dist"
