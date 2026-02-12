@@ -66,7 +66,7 @@ interface Template {
 interface PageConfig {
   width: number; // in points (612 = US Letter, 595 = A4)
   height: number; // in points (792 = US Letter, 842 = A4)
-  autoHeight?: boolean; // if true, page height grows to fit content (Phase 3)
+  autoHeight?: boolean; // if true, page height grows to fit content
   orientation?: 'portrait' | 'landscape';
   margins: {
     top: number;
@@ -81,9 +81,9 @@ interface Section {
   name?: string;
   page?: Partial<PageConfig>; // overrides template-level page config
   columns?: number; // multi-column layout (default: 1)
-  columnWidths?: number[]; // asymmetric column widths as ratios (e.g., [1, 2]) (Phase 3)
+  columnWidths?: number[]; // asymmetric column widths as ratios (e.g., [1, 2])
   columnGap?: number; // gap between columns in points
-  columnMode?: 'tile' | 'flow'; // "tile" (default): detail bands fill columns; "flow": text reflows across columns (Phase 8)
+  columnMode?: 'tile' | 'flow'; // "tile" (default): detail bands fill columns; "flow": text reflows across columns
   bookmark?: string; // PDF outline entry (Liquid expression supported)
   bands: Band[];
 }
@@ -100,8 +100,8 @@ interface Band {
   float?: boolean; // for columnFooter: sit under last detail row
   pageBreakBefore?: boolean; // force a page break before this band
   bookmark?: string; // PDF outline entry (Liquid expression supported)
-  anchor?: string; // cross-reference target (use {{ ref("id") }} to get page number)
-  backgroundColor?: string;
+  anchor?: string; // cross-reference target (use {{ "id" | ref }} to get page number)
+  backgroundColor?: string | Gradient; // hex color or gradient object
   elements: Element[];
 }
 
@@ -117,8 +117,8 @@ type BandType =
   | 'body' // static content, no data binding iteration
   | 'background' // behind all content on every page
   | 'noData' // shown when dataSource is empty
-  | 'groupHeader' // when groupBy expression changes (Phase 2)
-  | 'groupFooter'; // before groupBy expression changes (Phase 2)
+  | 'groupHeader' // when groupBy expression changes
+  | 'groupFooter'; // before groupBy expression changes
 
 interface Element {
   id: string;
@@ -153,7 +153,7 @@ interface StyledRun {
   style?: string; // reference to a named style
   styleOverrides?: Partial<Style>; // inline style overrides for this run
   link?: string; // URL or internal bookmark reference
-  footnote?: RichContent; // footnote content, rendered at page bottom (Phase 8)
+  footnote?: RichContent; // footnote content, rendered at page bottom
 }
 
 interface Style {
@@ -176,15 +176,15 @@ interface Style {
   borderRadius?: number;
   padding?: number | { top: number; right: number; bottom: number; left: number };
   opacity?: number;
-  widows?: number; // minimum lines at top of page after break (Phase 2)
-  orphans?: number; // minimum lines at bottom of page before break (Phase 2)
+  widows?: number; // minimum lines at top of page after break
+  orphans?: number; // minimum lines at bottom of page before break
 }
 
 interface FontDeclaration {
   family: string;
   weight?: number;
   style?: 'normal' | 'italic';
-  src: string; // URL, file path, or fontsource identifier
+  data: string; // base64-encoded font file data (.ttf, .otf, .woff)
 }
 ```
 
@@ -203,8 +203,8 @@ interface FontDeclaration {
 | `summary`        | Once, after all detail rows                        | Grand totals, conclusions                                    |
 | `body`           | Once, in document flow                             | Static content (certificates, letters, free-form sections)   |
 | `noData`         | Only when `dataSource` is empty                    | "No records found" fallback                                  |
-| `groupHeader`    | When `groupBy` expression changes                  | Group break headers (Phase 2)                                |
-| `groupFooter`    | Before `groupBy` expression changes                | Group subtotals (Phase 2)                                    |
+| `groupHeader`    | When `groupBy` expression changes                  | Group break headers                                          |
+| `groupFooter`    | Before `groupBy` expression changes                | Group subtotals                                              |
 
 ## Multi-Column Sections
 
@@ -301,40 +301,29 @@ interface Plugin<TProps = Record<string, unknown>> {
   type: string; // unique identifier
   propsSchema: JSONSchema; // validates element properties
   defaultProps: TProps; // sensible defaults
+  resolveProps(raw: Record<string, unknown>): TProps; // merge raw input with defaults
   validate(props: TProps): ValidationError[]; // custom validation
   measure(props: TProps, ctx: MeasureContext): Promise<{ width: number; height: number }>;
   render(props: TProps, ctx: RenderContext): Promise<void>;
-  editorComponent?: React.ComponentType; // optional: drag-and-drop canvas
-  propPanelComponent?: React.ComponentType; // optional: property editor UI
+  canSplit?: boolean; // supports splitting across page breaks
+  split?(props: TProps, ...): Promise<{ fit: TProps; overflow: TProps } | null>;
 }
 ```
 
 The `measure()` function is critical — it enables the two-pass rendering pipeline (measure all content first to compute page breaks, then render).
 
-### Phase 1 Plugins
-
-| Plugin | Properties                                                  | Description                                                                                                                          |
-| ------ | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `text` | `content: RichContent`, `autoHeight`                        | Text with rich formatting, word wrapping, multi-line. Content is a plain string or array of styled runs.                             |
-| `line` | `color`, `thickness`, `direction`, `dashPattern`            | Horizontal/vertical lines, dividers. `dashPattern` is an array of dash/gap lengths (e.g., `[4, 2]` for dashed, `[1, 2]` for dotted). |
-| `list` | `listType`, `items`, `bulletStyle`, `indent`, `itemSpacing` | Bullet, numbered, or lettered lists with nesting. Items use `RichContent` for mixed formatting.                                      |
-
-### Phase 3 Plugins
-
-| Plugin      | Properties                                                  | Description                                                                                                                                                       |
-| ----------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `image`     | `src`, `fit`, `alt`                                         | Images from URL, file path, or base64. Supports JPEG, PNG, and SVG. SVGs are rasterized at high DPI (default 300) for embedding. Fit modes: contain, cover, fill. |
-| `container` | `layout`, `columns`, `gap`, `elements`                      | Groups child elements. Layout: horizontal, vertical, absolute, or grid. Grid mode uses `columns` for static multi-column layouts.                                 |
-| `shape`     | `shapeType`, `fill`, `stroke`, `strokeWidth`, `dashPattern` | Rectangle, circle, ellipse primitives with fill and stroke styling                                                                                                |
-
-### Phase 5 Plugins
-
-| Plugin    | Properties                                                     | Description                                                                                                                                                                                                                     |
-| --------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `table`   | `dataSource`, `columns`, `borders`, `headerStyle`, `cellStyle` | Declarative tables with auto page-break support                                                                                                                                                                                 |
-| `chart`   | `spec`, `dataSource`                                           | Charts via Vega-Lite. Rendered to image then embedded                                                                                                                                                                           |
-| `barcode` | `value`, `format`                                              | Barcodes and QR codes via bwip-js                                                                                                                                                                                               |
-| `frame`   | `bands`                                                        | A nested band container (similar to JasperReports subreports). Contains its own bands with independent data iteration and page-break logic. Enables side-by-side repeating content like two tables with different data sources. |
+| Plugin      | Properties                                                     | Description                                                                                                                           |
+| ----------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `text`      | `content: RichContent`, `autoHeight`                           | Text with rich formatting, word wrapping, multi-line. Content is a plain string or array of styled runs.                              |
+| `line`      | `color`, `thickness`, `direction`, `dashPattern`               | Horizontal/vertical lines, dividers. `dashPattern` is an array of dash/gap lengths (e.g., `[4, 2]` for dashed, `[1, 2]` for dotted).  |
+| `list`      | `listType`, `items`, `bulletStyle`, `indent`, `itemSpacing`    | Bullet, numbered, or lettered lists with nesting. Items use `RichContent` for mixed formatting.                                       |
+| `image`     | `src`, `fit`                                                   | Images from data URIs only. Supports JPEG, PNG, and SVG. SVGs are rasterized before embedding. Fit modes: contain, cover, fill, none. |
+| `container` | `layout`, `columns`, `gap`, `elements`                         | Groups child elements. Layout: horizontal, vertical, absolute, or grid. Grid mode uses `columns` for static multi-column layouts.     |
+| `shape`     | `shapeType`, `fill`, `stroke`, `strokeWidth`, `dashPattern`    | Rectangle, circle, ellipse primitives with fill and stroke styling.                                                                   |
+| `table`     | `dataSource`, `columns`, `borders`, `headerStyle`, `cellStyle` | Declarative tables with auto page-break support.                                                                                      |
+| `chart`     | `spec`, `dataSource`                                           | Charts via Vega-Lite. Rendered to image then embedded.                                                                                |
+| `barcode`   | `value`, `format`                                              | Barcodes and QR codes via bwip-js.                                                                                                    |
+| `frame`     | `bands`                                                        | Nested band container with independent data iteration and page-break logic. Enables side-by-side repeating content.                   |
 
 ## Packages
 
@@ -351,8 +340,6 @@ Shared types, utilities, and validation helpers used by all packages.
 ### `@jsonpdf/template`
 
 Template schema and methods for creating, editing, and validating templates. All manipulation functions are **immutable** — they return a new `Template` object, leaving the original unchanged. This enables undo/redo in the editor via simple state snapshots.
-
-> **Phasing**: Phase 1 implements Factory & Validation plus basic `add*` helpers. The full manipulation API (update, remove, move, clone, queries) ships in Phase 6 alongside the editor.
 
 **Factory & Validation**
 
@@ -588,11 +575,6 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
       "textAlign": "center"
     }
   },
-
-  "fonts": [
-    { "family": "Inter", "weight": 400, "src": "fontsource:inter" },
-    { "family": "Inter", "weight": 700, "src": "fontsource:inter" }
-  ],
 
   "sections": [
     {
@@ -899,7 +881,7 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
           "type": "body",
           "height": 60,
           "autoHeight": true,
-          "condition": "{{ invoice.notes }}",
+          "condition": "invoice.notes",
           "elements": [
             {
               "id": "notesLabel",
@@ -944,6 +926,11 @@ Visual drag-and-drop template designer. Designed to run locally (via CLI) or in 
         }
       ]
     }
+  ],
+
+  "fonts": [
+    { "family": "Inter", "weight": 400, "style": "normal", "data": "AAWQABAAAT..." },
+    { "family": "Inter", "weight": 700, "style": "normal", "data": "AAWQABABAT..." }
   ]
 }
 ```
@@ -957,7 +944,7 @@ Key features demonstrated:
 - **Built-in variables**: `{{ _pageNumber }}` and `{{ _totalPages }}` are injected by the renderer
 - **Named styles + overrides**: Elements reference styles by name and add `styleOverrides` as needed
 
-> **Note**: This example uses the Inter font via fontsource, which requires Phase 3 font loading. In Phase 1, text renders with pdf-lib's standard fonts (Helvetica, Times, Courier).
+> **Note**: This example uses the Inter font with base64-embedded font data (truncated above for readability). Templates created with `jsonpdf init` include Inter (4 variants) by default.
 
 ## Critical Implementation Notes
 
@@ -979,4 +966,4 @@ Embedding entire font files creates bloated PDFs. pdf-lib with fontkit supports 
 
 ### Image Handling
 
-Images referenced by URL are fetched during rendering (async, can fail). Fetch all images in parallel at the start, cache by URL, and provide clear error messages on failure.
+Images must be provided as data URIs (`data:image/png;base64,...` or `data:image/svg+xml,...`). URL and file path sources are not supported. Images are cached by their data URI during rendering to avoid redundant embedding.
