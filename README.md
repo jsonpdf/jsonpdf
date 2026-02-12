@@ -31,13 +31,13 @@ jsonpdf editor template.json
 
 ## CLI Commands
 
-| Command        | Description                                      |
-| -------------- | ------------------------------------------------ |
-| `init`         | Scaffold a new template project                  |
-| `validate`     | Validate a template against the JSON Schema      |
-| `render`       | Render a template to PDF (supports `--watch`)    |
-| `sample-data`  | Generate sample data from the template's schema  |
-| `editor`       | Launch the visual drag-and-drop template editor  |
+| Command       | Description                                     |
+| ------------- | ----------------------------------------------- |
+| `init`        | Scaffold a new template project                 |
+| `validate`    | Validate a template against the JSON Schema     |
+| `render`      | Render a template to PDF (supports `--watch`)   |
+| `sample-data` | Generate sample data from the template's schema |
+| `editor`      | Launch the visual drag-and-drop template editor |
 
 ## Packages
 
@@ -54,16 +54,29 @@ graph TD
 
 `cli` and `editor` also depend on `template` and `core` directly.
 
-| Package | Description |
-| --- | --- |
-| [`@jsonpdf/core`](packages/core) | Shared types, utilities, JSON Schema validation |
-| [`@jsonpdf/template`](packages/template) | Immutable template factory, CRUD operations, validation |
-| [`@jsonpdf/plugins`](packages/plugins) | Element type implementations (text, image, line, table, chart, barcode, etc.) |
-| [`@jsonpdf/renderer`](packages/renderer) | PDF generation pipeline: validate, resolve, measure, layout, render |
-| [`@jsonpdf/cli`](packages/cli) | CLI for template management and rendering |
-| [`@jsonpdf/editor`](packages/editor) | Visual drag-and-drop template designer (React + Konva) |
+| Package                                  | Description                                                                   |
+| ---------------------------------------- | ----------------------------------------------------------------------------- |
+| [`@jsonpdf/core`](packages/core)         | Shared types, utilities, JSON Schema validation                               |
+| [`@jsonpdf/template`](packages/template) | Immutable template factory, CRUD operations, validation                       |
+| [`@jsonpdf/plugins`](packages/plugins)   | Element type implementations (text, image, line, table, chart, barcode, etc.) |
+| [`@jsonpdf/renderer`](packages/renderer) | PDF generation pipeline: validate, resolve, measure, layout, render           |
+| [`@jsonpdf/cli`](packages/cli)           | CLI for template management and rendering                                     |
+| [`@jsonpdf/editor`](packages/editor)     | Visual drag-and-drop template designer (React + Konva)                        |
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full content model, type definitions, band types, plugin interface, rendering pipeline, and a complete invoice example.
+See [docs/architecture.md](docs/architecture.md) for the full content model, type definitions, band types, plugin interface, rendering pipeline, and a complete invoice example.
+
+## Documentation
+
+| Guide                                          | Description                                                        |
+| ---------------------------------------------- | ------------------------------------------------------------------ |
+| [Getting Started](docs/getting-started.md)     | Installation, first template, data binding, and editor walkthrough |
+| [Template Guide](docs/template-guide.md)       | Template structure, sections, bands, data binding, and expressions |
+| [Element Reference](docs/elements.md)          | All 10 element types with properties, defaults, and examples       |
+| [Styling](docs/styling.md)                     | Style resolution, named styles, rich text, fonts, and gradients    |
+| [Advanced Features](docs/advanced-features.md) | Multi-section layouts, columns, bookmarks, TOC, grouping, and more |
+| [CLI Reference](docs/cli-reference.md)         | All commands and options                                           |
+| [Rendering API](docs/rendering-api.md)         | Programmatic rendering in Node.js and the browser                  |
+| [Architecture](docs/architecture.md)           | Internal design, content model, and rendering pipeline             |
 
 ## Tech Stack
 
