@@ -4,7 +4,28 @@ This document describes the JsonPDF template schema, plugin system, rendering pi
 
 ## Content Model: Sections > Bands > Elements
 
-JsonPDF uses a three-level content hierarchy inspired by [JasperReports](https://community.jaspersoft.com/downloads/community-edition/).
+JsonPDF uses a three-level content hierarchy inspired by [JasperReports](https://community.jaspersoft.com/downloads/community-edition/):
+
+```
+Template
+├── page (default page config: size, orientation, margins)
+├── dataSchema (JSON Schema defining expected input data)
+├── styles (reusable named styles)
+├── fonts (font declarations)
+└── sections[] (groups of bands sharing a page config)
+    ├── page? (overrides default page config for this section)
+    └── bands[] (content flow within the section)
+        ├── type (title, pageHeader, detail, etc.)
+        ├── height / autoHeight
+        ├── condition? (Liquid expression)
+        ├── dataSource? (dot-path to array for detail bands)
+        └── elements[] (visual primitives)
+            ├── type (text, image, table, line, etc.)
+            ├── x, y, width, height (absolute position within band)
+            ├── style? (reference to named style)
+            ├── styleOverrides? (inline overrides)
+            └── properties (plugin-specific props)
+```
 
 **Sections** group related bands and define page configuration. Each section can specify its own page size, orientation, and margins — enabling mixed layouts within a single document (e.g., portrait cover page followed by landscape data tables). A section can span multiple rendered pages.
 
