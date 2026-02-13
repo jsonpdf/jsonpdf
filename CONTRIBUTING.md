@@ -51,14 +51,14 @@ opt in with `@alpha`.
    ```
 
 2. **Bump the version** in all six `packages/*/package.json` files to the next alpha (e.g.
-   `0.1.0-alpha.1` → `0.1.0-alpha.2`). All packages share the same version.
+   `0.1.0-alpha.2` → `0.1.0-alpha.3`). All packages share the same version.
 
 3. **Commit the version bump:**
 
    ```sh
    git add packages/*/package.json
-   git commit -m "v0.1.0-alpha.2"
-   git tag v0.1.0-alpha.2
+   git commit -m "v0.1.0-alpha.3"
+   git tag v0.1.0-alpha.3
    ```
 
 4. **Publish:**
