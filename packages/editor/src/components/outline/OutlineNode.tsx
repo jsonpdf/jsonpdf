@@ -18,12 +18,30 @@ export function computeDropPosition(
   rect: { top: number; height: number },
   targetKind: 'band' | 'element' | 'section',
   sourceKind: 'element' | 'section' | 'band',
+  acceptsInside = false,
 ): 'before' | 'after' | 'inside' {
   const ratio = (clientY - rect.top) / rect.height;
   // Element dropping on band header → "inside" (append to band)
   // Band dropping on band → before/after (reorder)
   if (targetKind === 'band' && sourceKind !== 'band') return 'inside';
+  if (targetKind === 'element' && acceptsInside && sourceKind === 'element') {
+    if (ratio < 0.25) return 'before';
+    if (ratio > 0.75) return 'after';
+    return 'inside';
+  }
   return ratio < 0.5 ? 'before' : 'after';
+}
+
+function isContainerNode(node: TreeNode): boolean {
+  return node.kind === 'element' && node.typeLabel === 'container';
+}
+
+function collectDescendantIds(node: TreeNode): string[] {
+  const ids: string[] = [];
+  for (const child of node.children) {
+    ids.push(child.id, ...collectDescendantIds(child));
+  }
+  return ids;
 }
 
 export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
@@ -86,7 +104,9 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
           kind: 'band',
           elementId: node.id,
           sourceBandId: '',
+          sourceParentId: undefined,
           sourceIndex: node.bandArrayIndex ?? 0,
+          descendantIds: [],
           bandType: node.typeLabel,
         };
       } else {
@@ -94,7 +114,9 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
           kind: node.kind === 'section' ? 'section' : 'element',
           elementId: node.id,
           sourceBandId: node.bandId ?? '',
+          sourceParentId: node.parentElementId,
           sourceIndex: index ?? 0,
+          descendantIds: node.kind === 'element' ? collectDescendantIds(node) : [],
         };
       }
       dragCtx.setDraggingId(node.id);
@@ -131,7 +153,7 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
       const source = dragCtx.dragRef.current;
 
       if (isPaletteDrag && !source) {
-        // Palette drag — only accept on band nodes (not placeholder) or element nodes
+        // Palette drag — accept bands and containers, plus sibling before/after drops.
         if (node.kind === 'band' && !node.placeholder) {
           e.preventDefault();
           e.stopPropagation();
@@ -143,7 +165,13 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
           e.preventDefault();
           e.stopPropagation();
           const rect = e.currentTarget.getBoundingClientRect();
-          const position = computeDropPosition(e.clientY, rect, 'element', 'element');
+          const position = computeDropPosition(
+            e.clientY,
+            rect,
+            'element',
+            'element',
+            isContainerNode(node),
+          );
           const prev = dragCtx.dropIndicator;
           if (!prev || prev.targetId !== node.id || prev.position !== position) {
             dragCtx.setDropIndicator({ targetId: node.id, position });
@@ -153,6 +181,9 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
       }
 
       if (!source || source.elementId === node.id) return;
+      if (source.kind === 'element' && source.descendantIds?.includes(node.id)) {
+        return;
+      }
 
       // Kind-matching rules
       if (source.kind === 'section' && node.kind !== 'section') return;
@@ -170,7 +201,13 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
       e.stopPropagation();
 
       const rect = e.currentTarget.getBoundingClientRect();
-      const position = computeDropPosition(e.clientY, rect, node.kind, source.kind);
+      const position = computeDropPosition(
+        e.clientY,
+        rect,
+        node.kind,
+        source.kind,
+        isContainerNode(node),
+      );
 
       // Only update state when indicator actually changes
       const prev = dragCtx.dropIndicator;
@@ -210,11 +247,25 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
         if (node.kind === 'band' && !node.placeholder) {
           store.addElement(node.id, paletteType);
         } else if (node.kind === 'element' && node.bandId && currentIndicator) {
+          if (currentIndicator.position === 'inside' && isContainerNode(node)) {
+            store.addElementToContainer(node.id, paletteType);
+            return;
+          }
           const targetIndex = index ?? 0;
           const insertIndex =
             currentIndicator.position === 'before' ? targetIndex : targetIndex + 1;
+          if (node.parentElementId) {
+            store.addElementToContainer(
+              node.parentElementId,
+              paletteType,
+              undefined,
+              undefined,
+              insertIndex,
+            );
+            return;
+          }
           store.addElement(node.bandId, paletteType);
-          // Reorder the newly added element to the correct position
+          // Reorder the newly added element to the correct position.
           const newState = useEditorStore.getState();
           if (newState.selectedElementIds[0]) {
             const band = newState.template.sections
@@ -275,16 +326,23 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
 
       if (currentIndicator.position === 'inside' && node.kind === 'band') {
         // Drop on band header → append to that band (skip if already in this band)
-        if (source.sourceBandId === node.id) return;
+        if (source.sourceBandId === node.id && source.sourceParentId == null) return;
         store.moveElementToBand(source.elementId, node.id);
         return;
       }
 
       if (node.kind === 'element' && node.bandId) {
-        const targetIndex = index ?? 0;
+        if (currentIndicator.position === 'inside' && isContainerNode(node)) {
+          if (source.sourceParentId === node.id) return;
+          store.moveElementToContainer(source.elementId, node.id);
+          return;
+        }
 
-        if (source.sourceBandId === node.bandId) {
-          // Same band → reorder
+        const targetIndex = index ?? 0;
+        const targetParentId = node.parentElementId;
+
+        if (source.sourceBandId === node.bandId && source.sourceParentId === targetParentId) {
+          // Same parent → reorder
           const S = source.sourceIndex;
           const T = targetIndex;
           let toIndex: number;
@@ -295,6 +353,9 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
           }
           if (toIndex === S) return; // Already at target position
           store.reorderElement(source.elementId, toIndex);
+        } else if (targetParentId) {
+          const toIndex = currentIndicator.position === 'before' ? targetIndex : targetIndex + 1;
+          store.moveElementToContainer(source.elementId, targetParentId, toIndex);
         } else {
           // Different band → move
           const toIndex = currentIndicator.position === 'before' ? targetIndex : targetIndex + 1;
@@ -302,7 +363,7 @@ export function OutlineNode({ node, depth, index }: OutlineNodeProps) {
         }
       }
     },
-    [dragCtx, node.kind, node.bandId, node.id, node.placeholder, index],
+    [dragCtx, node, index],
   );
 
   /* ---------- Inline add-button for multi-band types ---------- */

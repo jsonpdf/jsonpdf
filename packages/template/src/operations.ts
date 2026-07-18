@@ -59,6 +59,45 @@ function removeElementById(
   return changed ? result : elements;
 }
 
+function containsElementId(element: Element, targetId: string): boolean {
+  if (!element.elements) return false;
+  for (const child of element.elements) {
+    if (child.id === targetId || containsElementId(child, targetId)) return true;
+  }
+  return false;
+}
+
+function insertElementIntoContainer(
+  elements: Element[],
+  containerId: string,
+  element: Element,
+  index: number | undefined,
+  inserted: { value: boolean },
+): Element[] {
+  return elements.map((el) => {
+    if (el.id === containerId && !inserted.value) {
+      if (el.type !== 'container') {
+        throw new Error(`Element "${containerId}" is not a container`);
+      }
+      inserted.value = true;
+      const children = [...(el.elements ?? [])];
+      children.splice(index ?? children.length, 0, element);
+      return { ...el, elements: children };
+    }
+    if (el.elements) {
+      const children = insertElementIntoContainer(
+        el.elements,
+        containerId,
+        element,
+        index,
+        inserted,
+      );
+      if (children !== el.elements) return { ...el, elements: children };
+    }
+    return el;
+  });
+}
+
 /** Recursively assign new IDs to a cloned tree (mutates in place — call on fresh clones only). */
 function replaceAllIds(node: Record<string, unknown>): void {
   if (typeof node.id === 'string') node.id = generateId();
@@ -126,6 +165,34 @@ export function addElement(
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!bandFound) {
     throw new Error(`Band "${bandId}" not found`);
+  }
+  return { ...template, sections };
+}
+
+/** Add an element to a container's child list. Returns a new template. */
+export function addElementToContainer(
+  template: Template,
+  containerId: string,
+  element: Element,
+  index?: number,
+): Template {
+  const inserted = { value: false };
+  const sections = template.sections.map((s) => ({
+    ...s,
+    bands: s.bands.map((b) => {
+      const elements = insertElementIntoContainer(
+        b.elements,
+        containerId,
+        element,
+        index,
+        inserted,
+      );
+      if (elements !== b.elements) return { ...b, elements };
+      return b;
+    }),
+  }));
+  if (!inserted.value) {
+    throw new Error(`Container "${containerId}" not found`);
   }
   return { ...template, sections };
 }
@@ -409,6 +476,55 @@ export function moveElement(
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!bandFound) {
     throw new Error(`Band "${toBandId}" not found`);
+  }
+  return { ...template, sections };
+}
+
+/** Move an element to a container's child list. Returns a new template. */
+export function moveElementToContainer(
+  template: Template,
+  elementId: string,
+  toContainerId: string,
+  toIndex?: number,
+): Template {
+  if (elementId === toContainerId) {
+    throw new Error('Cannot move an element into itself');
+  }
+
+  const removed = { value: null as Element | null };
+  let sections = template.sections.map((s) => ({
+    ...s,
+    bands: s.bands.map((b) => {
+      const elements = removeElementById(b.elements, elementId, removed);
+      if (elements !== b.elements) return { ...b, elements };
+      return b;
+    }),
+  }));
+  if (!removed.value) {
+    throw new Error(`Element "${elementId}" not found`);
+  }
+  if (containsElementId(removed.value, toContainerId)) {
+    throw new Error('Cannot move an element into one of its descendants');
+  }
+  const movedElement = removed.value;
+
+  const inserted = { value: false };
+  sections = sections.map((s) => ({
+    ...s,
+    bands: s.bands.map((b) => {
+      const elements = insertElementIntoContainer(
+        b.elements,
+        toContainerId,
+        movedElement,
+        toIndex,
+        inserted,
+      );
+      if (elements !== b.elements) return { ...b, elements };
+      return b;
+    }),
+  }));
+  if (!inserted.value) {
+    throw new Error(`Container "${toContainerId}" not found`);
   }
   return { ...template, sections };
 }

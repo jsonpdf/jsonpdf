@@ -16,11 +16,12 @@ export interface TreeNode {
   children: TreeNode[];
   sectionId: string;
   bandId?: string;
+  parentElementId?: string;
   /** When inside a frame, clicks select the parent frame element instead. */
   frameOwnerId?: string;
   /** The bandId of the frame element's parent band (for correct store selection). */
   frameOwnerBandId?: string;
-  /** Whether this element can be dragged (direct band children only, not nested/frame-internal). */
+  /** Whether this node can be dragged. Frame-internal nodes are intentionally locked. */
   draggable: boolean;
   /** True for band types that don't exist yet (shown dimmed). */
   placeholder?: boolean;
@@ -38,7 +39,9 @@ export interface DragSource {
   kind: 'element' | 'section' | 'band';
   elementId: string;
   sourceBandId: string;
+  sourceParentId?: string;
   sourceIndex: number;
+  descendantIds?: string[];
   /** Band type of the dragged band (for same-type-only reorder matching). */
   bandType?: string;
 }
@@ -68,15 +71,15 @@ function buildElementNode(
   bandId: string,
   frameOwnerId?: string,
   frameOwnerBandId?: string,
-  isDirectBandChild = false,
+  parentElementId?: string,
 ): TreeNode {
   const children: TreeNode[] = [];
 
-  // Container children (not direct band children)
+  // Container children
   if (element.elements) {
     for (const child of element.elements) {
       children.push(
-        buildElementNode(child, sectionId, bandId, frameOwnerId, frameOwnerBandId, false),
+        buildElementNode(child, sectionId, bandId, frameOwnerId, frameOwnerBandId, element.id),
       );
     }
   }
@@ -97,9 +100,10 @@ function buildElementNode(
     children,
     sectionId,
     bandId,
+    parentElementId,
     frameOwnerId,
     frameOwnerBandId,
-    draggable: isDirectBandChild && !frameOwnerId,
+    draggable: !frameOwnerId,
   };
 }
 
@@ -113,7 +117,7 @@ function buildBandNode(
 ): TreeNode {
   const meta = BAND_TYPE_META[band.type];
   const children = band.elements.map((el) =>
-    buildElementNode(el, sectionId, band.id, frameOwnerId, frameOwnerBandId, true),
+    buildElementNode(el, sectionId, band.id, frameOwnerId, frameOwnerBandId),
   );
 
   return {

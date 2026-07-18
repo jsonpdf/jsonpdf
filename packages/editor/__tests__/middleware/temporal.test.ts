@@ -39,6 +39,33 @@ function setupWithElement() {
   useEditorStore.setState({ _undoStack: [], _redoStack: [] });
 }
 
+function setupWithContainer() {
+  let t = createTemplate();
+  t = addSection(t, { id: 'sec1', bands: [] });
+  t = addBand(t, 'sec1', { id: 'band1', type: 'body', height: 100, elements: [] });
+  t = addElement(t, 'band1', {
+    id: 'el1',
+    type: 'text',
+    x: 10,
+    y: 20,
+    width: 100,
+    height: 50,
+    properties: { content: 'test' },
+  });
+  t = addElement(t, 'band1', {
+    id: 'container1',
+    type: 'container',
+    x: 40,
+    y: 40,
+    width: 200,
+    height: 100,
+    properties: { layout: 'absolute' },
+    elements: [],
+  });
+  useEditorStore.getState().setTemplate(t);
+  useEditorStore.setState({ _undoStack: [], _redoStack: [] });
+}
+
 describe('temporal middleware', () => {
   beforeEach(() => {
     resetStore();
@@ -74,6 +101,34 @@ describe('temporal middleware', () => {
 
     expect(useEditorStore.getState().template).toBe(original);
     expect(useEditorStore.getState().canUndo()).toBe(false);
+  });
+
+  it('undo restores position and parent after container drag reparenting', () => {
+    setupWithContainer();
+    const original = useEditorStore.getState().template;
+
+    useEditorStore.getState().moveElementToContainerAtPosition('el1', 'container1', 12, 14);
+
+    const changedState = useEditorStore.getState();
+    expect(changedState._undoStack).toHaveLength(1);
+    expect(changedState.template.sections[0].bands[0].elements.map((el) => el.id)).toEqual([
+      'container1',
+    ]);
+    expect(changedState.template.sections[0].bands[0].elements[0].elements?.[0]).toMatchObject({
+      id: 'el1',
+      x: 12,
+      y: 14,
+    });
+
+    useEditorStore.getState().undo();
+
+    expect(useEditorStore.getState().template).toBe(original);
+    expect(useEditorStore.getState().template.sections[0].bands[0].elements).toHaveLength(2);
+    expect(useEditorStore.getState().template.sections[0].bands[0].elements[0]).toMatchObject({
+      id: 'el1',
+      x: 10,
+      y: 20,
+    });
   });
 
   it('undo pushes to redo stack', () => {

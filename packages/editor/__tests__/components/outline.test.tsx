@@ -203,10 +203,10 @@ describe('OutlinePanel', () => {
       expect(elText.getAttribute('draggable')).toBe('true');
     });
 
-    it('container children are not draggable', () => {
+    it('container children are draggable', () => {
       render(<OutlinePanel />);
       const child = screen.getByText('el-child1').closest('[role="treeitem"]')!;
-      expect(child.getAttribute('draggable')).toBeNull();
+      expect(child.getAttribute('draggable')).toBe('true');
     });
 
     it('frame-internal elements are not draggable', () => {
@@ -250,6 +250,14 @@ describe('OutlinePanel', () => {
       const b2 = useEditorStore.getState().template.sections[0].bands[1];
       expect(b1.elements.map((e) => e.id)).toContain('el-text');
       expect(b2.elements.map((e) => e.id)).not.toContain('el-text');
+    });
+
+    it('moves element into a container via store action', () => {
+      useEditorStore.getState().moveElementToContainer('el-text', 'el-container');
+      const detailBand = useEditorStore.getState().template.sections[0].bands[1];
+      const container = detailBand.elements.find((el) => el.id === 'el-container')!;
+      expect(detailBand.elements.map((e) => e.id)).toEqual(['el-container']);
+      expect(container.elements?.map((e) => e.id)).toEqual(['el-child1', 'el-child2', 'el-text']);
     });
   });
 

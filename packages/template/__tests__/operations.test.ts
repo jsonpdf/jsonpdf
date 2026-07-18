@@ -4,6 +4,7 @@ import {
   addSection,
   addBand,
   addElement,
+  addElementToContainer,
   addStyle,
   addFont,
   updateSection,
@@ -19,6 +20,7 @@ import {
   moveSection,
   moveBand,
   moveElement,
+  moveElementToContainer,
   reorderElement,
   cloneSection,
   cloneBand,
@@ -136,6 +138,39 @@ describe('addElement', () => {
     // Only the first band should have the element
     expect(t.sections[0]!.bands[0]!.elements).toHaveLength(1);
     expect(t.sections[1]!.bands[0]!.elements).toHaveLength(0);
+  });
+});
+
+describe('addElementToContainer', () => {
+  it('appends an element to a container', () => {
+    let t = buildTemplate();
+    t = addElement(t, 'band1', makeElement({ id: 'container1', type: 'container', elements: [] }));
+    const result = addElementToContainer(t, 'container1', makeElement({ id: 'child1' }));
+    const container = result.sections[0]!.bands[0]!.elements[2]!;
+    expect(container.elements?.map((el) => el.id)).toEqual(['child1']);
+  });
+
+  it('inserts at index', () => {
+    let t = buildTemplate();
+    t = addElement(
+      t,
+      'band1',
+      makeElement({
+        id: 'container1',
+        type: 'container',
+        elements: [makeElement({ id: 'child1' })],
+      }),
+    );
+    const result = addElementToContainer(t, 'container1', makeElement({ id: 'child2' }), 0);
+    const container = result.sections[0]!.bands[0]!.elements[2]!;
+    expect(container.elements?.map((el) => el.id)).toEqual(['child2', 'child1']);
+  });
+
+  it('throws when target is not a container', () => {
+    const t = buildTemplate();
+    expect(() => addElementToContainer(t, 'el1', makeElement({ id: 'child1' }))).toThrow(
+      'Element "el1" is not a container',
+    );
   });
 });
 
@@ -610,6 +645,52 @@ describe('moveElement', () => {
     // child1 added to band2
     expect(result.sections[0]!.bands[1]!.elements).toHaveLength(1);
     expect(result.sections[0]!.bands[1]!.elements[0]!.id).toBe('child1');
+  });
+});
+
+describe('moveElementToContainer', () => {
+  it('moves a band child into a container', () => {
+    let t = buildTemplate();
+    t = addElement(t, 'band1', makeElement({ id: 'container1', type: 'container', elements: [] }));
+    const result = moveElementToContainer(t, 'el1', 'container1');
+    const bandElements = result.sections[0]!.bands[0]!.elements;
+    const container = bandElements.find((el) => el.id === 'container1')!;
+    expect(bandElements.map((el) => el.id)).toEqual(['el2', 'container1']);
+    expect(container.elements?.map((el) => el.id)).toEqual(['el1']);
+  });
+
+  it('moves a child between containers', () => {
+    let t = buildTemplate();
+    t = addElement(
+      t,
+      'band1',
+      makeElement({
+        id: 'container1',
+        type: 'container',
+        elements: [makeElement({ id: 'child1' })],
+      }),
+    );
+    t = addElement(t, 'band1', makeElement({ id: 'container2', type: 'container', elements: [] }));
+    const result = moveElementToContainer(t, 'child1', 'container2');
+    const [container1, container2] = result.sections[0]!.bands[0]!.elements.slice(2);
+    expect(container1.elements).toEqual([]);
+    expect(container2.elements?.map((el) => el.id)).toEqual(['child1']);
+  });
+
+  it('prevents moving a container into its descendant', () => {
+    let t = buildTemplate();
+    t = addElement(
+      t,
+      'band1',
+      makeElement({
+        id: 'container1',
+        type: 'container',
+        elements: [makeElement({ id: 'container2', type: 'container', elements: [] })],
+      }),
+    );
+    expect(() => moveElementToContainer(t, 'container1', 'container2')).toThrow(
+      'Cannot move an element into one of its descendants',
+    );
   });
 });
 
