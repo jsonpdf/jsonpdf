@@ -234,7 +234,7 @@ jsonpdf render -t template.json -d data.json -o invoice.pdf
 Or render all examples at once from the repository root:
 
 ```sh
-pnpm examples
+vp run --no-cache --filter '@jsonpdf/example-*' render
 ```
 
 ## 8. What's Next

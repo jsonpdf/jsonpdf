@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vite-plus/test';
 import { resolveElementStyle } from '../../src/style/resolve-style';
 import type { Element, Style } from '@jsonpdf/core';
 

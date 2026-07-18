@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vite-plus/test';
 import { detectFormat, loadImageBytes, createImageCache } from '../../src/image/image-loader.js';
 
 // Minimal 1x1 PNG (67 bytes)

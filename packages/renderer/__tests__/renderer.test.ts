@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vite-plus/test';
 import { PDFDocument, PDFName, PDFDict, PDFNumber, PDFArray } from 'pdf-lib';
 import { renderPdf } from '../src/renderer.js';
 import { createTemplate, addSection, addBand, addElement, addStyle } from '@jsonpdf/template';

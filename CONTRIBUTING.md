@@ -3,29 +3,30 @@
 ## Development Setup
 
 ```sh
-pnpm install
-pnpm build
+vp install
+vp run --filter './packages/*' build
 ```
 
 ### Useful Commands
 
-| Command             | Description                         |
-| ------------------- | ----------------------------------- |
-| `pnpm build`        | Build all packages (`tsc --build`)  |
-| `pnpm typecheck`    | Type-check without emitting         |
-| `pnpm lint`         | ESLint across all packages          |
-| `pnpm format:check` | Prettier check                      |
-| `pnpm format`       | Prettier auto-fix                   |
-| `pnpm test`         | Run all tests (Vitest)              |
-| `pnpm examples`     | Render all example templates to PDF |
+| Command                                                  | Description                           |
+| -------------------------------------------------------- | ------------------------------------- |
+| `vp run --filter './packages/*' build`                   | Build all packages                    |
+| `vp run --no-cache --filter './packages/*' typecheck`    | Type-check package project references |
+| `vp check`                                               | Format and lint                       |
+| `vp lint`                                                | Oxlint across the workspace           |
+| `vp fmt --check`                                         | Oxfmt check                           |
+| `vp fmt . --write`                                       | Oxfmt auto-fix                        |
+| `vp test`                                                | Run all tests                         |
+| `vp run --no-cache --filter '@jsonpdf/example-*' render` | Render all example templates to PDF   |
 
 Run a single test file:
 
 ```sh
-npx vitest run packages/renderer/__tests__/renderer.test.ts
+vp test packages/renderer/__tests__/renderer.test.ts
 ```
 
-CI runs: build, typecheck, lint, format:check, test, examples.
+CI runs: build, typecheck, check, test, examples.
 
 ## Publishing to npm
 
@@ -47,7 +48,7 @@ opt in with `@alpha`.
 1. **Run CI checks locally:**
 
    ```sh
-   pnpm build && pnpm typecheck && pnpm lint && pnpm format:check && pnpm test
+   vp run --filter './packages/*' build && vp run --no-cache --filter './packages/*' typecheck && vp check && vp test
    ```
 
 2. **Bump the version** in all six `packages/*/package.json` files to the next alpha (e.g.

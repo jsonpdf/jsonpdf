@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vite-plus/test';
 import { renderHook } from '@testing-library/react';
 import { useSelectionGeometry } from '../../src/hooks/useSelectionGeometry';
 import type { DesignPage } from '../../src/layout';

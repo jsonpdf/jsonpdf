@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vite-plus/test';
 import { generateSampleData, buildDefaultData } from '../src/sample-data.js';
 
 describe('generateSampleData', () => {

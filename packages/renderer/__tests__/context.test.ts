@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vite-plus/test';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 import type { PDFFont, PDFPage } from 'pdf-lib';
 import { createMeasureContext, createRenderContext } from '../src/context.js';

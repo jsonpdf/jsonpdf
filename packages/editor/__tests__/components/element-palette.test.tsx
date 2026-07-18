@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach } from 'vite-plus/test';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { ElementPalette, DRAG_TYPE } from '../../src/components/ElementPalette';
 import { ELEMENT_TYPES } from '../../src/constants/element-defaults';

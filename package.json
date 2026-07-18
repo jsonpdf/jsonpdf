@@ -2,28 +2,30 @@
   "name": "jsonpdf",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@10.28.2",
-  "engines": {
-    "node": ">=22"
-  },
   "scripts": {
     "clean": "tsc --build --clean && rm -rf packages/*/dist",
-    "build": "pnpm --filter @jsonpdf/editor run build && tsc --build",
-    "typecheck": "tsc --build --noEmit",
-    "lint": "eslint 'packages/*/src/**/*.{ts,tsx}'",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "test": "vitest run",
-    "examples": "pnpm -r --filter '@jsonpdf/example-*' run render"
+    "build": "vp run --filter './packages/*' build",
+    "typecheck": "vp run --no-cache --filter './packages/*' typecheck",
+    "check": "vp check",
+    "lint": "vp lint",
+    "lint:eslint": "eslint 'packages/*/src/**/*.{ts,tsx}'",
+    "format": "vp fmt . --write",
+    "format:check": "vp fmt --check",
+    "test": "vp test",
+    "examples": "vp run --no-cache --filter '@jsonpdf/example-*' render"
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",
     "@types/node": "^25.2.1",
     "eslint": "^9.18.0",
     "jsdom": "^28.0.0",
-    "prettier": "^3.4.0",
     "typescript": "^5.7.0",
     "typescript-eslint": "^8.20.0",
-    "vitest": "^3.0.0"
-  }
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@10.28.2"
 }

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vite-plus/test';
 import { PDFDocument, PDFName, PDFDict, PDFArray, PDFString, PDFNumber } from 'pdf-lib';
 import type { PDFPage } from 'pdf-lib';
 import { buildPdfOutline, type BookmarkEntry } from '../src/bookmarks.js';

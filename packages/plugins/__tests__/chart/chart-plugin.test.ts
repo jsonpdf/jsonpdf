@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, vi } from 'vitest';
+import { describe, it, expect, beforeAll, vi } from 'vite-plus/test';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 import type { PDFPage } from 'pdf-lib';
 

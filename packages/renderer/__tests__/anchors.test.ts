@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vite-plus/test';
 import { collectAnchors } from '../src/anchors.js';
 import type { LayoutResult } from '../src/layout.js';
 import type { Band, Element } from '@jsonpdf/core';

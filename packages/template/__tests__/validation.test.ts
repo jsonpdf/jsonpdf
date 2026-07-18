@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vite-plus/test';
 import { validateTemplate } from '../src/validation.js';
 import { createTemplate } from '../src/factory.js';
 import { addSection, addBand, addElement, addStyle } from '../src/operations.js';

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vite-plus/test';
 import { PDFDocument, StandardFonts, PDFName, PDFArray, PDFDict } from 'pdf-lib';
 import type { PDFFont, PDFPage, PDFRef } from 'pdf-lib';
 import { textPlugin } from '../../src/text/text-plugin.js';
