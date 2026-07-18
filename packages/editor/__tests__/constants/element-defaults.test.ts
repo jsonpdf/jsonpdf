@@ -60,8 +60,9 @@ describe('createDefaultElement', () => {
 
   it('container element has layout and gap', () => {
     const el = createDefaultElement('container');
-    expect(el.properties.layout).toBe('vertical');
+    expect(el.properties.layout).toBe('absolute');
     expect(el.properties.gap).toBe(0);
+    expect(el.elements).toEqual([]);
   });
 
   it('table element has columns and rows', () => {

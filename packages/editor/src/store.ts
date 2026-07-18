@@ -23,11 +23,13 @@ import {
   addSection as addSectionOp,
   addBand as addBandOp,
   addElement as addElementOp,
+  addElementToContainer as addElementToContainerOp,
   removeBand as removeBandOp,
   moveBand as moveBandOp,
   removeSection as removeSectionOp,
   reorderElement as reorderElementOp,
   moveElement as moveElementOp,
+  moveElementToContainer as moveElementToContainerOp,
   moveSection as moveSectionOp,
   addStyle as addStyleOp,
   updateStyle as updateStyleOp,
@@ -94,6 +96,14 @@ export interface EditorState extends TemporalState {
   ) => void;
   reorderElement: (elementId: string, toIndex: number) => void;
   moveElementToBand: (elementId: string, toBandId: string, toIndex?: number) => void;
+  moveElementToContainer: (elementId: string, toContainerId: string, toIndex?: number) => void;
+  moveElementToContainerAtPosition: (
+    elementId: string,
+    toContainerId: string,
+    x: number,
+    y: number,
+    toIndex?: number,
+  ) => void;
   removeBand: (bandId: string) => void;
   reorderBand: (bandId: string, sectionId: string, toIndex: number) => void;
   addBand: (sectionId: string, type: BandType) => void;
@@ -101,6 +111,13 @@ export interface EditorState extends TemporalState {
   removeSection: (sectionId: string) => void;
   moveSection: (sectionId: string, toIndex: number) => void;
   addElement: (bandId: string, elementType: string, x?: number, y?: number) => void;
+  addElementToContainer: (
+    containerId: string,
+    elementType: string,
+    x?: number,
+    y?: number,
+    toIndex?: number,
+  ) => void;
   activeTab: 'editor' | 'code' | 'preview';
   setActiveTab: (tab: 'editor' | 'code' | 'preview') => void;
   newTemplate: () => void;
@@ -474,7 +491,52 @@ export const useEditorStore = create<EditorState>(
     moveElementToBand: (elementId, toBandId, toIndex) => {
       set((state) => {
         try {
-          return { template: moveElementOp(state.template, elementId, toBandId, toIndex) };
+          const template = moveElementOp(state.template, elementId, toBandId, toIndex);
+          const bandResult = findBand(template, toBandId);
+          return {
+            template,
+            selectedElementIds: [elementId],
+            selectedBandId: toBandId,
+            selectedSectionId: bandResult?.section.id ?? state.selectedSectionId,
+          };
+        } catch {
+          return state;
+        }
+      });
+    },
+    moveElementToContainer: (elementId, toContainerId, toIndex) => {
+      set((state) => {
+        try {
+          const template = moveElementToContainerOp(
+            state.template,
+            elementId,
+            toContainerId,
+            toIndex,
+          );
+          const result = findElement(template, elementId);
+          return {
+            template,
+            selectedElementIds: [elementId],
+            selectedBandId: result?.band.id ?? state.selectedBandId,
+            selectedSectionId: result?.section.id ?? state.selectedSectionId,
+          };
+        } catch {
+          return state;
+        }
+      });
+    },
+    moveElementToContainerAtPosition: (elementId, toContainerId, x, y, toIndex) => {
+      set((state) => {
+        try {
+          let template = updateElement(state.template, elementId, { x, y });
+          template = moveElementToContainerOp(template, elementId, toContainerId, toIndex);
+          const result = findElement(template, elementId);
+          return {
+            template,
+            selectedElementIds: [elementId],
+            selectedBandId: result?.band.id ?? state.selectedBandId,
+            selectedSectionId: result?.section.id ?? state.selectedSectionId,
+          };
         } catch {
           return state;
         }
@@ -567,6 +629,25 @@ export const useEditorStore = create<EditorState>(
             selectedElementIds: [element.id],
             selectedBandId: bandId,
             selectedSectionId: bandResult?.section.id ?? null,
+          };
+        } catch {
+          return state;
+        }
+      });
+    },
+    addElementToContainer: (containerId, elementType, x, y, toIndex) => {
+      set((state) => {
+        const element = createDefaultElement(elementType);
+        if (x != null) element.x = x;
+        if (y != null) element.y = y;
+        try {
+          const template = addElementToContainerOp(state.template, containerId, element, toIndex);
+          const result = findElement(template, element.id);
+          return {
+            template,
+            selectedElementIds: [element.id],
+            selectedBandId: result?.band.id ?? state.selectedBandId,
+            selectedSectionId: result?.section.id ?? state.selectedSectionId,
           };
         } catch {
           return state;

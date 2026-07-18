@@ -2,7 +2,7 @@ import { useRef, useCallback } from 'react';
 import { Group, Rect } from 'react-konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { Element, Style } from '@jsonpdf/core';
-import { findBand } from '@jsonpdf/template';
+import { findBand, findElement } from '@jsonpdf/template';
 import { useEditorStore } from '../store';
 import { resolveElementStyle } from '../style';
 import type { SnapTargets } from '../snap/snap';
@@ -11,6 +11,12 @@ import { useGuideStore } from '../snap/guide-store';
 import { useBandGeometry } from '../snap/band-context';
 import { UnknownElement } from './elements/UnknownElement';
 import { ELEMENT_RENDERERS } from './element-renderers';
+import {
+  findContainerAtPoint,
+  findElementParentTransform,
+  transformPointToGlobal,
+  transformPointToLocal,
+} from './container-hit-test';
 
 export interface ElementRendererChildProps {
   element: Element;
@@ -25,9 +31,16 @@ interface ElementRendererProps {
   styles: Record<string, Style>;
   bandId: string;
   sectionId: string;
+  dragEnabled?: boolean;
 }
 
-export function ElementRenderer({ element, styles, bandId, sectionId }: ElementRendererProps) {
+export function ElementRenderer({
+  element,
+  styles,
+  bandId,
+  sectionId,
+  dragEnabled = true,
+}: ElementRendererProps) {
   const defaultStyle = useEditorStore((s) => s.template.defaultStyle);
   const style = resolveElementStyle(element, styles, defaultStyle);
   const Renderer = ELEMENT_RENDERERS[element.type] ?? UnknownElement;
@@ -160,6 +173,44 @@ export function ElementRenderer({ element, styles, bandId, sectionId }: ElementR
       if (store.selectedElementIds.length > 1) {
         store.moveSelectedElements(dx, dy);
       } else {
+        const result = findElement(store.template, element.id);
+        const bandResult = findBand(store.template, bandId);
+        const parentTransform = bandResult
+          ? findElementParentTransform(bandResult.band.elements, element.id)
+          : null;
+        if (result && bandResult && parentTransform) {
+          const globalTopLeft = transformPointToGlobal(parentTransform, { x: newX, y: newY });
+          const globalCenter = transformPointToGlobal(parentTransform, {
+            x: newX + element.width / 2,
+            y: newY + element.height / 2,
+          });
+          const target = findContainerAtPoint(
+            bandResult.band.elements,
+            globalCenter.x,
+            globalCenter.y,
+            element.id,
+          );
+          if (target) {
+            const localPosition = transformPointToLocal(target.transform, globalTopLeft);
+            if (result.parentElement?.id === target.container.id) {
+              store.updateElementPosition(element.id, localPosition.x, localPosition.y);
+              setTimeout(() => {
+                isDragging.current = false;
+              }, 0);
+              return;
+            }
+            store.moveElementToContainerAtPosition(
+              element.id,
+              target.container.id,
+              localPosition.x,
+              localPosition.y,
+            );
+            setTimeout(() => {
+              isDragging.current = false;
+            }, 0);
+            return;
+          }
+        }
         store.updateElementPosition(element.id, newX, newY);
       }
       // Reset isDragging after a tick so the click handler doesn't fire
@@ -170,13 +221,16 @@ export function ElementRenderer({ element, styles, bandId, sectionId }: ElementR
     [element.id, element.x, element.y, element.rotation, element.width, element.height],
   );
 
-  const handleMouseEnter = useCallback((e: KonvaEventObject<MouseEvent>) => {
-    if (useEditorStore.getState().activeTool !== 'select') return;
-    const stage = e.target.getStage();
-    if (stage) {
-      stage.container().style.cursor = 'move';
-    }
-  }, []);
+  const handleMouseEnter = useCallback(
+    (e: KonvaEventObject<MouseEvent>) => {
+      if (!dragEnabled || useEditorStore.getState().activeTool !== 'select') return;
+      const stage = e.target.getStage();
+      if (stage) {
+        stage.container().style.cursor = 'move';
+      }
+    },
+    [dragEnabled],
+  );
 
   const handleMouseLeave = useCallback((e: KonvaEventObject<MouseEvent>) => {
     if (useEditorStore.getState().activeTool !== 'select') return;
@@ -199,7 +253,7 @@ export function ElementRenderer({ element, styles, bandId, sectionId }: ElementR
       rotation={element.rotation ?? 0}
       offsetX={element.rotation ? element.width / 2 : 0}
       offsetY={element.rotation ? element.height / 2 : 0}
-      draggable={isSelected && activeTool === 'select'}
+      draggable={dragEnabled && isSelected && activeTool === 'select'}
       onClick={handleClick}
       onTap={handleClick}
       onDragStart={handleDragStart}

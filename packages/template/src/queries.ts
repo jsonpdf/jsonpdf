@@ -32,18 +32,20 @@ export interface FindElementResult {
   band: Band;
   section: Section;
   elementIndex: number;
+  parentElement?: Element;
 }
 
 /** Recursively search elements (including nested containers) for an element by ID. */
 function findElementInList(
   elements: Element[],
   elementId: string,
-): { element: Element; index: number } | undefined {
+  parentElement?: Element,
+): { element: Element; index: number; parentElement?: Element } | undefined {
   for (let i = 0; i < elements.length; i++) {
     const el = elements[i];
-    if (el.id === elementId) return { element: el, index: i };
+    if (el.id === elementId) return { element: el, index: i, parentElement };
     if (el.elements) {
-      const found = findElementInList(el.elements, elementId);
+      const found = findElementInList(el.elements, elementId, el);
       if (found) return found;
     }
   }
@@ -56,7 +58,13 @@ export function findElement(template: Template, elementId: string): FindElementR
     for (const band of section.bands) {
       const result = findElementInList(band.elements, elementId);
       if (result) {
-        return { element: result.element, band, section, elementIndex: result.index };
+        return {
+          element: result.element,
+          band,
+          section,
+          elementIndex: result.index,
+          parentElement: result.parentElement,
+        };
       }
     }
   }

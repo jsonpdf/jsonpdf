@@ -351,6 +351,64 @@ describe('useEditorStore', () => {
     });
   });
 
+  describe('container actions', () => {
+    function setupContainerTemplate() {
+      let t = createTemplate();
+      t = addSection(t, { id: 'sec1', bands: [] });
+      t = addBand(t, 'sec1', { id: 'b1', type: 'body', height: 100, elements: [] });
+      t = addElement(t, 'b1', {
+        id: 'el1',
+        type: 'text',
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 30,
+        properties: { content: 'A' },
+      });
+      t = addElement(t, 'b1', {
+        id: 'container1',
+        type: 'container',
+        x: 0,
+        y: 40,
+        width: 200,
+        height: 100,
+        properties: { layout: 'absolute' },
+        elements: [],
+      });
+      useEditorStore.setState({ template: t });
+    }
+
+    it('moves an element into a container and keeps it selected', () => {
+      setupContainerTemplate();
+      useEditorStore.getState().moveElementToContainer('el1', 'container1');
+      const state = useEditorStore.getState();
+      const container = state.template.sections[0].bands[0].elements[0];
+      expect(container.id).toBe('container1');
+      expect(container.elements?.map((el) => el.id)).toEqual(['el1']);
+      expect(state.selectedElementIds).toEqual(['el1']);
+      expect(state.selectedBandId).toBe('b1');
+      expect(state.selectedSectionId).toBe('sec1');
+    });
+
+    it('adds a new element to a container and selects it', () => {
+      setupContainerTemplate();
+      useEditorStore.getState().addElementToContainer('container1', 'text');
+      const state = useEditorStore.getState();
+      const container = state.template.sections[0].bands[0].elements[1];
+      expect(container.elements).toHaveLength(1);
+      expect(container.elements?.[0].type).toBe('text');
+      expect(state.selectedElementIds).toEqual([container.elements![0].id]);
+      expect(state.selectedBandId).toBe('b1');
+    });
+
+    it('no-ops when moving into a nonexistent container', () => {
+      setupContainerTemplate();
+      const before = useEditorStore.getState().template;
+      useEditorStore.getState().moveElementToContainer('el1', 'missing');
+      expect(useEditorStore.getState().template).toBe(before);
+    });
+  });
+
   describe('removeBand', () => {
     it('removes the band and clears band/element selection', () => {
       let t = createTemplate();

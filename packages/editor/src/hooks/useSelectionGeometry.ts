@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { Element } from '@jsonpdf/core';
 import type { DesignPage } from '../layout';
+import { computeContainerChildLayouts } from '../canvas/container-layout';
 
 export interface SelectionGeometry {
   /** Absolute x on the Stage (includes CANVAS_PADDING + margins + element.x). */
@@ -27,8 +28,15 @@ function findElementWithOffsets(
       return { element: el, offsetX, offsetY };
     }
     if (el.elements) {
-      const found = findElementWithOffsets(el.elements, targetId, offsetX + el.x, offsetY + el.y);
-      if (found) return found;
+      for (const layout of computeContainerChildLayouts(el)) {
+        const found = findElementWithOffsets(
+          [layout.element],
+          targetId,
+          offsetX + el.x + layout.offsetX - layout.element.x,
+          offsetY + el.y + layout.offsetY - layout.element.y,
+        );
+        if (found) return found;
+      }
     }
   }
   return null;

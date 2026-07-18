@@ -40,7 +40,8 @@ const ELEMENT_DEFAULTS: Record<string, Omit<Element, 'id'>> = {
     y: 10,
     width: 200,
     height: 100,
-    properties: { layout: 'vertical', gap: 0 },
+    properties: { layout: 'absolute', gap: 0 },
+    elements: [],
   },
   table: {
     type: 'table',
@@ -103,11 +104,13 @@ export function createDefaultElement(type: string): Element {
       properties: {},
     };
   }
-  return {
+  const element: Element = {
     ...defaults,
     id: generateId('el'),
     properties: structuredClone(defaults.properties),
   };
+  if (defaults.elements) element.elements = structuredClone(defaults.elements);
+  return element;
 }
 
 export const ELEMENT_TYPES = Object.keys(ELEMENT_DEFAULTS);

@@ -122,6 +122,7 @@ describe('findElement', () => {
     expect(result!.band.id).toBe('band1');
     expect(result!.section.id).toBe('sec1');
     expect(result!.elementIndex).toBe(1);
+    expect(result!.parentElement?.id).toBe('container1');
   });
 
   it('finds deeply nested elements', () => {

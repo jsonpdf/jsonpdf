@@ -7,6 +7,7 @@ export {
   addSection,
   addBand,
   addElement,
+  addElementToContainer,
   addStyle,
   addFont,
   // Update
@@ -25,6 +26,7 @@ export {
   moveSection,
   moveBand,
   moveElement,
+  moveElementToContainer,
   reorderElement,
   // Clone
   cloneSection,
