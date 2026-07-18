@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vite-plus/test';
 import { uint8ArrayToBase64 } from '../../src/platform/base64.js';
 
 describe('uint8ArrayToBase64', () => {

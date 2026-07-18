@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vite-plus/test';
 import { validateTemplateSchema } from '../src/validation.js';
 import type { Template } from '../src/types.js';
 

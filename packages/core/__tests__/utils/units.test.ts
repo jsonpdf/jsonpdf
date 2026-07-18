@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vite-plus/test';
 import { mmToPoints, inchesToPoints, pointsToMm, pointsToInches } from '../../src/utils/units.js';
 
 describe('unit conversions', () => {

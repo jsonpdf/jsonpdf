@@ -13,33 +13,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v4
+      - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version: 22
-          cache: pnpm
+          node-version: '24'
+          cache: true
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: vp install --frozen-lockfile
 
       - name: Build
-        run: pnpm build
+        run: vp run --filter './packages/*' build
 
       - name: Relink workspace bins
-        run: pnpm install --frozen-lockfile
+        run: vp install --frozen-lockfile
 
       - name: Typecheck
-        run: pnpm typecheck
+        run: vp run --no-cache --filter './packages/*' typecheck
 
-      - name: Lint
-        run: pnpm lint
-
-      - name: Format check
-        run: pnpm format:check
+      - name: Check
+        run: vp check
 
       - name: Test
-        run: pnpm test
+        run: vp test
 
       - name: Render examples
-        run: pnpm examples
+        run: vp run --no-cache --filter '@jsonpdf/example-*' render

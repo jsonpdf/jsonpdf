@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vite-plus/test';
 import { initBrowser } from '../../src/platform/init.js';
 
 describe('initBrowser (Node)', () => {

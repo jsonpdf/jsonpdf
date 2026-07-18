@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vite-plus/test';
 import { renderHook } from '@testing-library/react';
 import { useKeyboardShortcuts } from '../../src/hooks/useKeyboardShortcuts';
 import { useEditorStore } from '../../src/store';

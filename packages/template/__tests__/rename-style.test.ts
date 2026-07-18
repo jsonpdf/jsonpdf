@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vite-plus/test';
 import { createTemplate } from '../src/factory.js';
 import { addSection, addBand, addElement, addStyle, renameStyle } from '../src/operations.js';
 import type { Element, Band, StyledRun } from '@jsonpdf/core';

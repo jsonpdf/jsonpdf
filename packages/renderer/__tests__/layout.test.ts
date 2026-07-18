@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vite-plus/test';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 import { layoutTemplate } from '../src/layout.js';
 import {

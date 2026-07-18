@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
+import { describe, it, expect, vi, afterEach, beforeEach } from 'vite-plus/test';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { useEditorStore } from '../../src/store';
 import { createTemplate } from '@jsonpdf/template';

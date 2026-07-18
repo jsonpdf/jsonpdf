@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vite-plus/test';
 import { computeDesignLayout } from '../../src/layout/compute-layout';
 import { createTemplate, addSection, addBand } from '@jsonpdf/template';
 import type { Band } from '@jsonpdf/core';

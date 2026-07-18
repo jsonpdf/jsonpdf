@@ -1,13 +1,10 @@
 {
   "name": "@jsonpdf/plugins",
   "version": "0.1.0-alpha.4",
+  "files": [
+    "dist"
+  ],
   "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  },
   "imports": {
     "#platform/fs": {
       "browser": {
@@ -40,15 +37,18 @@
       }
     }
   },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "publishConfig": {
     "access": "public"
   },
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "build": "tsc --build",
-    "typecheck": "tsc --build --noEmit"
+    "typecheck": "tsc --noEmit --project tsconfig.json"
   },
   "dependencies": {
     "@jsonpdf/core": "workspace:*",

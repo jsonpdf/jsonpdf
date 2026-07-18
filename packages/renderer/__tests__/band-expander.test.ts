@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vite-plus/test';
 import { expandBands } from '../src/band-expander.js';
 import { createExpressionEngine } from '../src/expression.js';
 import type { ExpressionEngine } from '../src/expression.js';
